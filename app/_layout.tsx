@@ -17,16 +17,16 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen
-          name="index"
-          options={{
-            title: 'Chess Openings',
-          }}
+          name="(tabs)"
+          options={{ headerShown: false, headerBackTitle: 'Back' }}
         />
         <Stack.Screen
           name="move/[id]"
-          options={{
-            title: 'Opening Details',
-          }}
+          options={{ title: 'Opening Details', headerBackTitle: 'Back' }}
+        />
+        <Stack.Screen
+          name="opening-detail"
+          options={{ title: 'Opening', headerBackTitle: 'Back' }}
         />
       </Stack>
     </>

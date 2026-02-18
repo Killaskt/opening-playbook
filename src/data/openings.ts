@@ -1,5 +1,5 @@
 import { OpeningNode } from '../types';
-import { createOpening, response, tree, line, trap, game, arrow, principle } from './builders';
+import { createOpening, createVariation, response, tree, line, trap, game, arrow, principle } from './builders';
 
 // ============================================================================
 // WHITE'S FIRST MOVES
@@ -443,6 +443,11 @@ const e4_c5 = createOpening({
       'Fischer both played and faced the Sicilian throughout his career, contributing enormously to its theory.'
     ),
   ],
+  responses: [
+    response('e4_c5_nf3', 'Nf3', 'Open Sicilian'),
+    response('e4_c5_c3', 'c3', 'Alapin'),
+    response('e4_c5_nc3', 'Nc3', 'Closed Sicilian'),
+  ],
   lines: [
     line('Open Sicilian', 'e4 c5 Nf3 d6 d4 cxd4 Nxd4'),
     line('Najdorf', 'e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6'),
@@ -456,6 +461,55 @@ const e4_c5 = createOpening({
       tree('Nc3 (Closed)'),
     ]),
   ],
+});
+
+// Sicilian variations (depth 2–3)
+const e4_c5_nf3 = createVariation({
+  id: 'e4_c5_nf3',
+  move: 'Nf3',
+  name: 'Open Sicilian',
+  boardPgn: 'e4 c5 Nf3',
+  intent: ['Main line — open center with d4 next'],
+  responses: [
+    response('e4_c5_nf3_d6', 'd6', 'Najdorf / Dragon'),
+    response('e4_c5_nf3_nc6', 'Nc6', 'Accelerated Dragon'),
+  ],
+});
+const e4_c5_nf3_d6 = createVariation({
+  id: 'e4_c5_nf3_d6',
+  move: 'd6',
+  name: 'Najdorf / Dragon setup',
+  boardPgn: 'e4 c5 Nf3 d6',
+  intent: ['Most popular Sicilian — leads to Najdorf, Dragon, Scheveningen'],
+  responses: [response('e4_c5_nf3_d6_d4', 'd4', 'Open Sicilian main')],
+});
+const e4_c5_nf3_d6_d4 = createVariation({
+  id: 'e4_c5_nf3_d6_d4',
+  move: 'd4',
+  name: 'Open Sicilian main',
+  boardPgn: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4',
+  intent: ['Critical position — Nf6, Nf6 a6 (Najdorf), g6 (Dragon)'],
+});
+const e4_c5_nf3_nc6 = createVariation({
+  id: 'e4_c5_nf3_nc6',
+  move: 'Nc6',
+  name: 'Accelerated Dragon',
+  boardPgn: 'e4 c5 Nf3 Nc6',
+  intent: ['Flexible — can transpose to Classical or Accelerated Dragon'],
+});
+const e4_c5_c3 = createVariation({
+  id: 'e4_c5_c3',
+  move: 'c3',
+  name: 'Alapin Sicilian',
+  boardPgn: 'e4 c5 c3',
+  intent: ['Anti-Sicilian — solid, less theory'],
+});
+const e4_c5_nc3 = createVariation({
+  id: 'e4_c5_nc3',
+  move: 'Nc3',
+  name: 'Closed Sicilian',
+  boardPgn: 'e4 c5 Nc3',
+  intent: ['Slow, strategic — fianchetto or d3 systems'],
 });
 
 const e4_e5 = createOpening({
@@ -526,6 +580,10 @@ const e4_e5 = createOpening({
       'A deep modern battle in the Ruy Lopez showing its enduring relevance.'
     ),
   ],
+  responses: [
+    response('e4_e5_nf3', 'Nf3', 'Knight to f3'),
+    response('e4_e5_f4', 'f4', 'King\'s Gambit'),
+  ],
   lines: [
     line('Ruy Lopez', 'e4 e5 Nf3 Nc6 Bb5'),
     line('Italian Game', 'e4 e5 Nf3 Nc6 Bc4'),
@@ -540,6 +598,58 @@ const e4_e5 = createOpening({
       tree("f4 (King's Gambit)"),
     ]),
   ],
+});
+
+// Open Games variations
+const e4_e5_nf3 = createVariation({
+  id: 'e4_e5_nf3',
+  move: 'Nf3',
+  name: 'Knight to f3',
+  boardPgn: 'e4 e5 Nf3',
+  intent: ['Main continuation — Ruy Lopez, Italian, or Petrov'],
+  responses: [
+    response('e4_e5_nf3_nc6', 'Nc6', 'Spanish / Italian'),
+    response('e4_e5_nf3_nf6', 'Nf6', 'Petrov Defense'),
+  ],
+});
+const e4_e5_nf3_nc6 = createVariation({
+  id: 'e4_e5_nf3_nc6',
+  move: 'Nc6',
+  name: 'Spanish / Italian',
+  boardPgn: 'e4 e5 Nf3 Nc6',
+  intent: ['Ruy Lopez (Bb5) or Italian (Bc4) next'],
+  responses: [
+    response('e4_e5_nf3_nc6_bb5', 'Bb5', 'Ruy Lopez'),
+    response('e4_e5_nf3_nc6_bc4', 'Bc4', 'Italian Game'),
+  ],
+});
+const e4_e5_nf3_nc6_bb5 = createVariation({
+  id: 'e4_e5_nf3_nc6_bb5',
+  move: 'Bb5',
+  name: 'Ruy Lopez',
+  boardPgn: 'e4 e5 Nf3 Nc6 Bb5',
+  intent: ['The Spanish — pins Nc6, deep theory'],
+});
+const e4_e5_nf3_nc6_bc4 = createVariation({
+  id: 'e4_e5_nf3_nc6_bc4',
+  move: 'Bc4',
+  name: 'Italian Game',
+  boardPgn: 'e4 e5 Nf3 Nc6 Bc4',
+  intent: ['Direct attack on f7 — Evans, Giuoco Piano'],
+});
+const e4_e5_nf3_nf6 = createVariation({
+  id: 'e4_e5_nf3_nf6',
+  move: 'Nf6',
+  name: 'Petrov Defense',
+  boardPgn: 'e4 e5 Nf3 Nf6',
+  intent: ['Solid exchange — symmetrical, draws common'],
+});
+const e4_e5_f4 = createVariation({
+  id: 'e4_e5_f4',
+  move: 'f4',
+  name: 'King\'s Gambit',
+  boardPgn: 'e4 e5 f4',
+  intent: ['Romantic — sacrifices f-pawn for attack'],
 });
 
 const e4_e6 = createOpening({
@@ -596,6 +706,7 @@ const e4_e6 = createOpening({
       'A classic French Defense battle in the World Championship match.'
     ),
   ],
+  responses: [response('e4_e6_d4', 'd4', 'Advance / Classical')],
   lines: [
     line('Classical', 'e4 e6 d4 d5 Nc3 Nf6'),
     line('Tarrasch', 'e4 e6 d4 d5 Nd2'),
@@ -608,6 +719,49 @@ const e4_e6 = createOpening({
       ]),
     ]),
   ],
+});
+
+// French variations
+const e4_e6_d4 = createVariation({
+  id: 'e4_e6_d4',
+  move: 'd4',
+  name: 'd4',
+  boardPgn: 'e4 e6 d4',
+  intent: ['Central pawn break'],
+  responses: [response('e4_e6_d4_d5', 'd5', 'French main')],
+});
+const e4_e6_d4_d5 = createVariation({
+  id: 'e4_e6_d4_d5',
+  move: 'd5',
+  name: 'French main',
+  boardPgn: 'e4 e6 d4 d5',
+  intent: ['Classical pawn structure'],
+  responses: [
+    response('e4_e6_d4_d5_nc3', 'Nc3', 'Classical'),
+    response('e4_e6_d4_d5_nd2', 'Nd2', 'Tarrasch'),
+    response('e4_e6_d4_d5_e5', 'e5', 'Advance'),
+  ],
+});
+const e4_e6_d4_d5_nc3 = createVariation({
+  id: 'e4_e6_d4_d5_nc3',
+  move: 'Nc3',
+  name: 'French Classical',
+  boardPgn: 'e4 e6 d4 d5 Nc3',
+  intent: ['Main line — Nf6 (Classical), Bb4 (Winawer)'],
+});
+const e4_e6_d4_d5_nd2 = createVariation({
+  id: 'e4_e6_d4_d5_nd2',
+  move: 'Nd2',
+  name: 'Tarrasch',
+  boardPgn: 'e4 e6 d4 d5 Nd2',
+  intent: ['Avoids Winawer — solid, flexible'],
+});
+const e4_e6_d4_d5_e5 = createVariation({
+  id: 'e4_e6_d4_d5_e5',
+  move: 'e5',
+  name: 'French Advance',
+  boardPgn: 'e4 e6 d4 d5 e5',
+  intent: ['Space advantage — Black breaks with c5'],
 });
 
 const e4_c6 = createOpening({
@@ -664,6 +818,7 @@ const e4_c6 = createOpening({
       'Karpov used the Caro-Kann expertly in their marathon World Championship match.'
     ),
   ],
+  responses: [response('e4_c6_d4', 'd4', 'Main line')],
   lines: [
     line('Classical', 'e4 c6 d4 d5 Nc3 dxe4 Nxe4'),
     line('Advance', 'e4 c6 d4 d5 e5'),
@@ -676,6 +831,49 @@ const e4_c6 = createOpening({
       ]),
     ]),
   ],
+});
+
+// Caro-Kann variations
+const e4_c6_d4 = createVariation({
+  id: 'e4_c6_d4',
+  move: 'd4',
+  name: 'd4',
+  boardPgn: 'e4 c6 d4',
+  intent: ['Central claim'],
+  responses: [response('e4_c6_d4_d5', 'd5', 'Caro main')],
+});
+const e4_c6_d4_d5 = createVariation({
+  id: 'e4_c6_d4_d5',
+  move: 'd5',
+  name: 'Caro main',
+  boardPgn: 'e4 c6 d4 d5',
+  intent: ['Key tabiya'],
+  responses: [
+    response('e4_c6_d4_d5_nc3', 'Nc3', 'Classical'),
+    response('e4_c6_d4_d5_e5', 'e5', 'Advance'),
+    response('e4_c6_d4_d5_exd5', 'exd5', 'Exchange'),
+  ],
+});
+const e4_c6_d4_d5_nc3 = createVariation({
+  id: 'e4_c6_d4_d5_nc3',
+  move: 'Nc3',
+  name: 'Caro-Kann Classical',
+  boardPgn: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4',
+  intent: ['Main line — Bf5 or Nd7'],
+});
+const e4_c6_d4_d5_e5 = createVariation({
+  id: 'e4_c6_d4_d5_e5',
+  move: 'e5',
+  name: 'Caro-Kann Advance',
+  boardPgn: 'e4 c6 d4 d5 e5',
+  intent: ['Space — Black plays c5, Bf5'],
+});
+const e4_c6_d4_d5_exd5 = createVariation({
+  id: 'e4_c6_d4_d5_exd5',
+  move: 'exd5',
+  name: 'Exchange Variation',
+  boardPgn: 'e4 c6 d4 d5 exd5 cxd5',
+  intent: ['Simplifies — isolated d-pawn positions'],
 });
 
 // ============================================================================
@@ -723,6 +921,7 @@ const d4_d5 = createOpening({
     ],
   },
   famousPlayers: ['Anatoly Karpov', 'Tigran Petrosian', 'Vladimir Kramnik'],
+  responses: [response('d4_d5_c4', 'c4', "Queen's Gambit")],
   lines: [
     line("Queen's Gambit Declined", 'd4 d5 c4 e6'),
     line('Slav Defense', 'd4 d5 c4 c6'),
@@ -733,6 +932,41 @@ const d4_d5 = createOpening({
       tree('c4', [tree('e6 (QGD)'), tree('c6 (Slav)'), tree('dxc4 (QGA)')]),
     ]),
   ],
+});
+
+// d4 d5 needs c4 first - add intermediate
+const d4_d5_c4 = createVariation({
+  id: 'd4_d5_c4',
+  move: 'c4',
+  name: "Queen's Gambit",
+  boardPgn: 'd4 d5 c4',
+  intent: ['Gambit or development'],
+  responses: [
+    response('d4_d5_c4_e6', 'e6', 'QGD'),
+    response('d4_d5_c4_c6', 'c6', 'Slav'),
+    response('d4_d5_c4_dxc4', 'dxc4', 'QGA'),
+  ],
+});
+const d4_d5_c4_e6 = createVariation({
+  id: 'd4_d5_c4_e6',
+  move: 'e6',
+  name: "Queen's Gambit Declined",
+  boardPgn: 'd4 d5 c4 e6',
+  intent: ['Solid — Nc3, Nf3, or e3 next'],
+});
+const d4_d5_c4_c6 = createVariation({
+  id: 'd4_d5_c4_c6',
+  move: 'c6',
+  name: 'Slav Defense',
+  boardPgn: 'd4 d5 c4 c6',
+  intent: ['Solid — avoids Bg5 pin, dxc4 possible'],
+});
+const d4_d5_c4_dxc4 = createVariation({
+  id: 'd4_d5_c4_dxc4',
+  move: 'dxc4',
+  name: "Queen's Gambit Accepted",
+  boardPgn: 'd4 d5 c4 dxc4',
+  intent: ['Sharp — White regains pawn, Black develops'],
 });
 
 const d4_nf6 = createOpening({
@@ -778,6 +1012,7 @@ const d4_nf6 = createOpening({
     ],
   },
   famousPlayers: ['Garry Kasparov', 'Bobby Fischer', 'Mikhail Tal', 'Teimour Radjabov'],
+  responses: [response('d4_nf6_c4', 'c4', 'Main line')],
   lines: [
     line("Queen's Indian", "d4 Nf6 c4 e6 Nf3 b6"),
     line("King's Indian", 'd4 Nf6 c4 g6 Nc3 Bg7'),
@@ -791,6 +1026,41 @@ const d4_nf6 = createOpening({
       ]),
     ]),
   ],
+});
+
+// Indian Defense variations
+const d4_nf6_c4 = createVariation({
+  id: 'd4_nf6_c4',
+  move: 'c4',
+  name: 'c4',
+  boardPgn: 'd4 Nf6 c4',
+  intent: ['Broad center'],
+  responses: [
+    response('d4_nf6_c4_g6', 'g6', "King's Indian"),
+    response('d4_nf6_c4_e6', 'e6', "Queen's Indian / Nimzo"),
+  ],
+});
+const d4_nf6_c4_g6 = createVariation({
+  id: 'd4_nf6_c4_g6',
+  move: 'g6',
+  name: "King's Indian",
+  boardPgn: 'd4 Nf6 c4 g6',
+  intent: ['Fianchetto — Nc3 Bg7 next'],
+  responses: [response('d4_nf6_c4_g6_nc3', 'Nc3', 'KID main')],
+});
+const d4_nf6_c4_g6_nc3 = createVariation({
+  id: 'd4_nf6_c4_g6_nc3',
+  move: 'Nc3',
+  name: "King's Indian main",
+  boardPgn: 'd4 Nf6 c4 g6 Nc3 Bg7',
+  intent: ['Bg7, d6 — kingside attack'],
+});
+const d4_nf6_c4_e6 = createVariation({
+  id: 'd4_nf6_c4_e6',
+  move: 'e6',
+  name: "Queen's Indian / Nimzo",
+  boardPgn: 'd4 Nf6 c4 e6',
+  intent: ['Nf3 b6 (QID) or Nc3 Bb4 (Nimzo)'],
 });
 
 // ============================================================================
@@ -1028,9 +1298,44 @@ export const nodesById: Record<string, OpeningNode> = {
   e4_e5,
   e4_e6,
   e4_c6,
+  // Sicilian variations
+  e4_c5_nf3,
+  e4_c5_nf3_d6,
+  e4_c5_nf3_d6_d4,
+  e4_c5_nf3_nc6,
+  e4_c5_c3,
+  e4_c5_nc3,
+  // Open Games variations
+  e4_e5_nf3,
+  e4_e5_nf3_nc6,
+  e4_e5_nf3_nc6_bb5,
+  e4_e5_nf3_nc6_bc4,
+  e4_e5_nf3_nf6,
+  e4_e5_f4,
+  // French variations
+  e4_e6_d4,
+  e4_e6_d4_d5,
+  e4_e6_d4_d5_nc3,
+  e4_e6_d4_d5_nd2,
+  e4_e6_d4_d5_e5,
+  // Caro-Kann variations
+  e4_c6_d4,
+  e4_c6_d4_d5,
+  e4_c6_d4_d5_nc3,
+  e4_c6_d4_d5_e5,
+  e4_c6_d4_d5_exd5,
   // Black responses to d4
   d4_d5,
   d4_nf6,
+  // Queen's Gambit / Indian variations
+  d4_d5_c4,
+  d4_d5_c4_e6,
+  d4_d5_c4_c6,
+  d4_d5_c4_dxc4,
+  d4_nf6_c4,
+  d4_nf6_c4_g6,
+  d4_nf6_c4_g6_nc3,
+  d4_nf6_c4_e6,
   // Black responses to c4
   c4_e5,
   c4_c5,

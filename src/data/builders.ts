@@ -87,3 +87,25 @@ export const createOpening = (config: {
   tree: [],
   ...config,
 });
+
+/**
+ * Lightweight node for deeper variations — only id, move, name, boardPgn, intent, responses.
+ * Omits whyThisMove, strategicThemes, traps, prosAndCons, famous*, principles, etc. to save space.
+ */
+export const createVariation = (config: {
+  id: string;
+  move: string;
+  name: string;
+  boardPgn: string;
+  intent?: string[];
+  responses?: ResponseLink[];
+}): OpeningNode => ({
+  id: config.id,
+  move: config.move,
+  name: config.name,
+  boardPgn: config.boardPgn,
+  intent: config.intent ?? [config.name],
+  responses: config.responses ?? [],
+  lines: [],
+  tree: [],
+});
