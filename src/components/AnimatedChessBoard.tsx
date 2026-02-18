@@ -269,40 +269,60 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
         </Text>
       </View>
 
-      <View style={styles.controls}>
+      <View style={[styles.controls, { backgroundColor: colors.cardGlassStrong, borderColor: colors.glassBorder }]}>
         {!compact && (
           <Pressable
-            style={[styles.button, { backgroundColor: colors.buttonBg }, currentMoveIndex < 0 && { backgroundColor: colors.buttonDisabledBg, opacity: 0.5 }]}
+            style={({ pressed }) => [
+              styles.button,
+              { backgroundColor: colors.accentBg, borderColor: colors.accent + '45' },
+              pressed && styles.buttonPressed,
+              currentMoveIndex < 0 && { backgroundColor: colors.buttonDisabledBg, borderColor: colors.border, opacity: 0.5 },
+            ]}
             onPress={handleReset}
             disabled={currentMoveIndex < 0}
           >
-            <Text style={styles.buttonText}>Reset</Text>
+            <Text style={[styles.buttonText, { color: colors.accent }]}>Reset</Text>
           </Pressable>
         )}
 
         <Pressable
-          style={[styles.button, { backgroundColor: colors.buttonBg }, currentMoveIndex < 0 && { backgroundColor: colors.buttonDisabledBg, opacity: 0.5 }]}
+          style={({ pressed }) => [
+            styles.button,
+            { backgroundColor: colors.accentBg, borderColor: colors.accent + '45' },
+            pressed && styles.buttonPressed,
+            currentMoveIndex < 0 && { backgroundColor: colors.buttonDisabledBg, borderColor: colors.border, opacity: 0.5 },
+          ]}
           onPress={handlePrevious}
           disabled={currentMoveIndex < 0}
         >
-          <Text style={styles.buttonText}>Prev</Text>
+          <Text style={[styles.buttonText, { color: colors.accent }]}>{'\u2039 Prev'}</Text>
         </Pressable>
 
         <Pressable
-          style={[styles.button, { backgroundColor: colors.buttonBg }, currentMoveIndex >= moves.length - 1 && { backgroundColor: colors.buttonDisabledBg, opacity: 0.5 }]}
+          style={({ pressed }) => [
+            styles.button,
+            { backgroundColor: colors.accentBg, borderColor: colors.accent + '45' },
+            pressed && styles.buttonPressed,
+            currentMoveIndex >= moves.length - 1 && { backgroundColor: colors.buttonDisabledBg, borderColor: colors.border, opacity: 0.5 },
+          ]}
           onPress={handleNext}
           disabled={currentMoveIndex >= moves.length - 1}
         >
-          <Text style={styles.buttonText}>Next</Text>
+          <Text style={[styles.buttonText, { color: colors.accent }]}>{'Next \u203a'}</Text>
         </Pressable>
 
         {!compact && (
           <Pressable
-            style={[styles.button, { backgroundColor: colors.buttonBg }, currentMoveIndex >= moves.length - 1 && { backgroundColor: colors.buttonDisabledBg, opacity: 0.5 }]}
+            style={({ pressed }) => [
+              styles.button,
+              { backgroundColor: colors.accentBg, borderColor: colors.accent + '45' },
+              pressed && styles.buttonPressed,
+              currentMoveIndex >= moves.length - 1 && { backgroundColor: colors.buttonDisabledBg, borderColor: colors.border, opacity: 0.5 },
+            ]}
             onPress={handleJumpToEnd}
             disabled={currentMoveIndex >= moves.length - 1}
           >
-            <Text style={styles.buttonText}>End</Text>
+            <Text style={[styles.buttonText, { color: colors.accent }]}>End</Text>
           </Pressable>
         )}
       </View>
@@ -358,17 +378,24 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: 'row',
     gap: 8,
-    marginTop: 8,
+    marginTop: 10,
+    padding: 8,
+    borderRadius: 14,
+    borderWidth: 1,
   },
   button: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 6,
-    minWidth: 70,
+    borderRadius: 12,
+    borderWidth: 1,
+    minWidth: 78,
     alignItems: 'center',
   },
+  buttonPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
+  },
   buttonText: {
-    color: '#fff',
     fontSize: 13,
     fontWeight: '600',
   },

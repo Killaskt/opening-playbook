@@ -17,6 +17,7 @@ import { TrapInfo } from '../../src/types';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { openingStyleColors } from '../../src/theme/openingStyles';
 import { EcoBadge, GlassCard, PillChip, SectionCard, SectionTitle } from '../../src/components/UIPrimitives';
+import { IdeaIcon, IdeaIconKind } from '../../src/components/IdeaIcons';
 
 function TrapCard({ trap }: { trap: TrapInfo }) {
   const [expanded, setExpanded] = useState(false);
@@ -137,10 +138,13 @@ export default function MoveDetailScreen() {
                 {opening.principleApplications!.map((pa, index) => {
                   const p = PRINCIPLES[pa.principleId];
                   if (!p) return null;
+                  const ideaKind = (pa.principleId as IdeaIconKind) || 'idea';
                   return (
                     <View key={index} style={[styles.principleCard, { backgroundColor: colors.tealBg }]}>
                       <View style={styles.principleHeader}>
-                        <Text style={[styles.principleIcon, { color: colors.teal }]}>{p.icon}</Text>
+                        <View style={[styles.principleIconWrap, { backgroundColor: colors.cardGlassStrong }]}>
+                          <IdeaIcon kind={ideaKind} color={colors.teal} size={16} />
+                        </View>
                         <Text style={[styles.principleName, { color: colors.teal }]}>{p.name}</Text>
                       </View>
                       <Text style={[styles.principleExplanation, { color: colors.textSecondary }]}>{pa.explanation}</Text>
@@ -168,7 +172,9 @@ export default function MoveDetailScreen() {
               <View style={styles.bulletContainer}>
                 {opening.intent.slice(1).map((line, i) => (
                   <View key={i} style={styles.bulletItem}>
-                    <Text style={[styles.bulletDot, { color: colors.accent }]}>{'\u203A'}</Text>
+                    <View style={styles.bulletIconWrap}>
+                      <IdeaIcon kind="line" color={colors.accent} size={14} />
+                    </View>
                     <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{line}</Text>
                   </View>
                 ))}
@@ -183,7 +189,9 @@ export default function MoveDetailScreen() {
               <View style={styles.bulletContainer}>
                 {opening.strategicThemes!.map((theme, index) => (
                   <View key={index} style={styles.bulletItem}>
-                    <Text style={[styles.bulletDot, { color: colors.green }]}>+</Text>
+                    <View style={styles.bulletIconWrap}>
+                      <IdeaIcon kind="idea" color={colors.green} size={14} />
+                    </View>
                     <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{theme}</Text>
                   </View>
                 ))}
@@ -195,7 +203,9 @@ export default function MoveDetailScreen() {
               <View style={styles.bulletContainer}>
                 {catalog.keyIdeas.map((idea, index) => (
                   <View key={index} style={styles.bulletItem}>
-                    <Text style={[styles.bulletDot, { color: colors.green }]}>+</Text>
+                    <View style={styles.bulletIconWrap}>
+                      <IdeaIcon kind="idea" color={colors.green} size={14} />
+                    </View>
                     <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{idea}</Text>
                   </View>
                 ))}
@@ -205,15 +215,15 @@ export default function MoveDetailScreen() {
 
           {/* At a Glance */}
           {hasGlance && availableTabs.length > 0 && (
-            <View style={[styles.section, styles.sectionCard, { backgroundColor: colors.card, borderLeftColor: colors.textMuted }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>At a Glance</Text>
-              <View style={[styles.tabBar, { backgroundColor: colors.chipBg }]}>
+            <SectionCard style={styles.section} accentColor={colors.textMuted}>
+              <SectionTitle>At a Glance</SectionTitle>
+              <View style={[styles.tabBar, { backgroundColor: colors.cardGlassStrong, borderColor: colors.glassBorder }]}>
                 {availableTabs.map((tab) => (
                   <Pressable
                     key={tab.key}
                     style={[
                       styles.tab,
-                      glanceTab === tab.key && [styles.tabActive, { backgroundColor: colors.card }],
+                      glanceTab === tab.key && [styles.tabActive, { backgroundColor: colors.accentBg, borderColor: colors.accent + '40' }],
                     ]}
                     onPress={() => setGlanceTab(tab.key)}
                   >
@@ -233,7 +243,9 @@ export default function MoveDetailScreen() {
                   <View style={styles.glanceList}>
                     {opening.prosAndCons!.pros.map((pro, index) => (
                       <View key={index} style={styles.bulletItem}>
-                        <Text style={[styles.bulletDot, { color: colors.green }]}>+</Text>
+                        <View style={styles.bulletIconWrap}>
+                          <IdeaIcon kind="pro" color={colors.green} size={14} />
+                        </View>
                         <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{pro}</Text>
                       </View>
                     ))}
@@ -244,7 +256,9 @@ export default function MoveDetailScreen() {
                   <View style={styles.glanceList}>
                     {opening.prosAndCons!.cons.map((con, index) => (
                       <View key={index} style={styles.bulletItem}>
-                        <Text style={[styles.bulletDot, { color: colors.yellow }]}>-</Text>
+                        <View style={styles.bulletIconWrap}>
+                          <IdeaIcon kind="con" color={colors.yellow} size={14} />
+                        </View>
                         <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{con}</Text>
                       </View>
                     ))}
@@ -255,7 +269,9 @@ export default function MoveDetailScreen() {
                   <View style={styles.glanceList}>
                     {hasThreats && opening.threats!.map((threat, index) => (
                       <View key={`t-${index}`} style={styles.bulletItem}>
-                        <Text style={[styles.bulletDot, { color: colors.yellow }]}>!</Text>
+                        <View style={styles.bulletIconWrap}>
+                          <IdeaIcon kind="warning" color={colors.yellow} size={14} />
+                        </View>
                         <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{threat}</Text>
                       </View>
                     ))}
@@ -269,28 +285,40 @@ export default function MoveDetailScreen() {
                   </View>
                 )}
               </View>
-            </View>
+            </SectionCard>
           )}
 
           {/* Where this goes next — redesigned */}
           {hasResponses && (
-            <View style={[styles.section, styles.responsesOuter]}>
-              <Text style={[styles.responsesTitle, { color: colors.text }]}>Continue the line</Text>
-              <Text style={[styles.responsesSubtitle, { color: colors.textTertiary }]}>
-                {opening.responses.length} {opening.responses.length === 1 ? 'response' : 'responses'} to explore
-              </Text>
+            <SectionCard style={styles.section} accentColor={colors.orange}>
+              <View style={styles.responsesHeader}>
+                <SectionTitle style={[styles.responsesTitle, { color: colors.text }]}>
+                  Continue the line
+                </SectionTitle>
+                <Text style={[styles.responsesSubtitle, { color: colors.textTertiary }]}>
+                  {opening.responses.length} {opening.responses.length === 1 ? 'response' : 'responses'}
+                </Text>
+              </View>
               <View style={styles.responsesGrid}>
                 {opening.responses.map((resp) => (
                   <Pressable
                     key={resp.id}
                     style={({ pressed }) => [
                       styles.responseCard,
-                      { backgroundColor: colors.card, borderColor: colors.border },
-                      pressed && { backgroundColor: colors.accentBg, borderColor: colors.accent },
+                      {
+                        backgroundColor: colors.cardGlassStrong,
+                        borderColor: colors.glassBorder,
+                      },
+                      pressed && { backgroundColor: colors.accentBg },
                     ]}
                     onPress={() => router.push(`/move/${resp.id}`)}
                   >
-                    <View style={[styles.responseMoveCircle, { backgroundColor: colors.accentBg }]}>
+                    <View
+                      style={[
+                        styles.responseMoveCircle,
+                        { backgroundColor: colors.accentBg, borderColor: colors.accent + '40' },
+                      ]}
+                    >
                       <Text style={[styles.responseMove, { color: colors.accent }]}>{resp.move}</Text>
                     </View>
                     <Text style={[styles.responseName, { color: colors.text }]} numberOfLines={2}>{resp.name}</Text>
@@ -298,17 +326,17 @@ export default function MoveDetailScreen() {
                   </Pressable>
                 ))}
               </View>
-            </View>
+            </SectionCard>
           )}
 
           {/* Go deeper */}
           {hasDeepDive && (
-            <View style={[styles.section, styles.sectionCard, { backgroundColor: colors.card, borderLeftColor: colors.purple }]}>
+            <SectionCard style={styles.section} accentColor={colors.purple}>
               <Pressable
                 style={styles.deepDiveToggle}
                 onPress={() => setDeepDiveOpen(!deepDiveOpen)}
               >
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Go deeper</Text>
+                <SectionTitle style={styles.deepDiveTitle}>Go deeper</SectionTitle>
                 <Text style={[styles.deepDiveArrow, { color: colors.purple }]}>{deepDiveOpen ? '\u2212' : '+'}</Text>
               </Pressable>
 
@@ -353,14 +381,14 @@ export default function MoveDetailScreen() {
                   {hasTree && (
                     <View style={styles.deepDiveSubsection}>
                       <Text style={[styles.subsectionTitle, { color: colors.textTertiary }]}>Full move tree</Text>
-                      <View style={[styles.treeContainer, { backgroundColor: colors.chipBg, borderColor: colors.border }]}>
+                      <View style={[styles.treeContainer, { backgroundColor: colors.cardGlassStrong, borderColor: colors.glassBorder }]}>
                         <TreeView nodes={opening.tree} />
                       </View>
                     </View>
                   )}
                 </View>
               )}
-            </View>
+            </SectionCard>
           )}
 
         </ScrollView>
@@ -462,12 +490,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 6,
   },
-  principleIcon: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 8,
+  principleIconWrap: {
     width: 24,
-    textAlign: 'center',
+    height: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
   },
   principleName: {
     fontSize: 15,
@@ -497,6 +526,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     width: 18,
   },
+  bulletIconWrap: {
+    width: 18,
+    marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 2,
+  },
   bulletText: {
     fontSize: 15,
     flex: 1,
@@ -508,6 +544,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderRadius: 8,
     padding: 3,
+    borderWidth: 1,
   },
   tab: {
     flex: 1,
@@ -516,11 +553,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   tabActive: {
+    borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.06,
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 1,
   },
   tabText: {
     fontSize: 13,
@@ -567,17 +605,19 @@ const styles = StyleSheet.create({
   },
 
   // Responses — redesigned
-  responsesOuter: {
-    paddingHorizontal: 4,
+  responsesHeader: {
+    marginBottom: 12,
+    paddingRight: 6,
   },
   responsesTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    marginBottom: 2,
+    fontSize: 19,
+    fontWeight: '700',
+    lineHeight: 24,
+    marginBottom: 3,
   },
   responsesSubtitle: {
     fontSize: 13,
-    marginBottom: 16,
+    lineHeight: 18,
   },
   responsesGrid: {
     gap: 10,
@@ -585,15 +625,16 @@ const styles = StyleSheet.create({
   responseCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
+    padding: 12,
     borderRadius: 14,
-    borderWidth: 1.5,
-    gap: 14,
+    borderWidth: 1,
+    gap: 12,
   },
   responseMoveCircle: {
     width: 48,
     height: 48,
     borderRadius: 14,
+    borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -616,6 +657,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  deepDiveTitle: {
+    marginBottom: 0,
   },
   deepDiveArrow: {
     fontSize: 24,

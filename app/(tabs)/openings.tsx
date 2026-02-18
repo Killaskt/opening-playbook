@@ -17,6 +17,7 @@ import { useTheme } from '../../src/theme/ThemeContext';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { openingStyleColors } from '../../src/theme/openingStyles';
 import { EcoBadge, GlassCard, PillChip } from '../../src/components/UIPrimitives';
+import { IdeaIcon } from '../../src/components/IdeaIcons';
 
 const TYPE_ORDER: OpeningType[] = ['opening', 'gambit', 'defense', 'system'];
 
@@ -26,6 +27,13 @@ const TYPE_SECTION_LABEL: Record<OpeningType, string> = {
   system: 'Systems',
   gambit: 'Gambits',
 };
+const TYPE_FILTERS: { key: OpeningType | null; label: string }[] = [
+  { key: null, label: 'All types' },
+  { key: 'opening', label: 'Main lines' },
+  { key: 'defense', label: 'Defenses' },
+  { key: 'gambit', label: 'Gambits' },
+  { key: 'system', label: 'Systems' },
+];
 
 function sectionTitle(catLabel: string, type: OpeningType): string {
   return `${catLabel} \u2014 ${TYPE_SECTION_LABEL[type]}`;
@@ -36,7 +44,7 @@ export default function OpeningsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { colors, isDark, spacing, typography } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeType, setActiveType] = useState<OpeningType | null>(null);
 
   const sections = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
@@ -50,9 +58,9 @@ export default function OpeningsScreen() {
         (entry.eco?.toLowerCase().includes(query) ?? false) ||
         (entry.style?.some(s => s.toLowerCase().includes(query)) ?? false);
 
-      const matchesCategory = !activeCategory || entry.category === activeCategory;
+      const matchesType = !activeType || entry.type === activeType;
 
-      return matchesSearch && matchesCategory;
+      return matchesSearch && matchesType;
     });
 
     const result: { title: string; key: string; data: CatalogEntry[] }[] = [];
@@ -73,7 +81,7 @@ export default function OpeningsScreen() {
     }
 
     return result;
-  }, [searchQuery, activeCategory]);
+  }, [searchQuery, activeType]);
 
   const handlePress = (entry: CatalogEntry) => {
     if (entry.nodeId && nodesById[entry.nodeId]) {
@@ -122,29 +130,20 @@ export default function OpeningsScreen() {
           contentContainerStyle={styles.filterRow}
           keyboardShouldPersistTaps="handled"
         >
-        <Pressable onPress={() => setActiveCategory(null)}>
-          <PillChip
-            label="All"
-            backgroundColor={!activeCategory ? colors.accent : colors.chipBg}
-            textColor={!activeCategory ? colors.textInverse : colors.textTertiary}
-            style={styles.filterChip}
-            textStyle={styles.filterText}
-          />
-        </Pressable>
-        {catalogCategories.map((cat) => (
-          <Pressable
-            key={cat.key}
-            onPress={() => setActiveCategory(activeCategory === cat.key ? null : cat.key)}
-          >
-            <PillChip
-              label={cat.label}
-              backgroundColor={activeCategory === cat.key ? colors.accent : colors.chipBg}
-              textColor={activeCategory === cat.key ? colors.textInverse : colors.textTertiary}
-              style={styles.filterChip}
-              textStyle={styles.filterText}
-            />
-          </Pressable>
-        ))}
+          {TYPE_FILTERS.map((typeFilter) => (
+            <Pressable
+              key={typeFilter.label}
+              onPress={() => setActiveType(typeFilter.key)}
+            >
+              <PillChip
+                label={typeFilter.label}
+                backgroundColor={activeType === typeFilter.key ? colors.accent : colors.chipBg}
+                textColor={activeType === typeFilter.key ? colors.textInverse : colors.textTertiary}
+                style={styles.filterChip}
+                textStyle={styles.filterText}
+              />
+            </Pressable>
+          ))}
         </ScrollView>
       </View>
 
@@ -201,7 +200,9 @@ export default function OpeningsScreen() {
                 <View style={styles.ideasSection}>
                   {item.keyIdeas.map((idea, i) => (
                     <View key={i} style={styles.ideaRow}>
-                      <Text style={[styles.ideaDot, { color: colors.green }]}>+</Text>
+                      <View style={styles.ideaIconWrap}>
+                        <IdeaIcon kind="idea" color={colors.green} size={14} />
+                      </View>
                       <Text style={[styles.ideaText, typography.bodySM, { color: colors.textTertiary }]}>{idea}</Text>
                     </View>
                   ))}
@@ -246,12 +247,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   filterWrapper: {
-    height: 45,
     marginBottom: 10,
   },
   filterRow: {
     paddingHorizontal: 16,
-    paddingVertical: 6,
+    paddingVertical: 4,
     gap: 10,
     alignItems: 'center',
   },
@@ -338,11 +338,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
-  ideaDot: {
-    fontSize: 14,
-    fontWeight: 'bold',
+  ideaIconWrap: {
     width: 18,
-    marginTop: 1,
+    marginRight: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 2,
   },
   ideaText: {
     flex: 1,

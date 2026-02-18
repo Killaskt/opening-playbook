@@ -14,6 +14,7 @@ import { openingsCatalog, OpeningStyle } from '../src/data/catalog';
 import { useTheme } from '../src/theme/ThemeContext';
 import { openingStyleColors } from '../src/theme/openingStyles';
 import { EcoBadge, GlassCard, PillChip, SectionCard, SectionTitle } from '../src/components/UIPrimitives';
+import { IdeaIcon } from '../src/components/IdeaIcons';
 
 const TYPE_COLORS: Record<string, { light: string; dark: string }> = {
   opening: { light: '#2e78b7', dark: '#5b9fd6' },
@@ -99,7 +100,9 @@ export default function OpeningDetailScreen() {
               <SectionTitle>Key ideas</SectionTitle>
               {keyIdeas.map((idea, i) => (
                 <View key={i} style={styles.ideaRow}>
-                  <Text style={[styles.ideaDot, { color: colors.green }]}>+</Text>
+                  <View style={styles.ideaIconWrap}>
+                    <IdeaIcon kind="idea" color={colors.green} size={14} />
+                  </View>
                   <Text style={[styles.ideaText, typography.bodyMD, { color: colors.textSecondary }]}>{idea}</Text>
                 </View>
               ))}
@@ -108,11 +111,18 @@ export default function OpeningDetailScreen() {
 
           {linkedNode && (
             <Pressable
-              style={({ pressed }) => [styles.exploreBtn, { backgroundColor: colors.accent }, pressed && { opacity: 0.85 }]}
+              style={({ pressed }) => [
+                styles.exploreBtn,
+                {
+                  backgroundColor: colors.accentBg,
+                  borderColor: colors.accent + '45',
+                },
+                pressed && { opacity: 0.9 },
+              ]}
               onPress={() => router.push(`/move/${linkedNode.id}`)}
             >
-              <Text style={styles.exploreBtnText}>Explore move-by-move</Text>
-              <Text style={styles.exploreBtnArrow}>{'>'}</Text>
+              <Text style={[styles.exploreBtnText, { color: colors.accent }]}>Explore move-by-move</Text>
+              <Text style={[styles.exploreBtnArrow, { color: colors.accent }]}>{'>'}</Text>
             </Pressable>
           )}
         </ScrollView>
@@ -203,11 +213,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 6,
   },
-  ideaDot: {
-    fontSize: 15,
-    fontWeight: 'bold',
+  ideaIconWrap: {
     width: 20,
-    marginTop: 1,
+    marginRight: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 2,
   },
   ideaText: {
     flex: 1,
@@ -218,16 +229,15 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 12,
     marginTop: 8,
+    borderWidth: 1,
   },
   exploreBtnText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#fff',
     flex: 1,
   },
   exploreBtnArrow: {
     fontSize: 18,
-    color: '#fff',
     fontWeight: '700',
   },
 });

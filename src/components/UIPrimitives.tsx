@@ -52,7 +52,7 @@ export function SectionCard({ children, accentColor, style }: SectionCardProps) 
           padding: spacing.xl,
           backgroundColor: colors.cardGlass,
           borderColor: colors.glassBorder,
-          borderLeftColor: accentColor || colors.accent,
+          borderTopColor: accentColor || colors.accent,
         },
         style,
       ]}
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   sectionCard: {
     borderWidth: 1,
-    borderLeftWidth: 4,
+    borderTopWidth: 2,
     borderRadius: 14,
   },
   pill: {
