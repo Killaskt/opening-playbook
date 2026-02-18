@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import {
   LayoutAnimation,
   Platform,
@@ -11,6 +11,7 @@ import {
   ScrollView,
   UIManager,
   Keyboard,
+  ViewToken,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
@@ -46,12 +47,16 @@ function sectionTitle(catLabel: string, type: OpeningType): string {
   return `${catLabel} \u2014 ${TYPE_SECTION_LABEL[type]}`;
 }
 
+type CatalogSection = { title: string; key: string; data: CatalogEntry[] };
+
 export default function OpeningsScreen() {
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
   const { colors, isDark, spacing, typography } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeType, setActiveType] = useState<OpeningType | null>(null);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const sectionListRef = useRef<SectionList<CatalogEntry, CatalogSection> | null>(null);
 
   const handleTypeFilterChange = (type: OpeningType | null) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -75,7 +80,7 @@ export default function OpeningsScreen() {
       return matchesSearch && matchesType;
     });
 
-    const result: { title: string; key: string; data: CatalogEntry[] }[] = [];
+    const result: CatalogSection[] = [];
 
     for (const cat of catalogCategories) {
       const catEntries = filtered.filter((e) => e.category === cat.key);
@@ -94,6 +99,34 @@ export default function OpeningsScreen() {
 
     return result;
   }, [searchQuery, activeType]);
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 15,
+    minimumViewTime: 50,
+  }).current;
+
+  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    const firstVisibleWithSection = viewableItems.find((token) => token.section?.key);
+    if (!firstVisibleWithSection?.section?.key) return;
+    const idx = sections.findIndex((s) => s.key === firstVisibleWithSection.section?.key);
+    if (idx >= 0) setCurrentSectionIndex(idx);
+  }).current;
+
+  const canGoUp = currentSectionIndex > 0;
+  const canGoDown = sections.length > 0 && currentSectionIndex < sections.length - 1;
+
+  const jumpSection = (direction: -1 | 1) => {
+    if (sections.length === 0) return;
+    const target = Math.max(0, Math.min(sections.length - 1, currentSectionIndex + direction));
+    if (target === currentSectionIndex) return;
+    setCurrentSectionIndex(target);
+    sectionListRef.current?.scrollToLocation({
+      sectionIndex: target,
+      itemIndex: 0,
+      animated: true,
+      viewOffset: 8,
+    });
+  };
 
   const handlePress = (entry: CatalogEntry) => {
     if (entry.nodeId && nodesById[entry.nodeId]) {
@@ -160,10 +193,13 @@ export default function OpeningsScreen() {
       </View>
 
       <SectionList
+        ref={sectionListRef}
         sections={sections}
         keyExtractor={(item, index) => item.name + index}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
         renderSectionHeader={({ section }) => (
           <View style={[styles.sectionHeader, { borderBottomColor: colors.border }]}>
             <Text style={[styles.sectionHeaderText, { color: colors.textTertiary }]}>{section.title}</Text>
@@ -238,7 +274,57 @@ export default function OpeningsScreen() {
           </View>
         }
         stickySectionHeadersEnabled={false}
+        onScrollToIndexFailed={() => {
+          // Retry lightly when RN has not measured yet.
+          setTimeout(() => {
+            sectionListRef.current?.scrollToLocation({
+              sectionIndex: currentSectionIndex,
+              itemIndex: 0,
+              animated: true,
+              viewOffset: 8,
+            });
+          }, 80);
+        }}
       />
+      {sections.length > 1 && (
+        <View
+          style={[
+            styles.sectionJumpWrap,
+            {
+              bottom: tabBarHeight + 56,
+              backgroundColor: colors.cardGlassStrong,
+              borderColor: colors.glassBorder,
+            },
+          ]}
+        >
+          <Pressable
+            onPress={() => jumpSection(-1)}
+            disabled={!canGoUp}
+            style={[
+              styles.sectionJumpBtn,
+              {
+                borderBottomColor: colors.glassBorder,
+                opacity: canGoUp ? 1 : 0.35,
+              },
+            ]}
+          >
+            <Text style={[styles.sectionJumpText, { color: colors.text }]}>▲</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => jumpSection(1)}
+            disabled={!canGoDown}
+            style={[
+              styles.sectionJumpBtn,
+              {
+                borderBottomWidth: 0,
+                opacity: canGoDown ? 1 : 0.35,
+              },
+            ]}
+          >
+            <Text style={[styles.sectionJumpText, { color: colors.text }]}>▼</Text>
+          </Pressable>
+        </View>
+      )}
     </View>
   );
 }
@@ -388,5 +474,23 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
+  },
+  sectionJumpWrap: {
+    position: 'absolute',
+    right: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  sectionJumpBtn: {
+    width: 38,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+  },
+  sectionJumpText: {
+    fontSize: 13,
+    fontWeight: '700',
   },
 });

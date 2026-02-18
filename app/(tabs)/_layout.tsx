@@ -193,23 +193,30 @@ function LiquidTabBar({ state, navigation }: BottomTabBarProps) {
               width: itemWidth,
               top: highlightTop,
               transform: [{ translateX: highlightX }],
-              backgroundColor: 'rgba(147, 197, 253, 0.16)',
-              borderColor: 'rgba(147, 197, 253, 0.32)',
+              backgroundColor: isDark ? 'rgba(147, 197, 253, 0.10)' : 'rgba(147, 197, 253, 0.13)',
+              borderColor: isDark ? 'rgba(147, 197, 253, 0.20)' : 'rgba(147, 197, 253, 0.26)',
             },
           ]}
         >
           <BlurView
-            intensity={42}
+            intensity={isDark ? 26 : 38}
             tint={isDark ? 'dark' : 'light'}
             style={StyleSheet.absoluteFillObject}
           />
-          <View style={styles.highlightFrost} />
+          <View
+            style={[
+              styles.highlightFrost,
+              {
+                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.18)',
+              },
+            ]}
+          />
         </Animated.View>
       )}
       {state.routes.map((route, index) => {
         const focused = index === visualIndex;
         const Icon = getTabIcon(route.name);
-        const tint = focused ? colors.tabBarActive : colors.textTertiary;
+        const tint = focused ? colors.tabBarActive : colors.textSecondary;
 
         return (
           <View
@@ -294,8 +301,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: 'hidden',
     shadowColor: '#93c5fd',
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
   },
   highlightFrost: {
