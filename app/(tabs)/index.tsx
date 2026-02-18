@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   FlatList,
   Pressable,
   StyleSheet,
-  Keyboard,
   ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -14,6 +12,7 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { startMoves } from '../../src/data/openings';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
+import { SearchBar } from '../../src/components/SearchBar';
 import { GlassCard, PillChip } from '../../src/components/UIPrimitives';
 
 export default function ExploreScreen() {
@@ -22,7 +21,7 @@ export default function ExploreScreen() {
   const { colors, spacing, typography } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredMoves = startMoves.filter((move) => {
+  const filteredMoves = useMemo(() => startMoves.filter((move) => {
     const query = searchQuery.toLowerCase();
     return (
       move.move.toLowerCase().includes(query) ||
@@ -30,9 +29,9 @@ export default function ExploreScreen() {
       move.intent[0]?.toLowerCase().includes(query) ||
       (move.whyThisMove?.toLowerCase().includes(query) ?? false)
     );
-  });
+  }), [searchQuery]);
 
-  const renderItem = ({ item }: { item: typeof startMoves[0] }) => (
+  const renderItem = useCallback(({ item }: { item: typeof startMoves[0] }) => (
     <Pressable
       style={({ pressed }) => [
         styles.cardTouch,
@@ -78,28 +77,17 @@ export default function ExploreScreen() {
       </View>
       </GlassCard>
     </Pressable>
-  );
+  ), [colors, spacing, typography, router]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <ScreenHeader title="Moves" subtitle="Step through openings move by move" />
 
-      <GlassCard style={[styles.searchBar, { padding: spacing.md, marginHorizontal: spacing.lg }]}>
-        <TextInput
-          style={[styles.searchInput, {
-            backgroundColor: colors.inputBg,
-            borderColor: colors.glassBorder,
-            color: colors.text,
-            ...typography.bodyLG,
-          }]}
-          placeholder="Search moves, names, concepts..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor={colors.textMuted}
-          returnKeyType="search"
-          onSubmitEditing={Keyboard.dismiss}
-        />
-      </GlassCard>
+      <SearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        placeholder="Search moves, names, concepts..."
+      />
 
       <FlatList
         data={filteredMoves}
@@ -108,6 +96,10 @@ export default function ExploreScreen() {
         contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 30 }]}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
+        removeClippedSubviews={true}
+        initialNumToRender={8}
+        maxToRenderPerBatch={6}
+        windowSize={7}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: colors.textMuted }]}>No openings found</Text>
@@ -121,17 +113,6 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  searchBar: {
-    marginTop: 8,
-    marginBottom: 15,
-    borderRadius: 16,
-  },
-  searchInput: {
-    borderRadius: 12,
-    padding: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
   },
   listContent: {
     paddingHorizontal: 16,
@@ -186,9 +167,6 @@ const styles = StyleSheet.create({
     minHeight: 22,
   },
   chipText: {
-    fontSize: 11,
-  },
-  moreText: {
     fontSize: 11,
   },
   arrow: {

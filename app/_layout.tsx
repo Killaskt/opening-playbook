@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, Text } from 'react-native';
@@ -5,22 +6,22 @@ import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
 
 function AppStack() {
   const { colors, isDark } = useTheme();
-  const renderBackButton = (onPress: () => void) => (
+  const renderBackButton = useCallback((onPress: () => void) => (
     <Pressable
       onPress={onPress}
       hitSlop={12}
       style={({ pressed }) => ({
-        minWidth: 50,
+        minWidth: 60,
         paddingVertical: 6,
-        paddingHorizontal: 10,
+        paddingHorizontal: 15,
         borderRadius: 10,
-        justifyContent: 'center',
+        justifyContent: 'center' as const,
         opacity: pressed ? 0.75 : 1,
       })}
     >
       <Text style={{ color: colors.text, fontSize: 16, fontWeight: '600' }}>{'\u2039 Back'}</Text>
     </Pressable>
-  );
+  ), [colors.text]);
 
   return (
     <>

@@ -43,6 +43,12 @@ export interface ThemeColors {
   buttonDisabledBg: string;
   highlight: string;
   highlightBorder: string;
+  highlightBg: string;
+  highlightFrost: string;
+  arrowMove: string;
+  arrowAnnotation: string;
+  squareHighlightLight: string;
+  squareHighlightDark: string;
   shadow: string;
 }
 
@@ -91,6 +97,12 @@ export const lightColors: ThemeColors = {
   buttonDisabledBg: '#ccc',
   highlight: '#9fff9f',
   highlightBorder: '#00aa00',
+  highlightBg: 'rgba(147, 197, 253, 0.13)',
+  highlightFrost: 'rgba(255, 255, 255, 0.18)',
+  arrowMove: 'rgba(255, 170, 0, 0.65)',
+  arrowAnnotation: 'rgba(0, 150, 50, 0.6)',
+  squareHighlightLight: '#e8d44d',
+  squareHighlightDark: '#daa520',
   shadow: '#000',
 };
 
@@ -139,5 +151,11 @@ export const darkColors: ThemeColors = {
   buttonDisabledBg: '#444',
   highlight: '#3a6a3a',
   highlightBorder: '#55aa55',
+  highlightBg: 'rgba(147, 197, 253, 0.10)',
+  highlightFrost: 'rgba(255, 255, 255, 0.06)',
+  arrowMove: 'rgba(255, 170, 0, 0.65)',
+  arrowAnnotation: 'rgba(0, 150, 50, 0.6)',
+  squareHighlightLight: '#e8d44d',
+  squareHighlightDark: '#daa520',
   shadow: '#000',
 };

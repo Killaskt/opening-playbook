@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,16 +12,9 @@ import { AnimatedChessBoard } from '../src/components/AnimatedChessBoard';
 import { nodesById } from '../src/data/openings';
 import { openingsCatalog, OpeningStyle } from '../src/data/catalog';
 import { useTheme } from '../src/theme/ThemeContext';
-import { openingStyleColors } from '../src/theme/openingStyles';
+import { openingStyleColors, openingTypeColors } from '../src/theme/openingStyles';
 import { EcoBadge, GlassCard, PillChip, SectionCard, SectionTitle } from '../src/components/UIPrimitives';
-import { IdeaIcon } from '../src/components/IdeaIcons';
-
-const TYPE_COLORS: Record<string, { light: string; dark: string }> = {
-  opening: { light: '#2e78b7', dark: '#5b9fd6' },
-  defense: { light: '#7b1fa2', dark: '#ba68c8' },
-  system:  { light: '#00695c', dark: '#4db6ac' },
-  gambit:  { light: '#c62828', dark: '#ef5350' },
-};
+import { BulletRow } from '../src/components/BulletRow';
 
 export default function OpeningDetailScreen() {
   const { colors, isDark, typography, spacing } = useTheme();
@@ -38,16 +31,21 @@ export default function OpeningDetailScreen() {
 
   const { pgn, name, desc } = params;
   const eco = params.eco || undefined;
-  const styleList = params.style ? params.style.split(',').filter(Boolean) as OpeningStyle[] : [];
-  const keyIdeas = params.keyIdeas ? params.keyIdeas.split('||').filter(Boolean) : [];
+  const { styleList, keyIdeas } = useMemo(() => ({
+    styleList: params.style ? params.style.split(',').filter(Boolean) as OpeningStyle[] : [],
+    keyIdeas: params.keyIdeas ? params.keyIdeas.split('||').filter(Boolean) : [],
+  }), [params.style, params.keyIdeas]);
   const type = params.type || undefined;
 
-  const catalogEntry = openingsCatalog.find(
-    (e) => e.pgn === pgn && e.name === name
-  );
-  const linkedNode = catalogEntry?.nodeId ? nodesById[catalogEntry.nodeId] : undefined;
+  const { catalogEntry, linkedNode } = useMemo(() => {
+    const entry = openingsCatalog.find((e) => e.pgn === pgn && e.name === name);
+    return {
+      catalogEntry: entry,
+      linkedNode: entry?.nodeId ? nodesById[entry.nodeId] : undefined,
+    };
+  }, [pgn, name]);
 
-  const typeColor = type ? (isDark ? TYPE_COLORS[type]?.dark : TYPE_COLORS[type]?.light) || colors.textMuted : colors.textMuted;
+  const typeColor = type ? (isDark ? openingTypeColors[type]?.dark : openingTypeColors[type]?.light) || colors.textMuted : colors.textMuted;
 
   return (
     <>
@@ -99,12 +97,7 @@ export default function OpeningDetailScreen() {
             <SectionCard accentColor={colors.orange} style={styles.infoCard}>
               <SectionTitle>Key ideas</SectionTitle>
               {keyIdeas.map((idea, i) => (
-                <View key={i} style={styles.ideaRow}>
-                  <View style={styles.ideaIconWrap}>
-                    <IdeaIcon kind="idea" color={colors.green} size={14} />
-                  </View>
-                  <Text style={[styles.ideaText, typography.bodyMD, { color: colors.textSecondary }]}>{idea}</Text>
-                </View>
+                <BulletRow key={i} icon="idea" iconColor={colors.green} text={idea} />
               ))}
             </SectionCard>
           )}
@@ -207,21 +200,6 @@ const styles = StyleSheet.create({
   },
   descText: {
     lineHeight: 23,
-  },
-  ideaRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 6,
-  },
-  ideaIconWrap: {
-    width: 20,
-    marginRight: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 2,
-  },
-  ideaText: {
-    flex: 1,
   },
   exploreBtn: {
     flexDirection: 'row',

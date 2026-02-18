@@ -143,7 +143,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
         {arrowList.map((arr, i) => {
           const from = squareToPixel(arr.from);
           const to = squareToPixel(arr.to);
-          const color = arr.color || 'rgba(0, 150, 50, 0.6)';
+          const color = arr.color || colors.arrowAnnotation;
 
           const dx = to.x - from.x;
           const dy = to.y - from.y;
@@ -191,7 +191,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
   const allArrows: { from: string; to: string; color?: string }[] = [];
   if (arrows && currentMoveIndex === moves.length - 1) allArrows.push(...arrows);
   if (lastMove) {
-    allArrows.push({ from: lastMove.from, to: lastMove.to, color: 'rgba(255, 170, 0, 0.65)' });
+    allArrows.push({ from: lastMove.from, to: lastMove.to, color: colors.arrowMove });
   }
 
   const renderSquare = (row: number, col: number) => {
@@ -221,7 +221,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
             position: 'relative' as const,
             backgroundColor: isLight ? colors.lightSquare : colors.darkSquare,
           },
-          (isFrom || isTo) && { backgroundColor: isLight ? '#e8d44d' : '#daa520' },
+          (isFrom || isTo) && { backgroundColor: isLight ? colors.squareHighlightLight : colors.squareHighlightDark },
         ]}
       >
         {piece && renderPiece(pieceType, isWhite, pieceSize)}

@@ -27,13 +27,6 @@ export interface FamousGame {
   pgn?: string;
 }
 
-export interface LichessStats {
-  whiteWinRate?: number;
-  drawRate?: number;
-  blackWinRate?: number;
-  totalGames?: number;
-}
-
 export interface BoardArrow {
   from: string;
   to: string;
@@ -61,7 +54,6 @@ export interface OpeningNode {
   prosAndCons?: { pros: string[]; cons: string[] };
   famousPlayers?: string[];
   famousGames?: FamousGame[];
-  lichessStats?: LichessStats;
   boardArrows?: BoardArrow[];
   principleApplications?: PrincipleApplication[];
 }

@@ -542,6 +542,18 @@ export const catalogCategories: { key: CatalogEntry['category']; label: string }
   { key: 'other', label: 'Other' },
 ];
 
-export const catalogByNodeId = new Map<string, CatalogEntry>(
-  openingsCatalog.filter(e => e.nodeId).map(e => [e.nodeId!, e])
-);
+export const catalogByNodeId: Map<string, CatalogEntry> = (() => {
+  const map = new Map<string, CatalogEntry>();
+  for (const entry of openingsCatalog) {
+    if (entry.nodeId) map.set(entry.nodeId, entry);
+  }
+  return map;
+})();
+
+export const TYPE_FILTERS: { key: OpeningType | null; label: string }[] = [
+  { key: null, label: 'All types' },
+  { key: 'opening', label: 'Main lines' },
+  { key: 'defense', label: 'Defenses' },
+  { key: 'gambit', label: 'Gambits' },
+  { key: 'system', label: 'Systems' },
+];

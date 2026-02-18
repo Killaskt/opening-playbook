@@ -13,40 +13,13 @@ import { catalogByNodeId } from '../../src/data/catalog';
 import { PRINCIPLES } from '../../src/data/principles';
 import { TreeView } from '../../src/components/TreeView';
 import { AnimatedChessBoard } from '../../src/components/AnimatedChessBoard';
-import { TrapInfo } from '../../src/types';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { openingStyleColors } from '../../src/theme/openingStyles';
 import { EcoBadge, GlassCard, PillChip, SectionCard, SectionTitle } from '../../src/components/UIPrimitives';
+import { BulletRow } from '../../src/components/BulletRow';
 import { IdeaIcon, IdeaIconKind } from '../../src/components/IdeaIcons';
-
-function TrapCard({ trap }: { trap: TrapInfo }) {
-  const [expanded, setExpanded] = useState(false);
-  const { colors } = useTheme();
-
-  return (
-    <Pressable
-      style={[styles.trapCard, { backgroundColor: colors.yellowBg, borderColor: colors.yellow + '40' }]}
-      onPress={() => setExpanded(!expanded)}
-    >
-      <View style={styles.trapHeader}>
-        <Text style={[styles.trapName, { color: colors.yellow }]}>{trap.name}</Text>
-        <Text style={[styles.trapToggle, { color: colors.yellow }]}>{expanded ? '\u2212' : '+'}</Text>
-      </View>
-      {expanded && (
-        <View style={styles.trapBody}>
-          <Text style={[styles.trapDesc, { color: colors.textSecondary }]}>{trap.description}</Text>
-          {trap.pgn && (
-            <View style={{ marginTop: 12 }}>
-              <AnimatedChessBoard pgn={trap.pgn} compact />
-            </View>
-          )}
-        </View>
-      )}
-    </Pressable>
-  );
-}
-
-type GlanceTab = 'strengths' | 'weaknesses' | 'watchOut';
+import { GlanceSection } from '../../src/components/GlanceSection';
+import { ResponseGrid } from '../../src/components/ResponseGrid';
 
 export default function MoveDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -54,7 +27,6 @@ export default function MoveDetailScreen() {
   const { colors, isDark, typography } = useTheme();
   const opening = id ? nodesById[id] : undefined;
   const catalog = id ? catalogByNodeId.get(id) : undefined;
-  const [glanceTab, setGlanceTab] = useState<GlanceTab>('strengths');
   const [deepDiveOpen, setDeepDiveOpen] = useState(false);
 
   if (!opening) {
@@ -91,13 +63,6 @@ export default function MoveDetailScreen() {
   const hasHallOfFame = hasFamousPlayers || hasFamousGames;
   const hasTree = opening.tree.length > 0;
   const hasDeepDive = hasLines || hasHallOfFame || hasTree;
-
-  const glanceTabs: { key: GlanceTab; label: string; hasContent: boolean }[] = [
-    { key: 'strengths', label: 'Strengths', hasContent: hasPros },
-    { key: 'weaknesses', label: 'Weaknesses', hasContent: hasCons },
-    { key: 'watchOut', label: 'Watch Out For', hasContent: hasThreats || hasTraps },
-  ];
-  const availableTabs = glanceTabs.filter(t => t.hasContent);
 
   return (
     <>
@@ -171,12 +136,7 @@ export default function MoveDetailScreen() {
               <SectionTitle>Why play this?</SectionTitle>
               <View style={styles.bulletContainer}>
                 {opening.intent.slice(1).map((line, i) => (
-                  <View key={i} style={styles.bulletItem}>
-                    <View style={styles.bulletIconWrap}>
-                      <IdeaIcon kind="line" color={colors.accent} size={14} />
-                    </View>
-                    <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{line}</Text>
-                  </View>
+                  <BulletRow key={i} icon="line" iconColor={colors.accent} text={line} />
                 ))}
               </View>
             </SectionCard>
@@ -188,12 +148,7 @@ export default function MoveDetailScreen() {
               <SectionTitle>What you're aiming for</SectionTitle>
               <View style={styles.bulletContainer}>
                 {opening.strategicThemes!.map((theme, index) => (
-                  <View key={index} style={styles.bulletItem}>
-                    <View style={styles.bulletIconWrap}>
-                      <IdeaIcon kind="idea" color={colors.green} size={14} />
-                    </View>
-                    <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{theme}</Text>
-                  </View>
+                  <BulletRow key={index} icon="idea" iconColor={colors.green} text={theme} />
                 ))}
               </View>
             </SectionCard>
@@ -202,90 +157,22 @@ export default function MoveDetailScreen() {
               <SectionTitle>Key ideas</SectionTitle>
               <View style={styles.bulletContainer}>
                 {catalog.keyIdeas.map((idea, index) => (
-                  <View key={index} style={styles.bulletItem}>
-                    <View style={styles.bulletIconWrap}>
-                      <IdeaIcon kind="idea" color={colors.green} size={14} />
-                    </View>
-                    <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{idea}</Text>
-                  </View>
+                  <BulletRow key={index} icon="idea" iconColor={colors.green} text={idea} />
                 ))}
               </View>
             </SectionCard>
           ) : null}
 
           {/* At a Glance */}
-          {hasGlance && availableTabs.length > 0 && (
-            <SectionCard style={styles.section} accentColor={colors.textMuted}>
-              <SectionTitle>At a Glance</SectionTitle>
-              <View style={[styles.tabBar, { backgroundColor: colors.cardGlassStrong, borderColor: colors.glassBorder }]}>
-                {availableTabs.map((tab) => (
-                  <Pressable
-                    key={tab.key}
-                    style={[
-                      styles.tab,
-                      glanceTab === tab.key && [styles.tabActive, { backgroundColor: colors.accentBg, borderColor: colors.accent + '40' }],
-                    ]}
-                    onPress={() => setGlanceTab(tab.key)}
-                  >
-                    <Text style={[
-                      styles.tabText,
-                      { color: colors.textTertiary },
-                      glanceTab === tab.key && { color: colors.text },
-                    ]}>
-                      {tab.label}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-
-              <View style={styles.tabContent}>
-                {glanceTab === 'strengths' && hasPros && (
-                  <View style={styles.glanceList}>
-                    {opening.prosAndCons!.pros.map((pro, index) => (
-                      <View key={index} style={styles.bulletItem}>
-                        <View style={styles.bulletIconWrap}>
-                          <IdeaIcon kind="pro" color={colors.green} size={14} />
-                        </View>
-                        <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{pro}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
-
-                {glanceTab === 'weaknesses' && hasCons && (
-                  <View style={styles.glanceList}>
-                    {opening.prosAndCons!.cons.map((con, index) => (
-                      <View key={index} style={styles.bulletItem}>
-                        <View style={styles.bulletIconWrap}>
-                          <IdeaIcon kind="con" color={colors.yellow} size={14} />
-                        </View>
-                        <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{con}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
-
-                {glanceTab === 'watchOut' && (hasThreats || hasTraps) && (
-                  <View style={styles.glanceList}>
-                    {hasThreats && opening.threats!.map((threat, index) => (
-                      <View key={`t-${index}`} style={styles.bulletItem}>
-                        <View style={styles.bulletIconWrap}>
-                          <IdeaIcon kind="warning" color={colors.yellow} size={14} />
-                        </View>
-                        <Text style={[styles.bulletText, { color: colors.textSecondary }]}>{threat}</Text>
-                      </View>
-                    ))}
-                    {hasTraps && (
-                      <View style={styles.trapsContainer}>
-                        {opening.traps!.map((t, index) => (
-                          <TrapCard key={index} trap={t} />
-                        ))}
-                      </View>
-                    )}
-                  </View>
-                )}
-              </View>
-            </SectionCard>
+          {hasGlance && (
+            <View style={styles.section}>
+              <GlanceSection
+                pros={opening.prosAndCons?.pros ?? []}
+                cons={opening.prosAndCons?.cons ?? []}
+                threats={opening.threats ?? []}
+                traps={opening.traps ?? []}
+              />
+            </View>
           )}
 
           {/* Where this goes next — redesigned */}
@@ -299,33 +186,10 @@ export default function MoveDetailScreen() {
                   {opening.responses.length} {opening.responses.length === 1 ? 'response' : 'responses'}
                 </Text>
               </View>
-              <View style={styles.responsesGrid}>
-                {opening.responses.map((resp) => (
-                  <Pressable
-                    key={resp.id}
-                    style={({ pressed }) => [
-                      styles.responseCard,
-                      {
-                        backgroundColor: colors.cardGlassStrong,
-                        borderColor: colors.glassBorder,
-                      },
-                      pressed && { backgroundColor: colors.accentBg },
-                    ]}
-                    onPress={() => router.push(`/move/${resp.id}`)}
-                  >
-                    <View
-                      style={[
-                        styles.responseMoveCircle,
-                        { backgroundColor: colors.accentBg, borderColor: colors.accent + '40' },
-                      ]}
-                    >
-                      <Text style={[styles.responseMove, { color: colors.accent }]}>{resp.move}</Text>
-                    </View>
-                    <Text style={[styles.responseName, { color: colors.text }]} numberOfLines={2}>{resp.name}</Text>
-                    <Text style={[styles.responseArrow, { color: colors.accent }]}>{'\u203A'}</Text>
-                  </Pressable>
-                ))}
-              </View>
+              <ResponseGrid
+                responses={opening.responses}
+                onPress={(id) => router.push(`/move/${id}`)}
+              />
             </SectionCard>
           )}
 
@@ -408,11 +272,6 @@ const styles = StyleSheet.create({
 
   section: {
     marginBottom: 24,
-  },
-  sectionCard: {
-    padding: 20,
-    borderRadius: 12,
-    borderLeftWidth: 4,
   },
   sectionTitle: {
     fontSize: 19,
@@ -516,93 +375,6 @@ const styles = StyleSheet.create({
   bulletContainer: {
     gap: 8,
   },
-  bulletItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  bulletDot: {
-    fontSize: 16,
-    marginRight: 10,
-    fontWeight: 'bold',
-    width: 18,
-  },
-  bulletIconWrap: {
-    width: 18,
-    marginRight: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 2,
-  },
-  bulletText: {
-    fontSize: 15,
-    flex: 1,
-    lineHeight: 22,
-  },
-
-  tabBar: {
-    flexDirection: 'row',
-    marginBottom: 16,
-    borderRadius: 8,
-    padding: 3,
-    borderWidth: 1,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 9,
-    alignItems: 'center',
-    borderRadius: 6,
-  },
-  tabActive: {
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  tabText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  tabContent: {
-    minHeight: 60,
-  },
-  glanceList: {
-    gap: 8,
-  },
-  trapsContainer: {
-    gap: 10,
-    marginTop: 8,
-  },
-  trapCard: {
-    borderRadius: 8,
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-  trapHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 14,
-  },
-  trapName: {
-    fontSize: 15,
-    fontWeight: '600',
-    flex: 1,
-  },
-  trapToggle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    paddingLeft: 12,
-  },
-  trapBody: {
-    paddingHorizontal: 14,
-    paddingBottom: 14,
-  },
-  trapDesc: {
-    fontSize: 14,
-    lineHeight: 21,
-  },
 
   // Responses — redesigned
   responsesHeader: {
@@ -619,40 +391,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
-  responsesGrid: {
-    gap: 10,
-  },
-  responseCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    gap: 12,
-  },
-  responseMoveCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  responseMove: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
-  },
-  responseName: {
-    fontSize: 15,
-    fontWeight: '600',
-    flex: 1,
-  },
-  responseArrow: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-
   deepDiveToggle: {
     flexDirection: 'row',
     justifyContent: 'space-between',

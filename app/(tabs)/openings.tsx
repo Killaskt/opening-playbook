@@ -1,27 +1,27 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
 import {
   LayoutAnimation,
   Platform,
   View,
   Text,
-  TextInput,
   SectionList,
   Pressable,
   StyleSheet,
   ScrollView,
   UIManager,
-  Keyboard,
   ViewToken,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { openingsCatalog, catalogCategories, CatalogEntry, OpeningType } from '../../src/data/catalog';
+import { openingsCatalog, catalogCategories, CatalogEntry, OpeningType, TYPE_FILTERS } from '../../src/data/catalog';
 import { nodesById } from '../../src/data/openings';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
+import { SearchBar } from '../../src/components/SearchBar';
 import { openingStyleColors } from '../../src/theme/openingStyles';
 import { EcoBadge, GlassCard, PillChip } from '../../src/components/UIPrimitives';
-import { IdeaIcon } from '../../src/components/IdeaIcons';
+import { BulletRow } from '../../src/components/BulletRow';
+import { SectionJumper } from '../../src/components/SectionJumper';
 
 const TYPE_ORDER: OpeningType[] = ['opening', 'gambit', 'defense', 'system'];
 
@@ -31,14 +31,6 @@ const TYPE_SECTION_LABEL: Record<OpeningType, string> = {
   system: 'Systems',
   gambit: 'Gambits',
 };
-const TYPE_FILTERS: { key: OpeningType | null; label: string }[] = [
-  { key: null, label: 'All types' },
-  { key: 'opening', label: 'Main lines' },
-  { key: 'defense', label: 'Defenses' },
-  { key: 'gambit', label: 'Gambits' },
-  { key: 'system', label: 'Systems' },
-];
-
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
@@ -58,10 +50,10 @@ export default function OpeningsScreen() {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const sectionListRef = useRef<SectionList<CatalogEntry, CatalogSection> | null>(null);
 
-  const handleTypeFilterChange = (type: OpeningType | null) => {
+  const handleTypeFilterChange = useCallback((type: OpeningType | null) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setActiveType(type);
-  };
+  }, []);
 
   const sections = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
@@ -105,7 +97,7 @@ export default function OpeningsScreen() {
     minimumViewTime: 50,
   }).current;
 
-  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: (ViewToken & { section?: CatalogSection })[] }) => {
     const firstVisibleWithSection = viewableItems.find((token) => token.section?.key);
     if (!firstVisibleWithSection?.section?.key) return;
     const idx = sections.findIndex((s) => s.key === firstVisibleWithSection.section?.key);
@@ -115,7 +107,7 @@ export default function OpeningsScreen() {
   const canGoUp = currentSectionIndex > 0;
   const canGoDown = sections.length > 0 && currentSectionIndex < sections.length - 1;
 
-  const jumpSection = (direction: -1 | 1) => {
+  const jumpSection = useCallback((direction: -1 | 1) => {
     if (sections.length === 0) return;
     const target = Math.max(0, Math.min(sections.length - 1, currentSectionIndex + direction));
     if (target === currentSectionIndex) return;
@@ -126,9 +118,9 @@ export default function OpeningsScreen() {
       animated: true,
       viewOffset: 8,
     });
-  };
+  }, [sections, currentSectionIndex]);
 
-  const handlePress = (entry: CatalogEntry) => {
+  const handlePress = useCallback((entry: CatalogEntry) => {
     if (entry.nodeId && nodesById[entry.nodeId]) {
       router.push(`/move/${entry.nodeId}`);
     } else {
@@ -145,28 +137,17 @@ export default function OpeningsScreen() {
         },
       });
     }
-  };
+  }, [router]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <ScreenHeader title="Library" subtitle="Browse opening encyclopedia entries" />
 
-      <GlassCard style={[styles.searchBar, { marginHorizontal: spacing.lg, padding: spacing.md }]}>
-        <TextInput
-          style={[styles.searchInput, {
-            backgroundColor: colors.inputBg,
-            borderColor: colors.glassBorder,
-            color: colors.text,
-            ...typography.bodyLG,
-          }]}
-          placeholder="Search openings, styles..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholderTextColor={colors.textMuted}
-          returnKeyType="search"
-          onSubmitEditing={Keyboard.dismiss}
-        />
-      </GlassCard>
+      <SearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        placeholder="Search openings, styles..."
+      />
 
       <View style={styles.filterWrapper}>
         <ScrollView
@@ -200,6 +181,10 @@ export default function OpeningsScreen() {
         keyboardShouldPersistTaps="handled"
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
+        removeClippedSubviews={true}
+        initialNumToRender={8}
+        maxToRenderPerBatch={6}
+        windowSize={7}
         renderSectionHeader={({ section }) => (
           <View style={[styles.sectionHeader, { borderBottomColor: colors.border }]}>
             <Text style={[styles.sectionHeaderText, { color: colors.textTertiary }]}>{section.title}</Text>
@@ -247,12 +232,7 @@ export default function OpeningsScreen() {
               {item.keyIdeas && item.keyIdeas.length > 0 && (
                 <View style={styles.ideasSection}>
                   {item.keyIdeas.map((idea, i) => (
-                    <View key={i} style={styles.ideaRow}>
-                      <View style={styles.ideaIconWrap}>
-                        <IdeaIcon kind="idea" color={colors.green} size={14} />
-                      </View>
-                      <Text style={[styles.ideaText, typography.bodySM, { color: colors.textTertiary }]}>{idea}</Text>
-                    </View>
+                    <BulletRow key={i} icon="idea" iconColor={colors.green} text={idea} />
                   ))}
                 </View>
               )}
@@ -287,43 +267,13 @@ export default function OpeningsScreen() {
         }}
       />
       {sections.length > 1 && (
-        <View
-          style={[
-            styles.sectionJumpWrap,
-            {
-              bottom: tabBarHeight + 56,
-              backgroundColor: colors.cardGlassStrong,
-              borderColor: colors.glassBorder,
-            },
-          ]}
-        >
-          <Pressable
-            onPress={() => jumpSection(-1)}
-            disabled={!canGoUp}
-            style={[
-              styles.sectionJumpBtn,
-              {
-                borderBottomColor: colors.glassBorder,
-                opacity: canGoUp ? 1 : 0.35,
-              },
-            ]}
-          >
-            <Text style={[styles.sectionJumpText, { color: colors.text }]}>▲</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => jumpSection(1)}
-            disabled={!canGoDown}
-            style={[
-              styles.sectionJumpBtn,
-              {
-                borderBottomWidth: 0,
-                opacity: canGoDown ? 1 : 0.35,
-              },
-            ]}
-          >
-            <Text style={[styles.sectionJumpText, { color: colors.text }]}>▼</Text>
-          </Pressable>
-        </View>
+        <SectionJumper
+          canGoUp={canGoUp}
+          canGoDown={canGoDown}
+          onUp={() => jumpSection(-1)}
+          onDown={() => jumpSection(1)}
+          bottom={tabBarHeight + 56}
+        />
       )}
     </View>
   );
@@ -332,17 +282,6 @@ export default function OpeningsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  searchBar: {
-    marginTop: 8,
-    marginBottom: 10,
-    borderRadius: 16,
-  },
-  searchInput: {
-    borderRadius: 12,
-    padding: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
   },
   filterWrapper: {
     marginBottom: 10,
@@ -432,20 +371,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     gap: 5,
   },
-  ideaRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  ideaIconWrap: {
-    width: 18,
-    marginRight: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 2,
-  },
-  ideaText: {
-    flex: 1,
-  },
   linkHint: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -474,23 +399,5 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-  },
-  sectionJumpWrap: {
-    position: 'absolute',
-    right: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-  sectionJumpBtn: {
-    width: 38,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomWidth: 1,
-  },
-  sectionJumpText: {
-    fontSize: 13,
-    fontWeight: '700',
   },
 });

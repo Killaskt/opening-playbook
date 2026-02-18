@@ -12,7 +12,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { fundamentals, FundamentalSection } from '../../src/data/fundamentals';
+import { fundamentals, openingTypeGuideSection, FundamentalSection } from '../../src/data/fundamentals';
 import { AnimatedChessBoard } from '../../src/components/AnimatedChessBoard';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
@@ -21,20 +21,6 @@ import { GlassCard } from '../../src/components/UIPrimitives';
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
-
-const openingTypeGuideSection: FundamentalSection = {
-  id: 'opening-type-guide',
-  title: 'Opening Type Guide',
-  subtitle: 'Opening vs Defense vs System vs Gambit',
-  content:
-    'Quick definitions so you can instantly tell what kind of line you are looking at.',
-  keyPoints: [
-    'Opening: A broad main-line setup where both sides develop naturally and fight for the center. Best for classical positions and transferable fundamentals.',
-    "Defense: Black's chosen answer to White's first move (for example, the Sicilian Defense vs 1.e4). Best for building a reliable Black repertoire.",
-    'System: A setup-first approach where your piece pattern stays similar against many replies. Best for easier memorization and consistency.',
-    'Gambit: An intentional pawn sacrifice for faster development, initiative, or attacking chances. Best for dynamic play and tactical risk.',
-  ],
-};
 
 function SectionCard({
   section,

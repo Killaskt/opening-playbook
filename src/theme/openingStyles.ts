@@ -9,3 +9,10 @@ export const openingStyleColors: Record<OpeningStyle, { bg: string; darkBg: stri
   gambit: { bg: '#fce4ec', darkBg: '#301020', text: '#ad1457', darkText: '#f06292' },
   hypermodern: { bg: '#dff0ee', darkBg: '#1a2e2a', text: '#00695c', darkText: '#4db6ac' },
 };
+
+export const openingTypeColors: Record<string, { light: string; dark: string }> = {
+  opening: { light: '#2e78b7', dark: '#5b9fd6' },
+  defense: { light: '#7b1fa2', dark: '#ba68c8' },
+  system:  { light: '#00695c', dark: '#4db6ac' },
+  gambit:  { light: '#c62828', dark: '#ef5350' },
+};

@@ -1,42 +1,30 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 interface GlassCardProps {
   children: React.ReactNode;
   style?: ViewStyle | ViewStyle[];
-  pressable?: boolean;
-  onPress?: () => void;
 }
 
-export function GlassCard({ children, style, pressable = false, onPress }: GlassCardProps) {
+export function GlassCard({ children, style }: GlassCardProps) {
   const { colors, elevation } = useTheme();
 
-  const baseStyle = [
-    styles.card,
-    elevation.md,
-    {
-      backgroundColor: colors.cardGlass,
-      borderColor: colors.glassBorder,
-    },
-    style,
-  ];
-
-  if (pressable) {
-    return (
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-          baseStyle,
-          pressed && { backgroundColor: colors.cardPressed, transform: [{ scale: 0.988 }] },
-        ]}
-      >
-        {children}
-      </Pressable>
-    );
-  }
-
-  return <View style={baseStyle}>{children}</View>;
+  return (
+    <View
+      style={[
+        styles.card,
+        elevation.md,
+        {
+          backgroundColor: colors.cardGlass,
+          borderColor: colors.glassBorder,
+        },
+        style,
+      ]}
+    >
+      {children}
+    </View>
+  );
 }
 
 interface SectionCardProps {
