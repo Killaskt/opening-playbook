@@ -12,16 +12,8 @@ import { AnimatedChessBoard } from '../src/components/AnimatedChessBoard';
 import { nodesById } from '../src/data/openings';
 import { openingsCatalog, OpeningStyle } from '../src/data/catalog';
 import { useTheme } from '../src/theme/ThemeContext';
-
-const STYLE_COLORS: Record<OpeningStyle, { bg: string; darkBg: string; text: string; darkText: string }> = {
-  sharp:       { bg: '#fde8e8', darkBg: '#3a1a1a', text: '#c62828', darkText: '#ef5350' },
-  solid:       { bg: '#e3eefc', darkBg: '#1a2a3a', text: '#1565c0', darkText: '#64b5f6' },
-  positional:  { bg: '#e4f5e6', darkBg: '#1a2e1a', text: '#2e7d32', darkText: '#66bb6a' },
-  aggressive:  { bg: '#fff3e0', darkBg: '#2e1e0e', text: '#e65100', darkText: '#ff8a50' },
-  flexible:    { bg: '#f0e4f6', darkBg: '#2a1a30', text: '#7b1fa2', darkText: '#ba68c8' },
-  gambit:      { bg: '#fce4ec', darkBg: '#301020', text: '#ad1457', darkText: '#f06292' },
-  hypermodern: { bg: '#dff0ee', darkBg: '#1a2e2a', text: '#00695c', darkText: '#4db6ac' },
-};
+import { openingStyleColors } from '../src/theme/openingStyles';
+import { EcoBadge, GlassCard, PillChip, SectionCard, SectionTitle } from '../src/components/UIPrimitives';
 
 const TYPE_COLORS: Record<string, { light: string; dark: string }> = {
   opening: { light: '#2e78b7', dark: '#5b9fd6' },
@@ -31,7 +23,7 @@ const TYPE_COLORS: Record<string, { light: string; dark: string }> = {
 };
 
 export default function OpeningDetailScreen() {
-  const { colors, isDark } = useTheme();
+  const { colors, isDark, typography, spacing } = useTheme();
   const params = useLocalSearchParams<{
     pgn: string;
     name: string;
@@ -61,63 +53,57 @@ export default function OpeningDetailScreen() {
       <Stack.Screen options={{ title: name || 'Opening' }} />
       <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={[styles.heroCard, { backgroundColor: colors.card }]}>
+          <GlassCard style={[styles.heroCard, { padding: spacing.xxl }]}>
             <View style={styles.heroTopRow}>
-              <Text style={[styles.heroName, { color: colors.text }]}>{name}</Text>
+              <Text style={[styles.heroName, typography.titleLG, { color: colors.text }]}>{name}</Text>
               {type && (
-                <View style={[styles.typeBadge, { backgroundColor: typeColor + '20' }]}>
-                  <Text style={[styles.typeBadgeText, { color: typeColor }]}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </Text>
-                </View>
+                <PillChip label={type.charAt(0).toUpperCase() + type.slice(1)} backgroundColor={typeColor + '20'} textColor={typeColor} style={styles.typeBadge} textStyle={styles.typeBadgeText} />
               )}
             </View>
             {eco && (
-              <Text style={[styles.ecoLabel, { color: colors.textMuted, backgroundColor: colors.chipBg }]}>{eco}</Text>
+              <EcoBadge code={eco} style={styles.ecoLabel} />
             )}
             <View style={styles.boardWrapper}>
               <AnimatedChessBoard pgn={pgn || ''} />
             </View>
-          </View>
+          </GlassCard>
 
-          <View style={[styles.infoCard, { backgroundColor: colors.card, borderLeftColor: colors.accent }]}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Moves</Text>
-            <Text style={[styles.pgnText, { color: colors.accent }]}>{pgn}</Text>
-          </View>
+          <SectionCard accentColor={colors.accent} style={styles.infoCard}>
+            <SectionTitle>Moves</SectionTitle>
+            <Text style={[styles.pgnText, typography.mono, { color: colors.accent }]}>{pgn}</Text>
+          </SectionCard>
 
           {styleList.length > 0 && (
-            <View style={[styles.infoCard, { backgroundColor: colors.card, borderLeftColor: colors.purple }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Style</Text>
+            <SectionCard accentColor={colors.purple} style={styles.infoCard}>
+              <SectionTitle>Style</SectionTitle>
               <View style={styles.styleRow}>
                 {styleList.map((s) => {
-                  const sc = STYLE_COLORS[s];
+                  const sc = openingStyleColors[s];
                   return (
-                    <View key={s} style={[styles.styleTag, { backgroundColor: isDark ? sc.darkBg : sc.bg }]}>
-                      <Text style={[styles.styleTagText, { color: isDark ? sc.darkText : sc.text }]}>{s}</Text>
-                    </View>
+                    <PillChip key={s} label={s} backgroundColor={isDark ? sc.darkBg : sc.bg} textColor={isDark ? sc.darkText : sc.text} style={styles.styleTag} textStyle={styles.styleTagText} />
                   );
                 })}
               </View>
-            </View>
+            </SectionCard>
           )}
 
           {desc && (
-            <View style={[styles.infoCard, { backgroundColor: colors.card, borderLeftColor: colors.green }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>About this opening</Text>
-              <Text style={[styles.descText, { color: colors.textSecondary }]}>{desc}</Text>
-            </View>
+            <SectionCard accentColor={colors.green} style={styles.infoCard}>
+              <SectionTitle>About this opening</SectionTitle>
+              <Text style={[styles.descText, typography.bodyLG, { color: colors.textSecondary }]}>{desc}</Text>
+            </SectionCard>
           )}
 
           {keyIdeas.length > 0 && (
-            <View style={[styles.infoCard, { backgroundColor: colors.card, borderLeftColor: colors.orange }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Key ideas</Text>
+            <SectionCard accentColor={colors.orange} style={styles.infoCard}>
+              <SectionTitle>Key ideas</SectionTitle>
               {keyIdeas.map((idea, i) => (
                 <View key={i} style={styles.ideaRow}>
                   <Text style={[styles.ideaDot, { color: colors.green }]}>+</Text>
-                  <Text style={[styles.ideaText, { color: colors.textSecondary }]}>{idea}</Text>
+                  <Text style={[styles.ideaText, typography.bodyMD, { color: colors.textSecondary }]}>{idea}</Text>
                 </View>
               ))}
-            </View>
+            </SectionCard>
           )}
 
           {linkedNode && (
@@ -148,11 +134,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 24,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
   },
   heroTopRow: {
     flexDirection: 'row',
@@ -160,11 +141,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 8,
   },
-  heroName: {
-    fontSize: 22,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
+  heroName: { textAlign: 'center' },
   typeBadge: {
     paddingHorizontal: 12,
     paddingVertical: 5,
@@ -174,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   typeBadgeText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.3,
   },
@@ -196,14 +173,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderLeftWidth: 4,
   },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    marginBottom: 10,
-  },
   pgnText: {
     fontSize: 16,
-    fontFamily: 'monospace',
     lineHeight: 24,
   },
   styleRow: {
@@ -225,8 +196,7 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
   descText: {
-    fontSize: 15,
-    lineHeight: 24,
+    lineHeight: 23,
   },
   ideaRow: {
     flexDirection: 'row',
@@ -240,9 +210,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   ideaText: {
-    fontSize: 14,
     flex: 1,
-    lineHeight: 21,
   },
   exploreBtn: {
     flexDirection: 'row',

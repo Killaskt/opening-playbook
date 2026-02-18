@@ -1,11 +1,17 @@
 import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import { useColorScheme } from 'react-native';
 import { ThemeColors, lightColors, darkColors } from './colors';
+import { spacing, SpacingScale } from './spacing';
+import { typography, TypographyScale } from './typography';
+import { elevation, ElevationScale } from './elevation';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 
 interface ThemeContextValue {
   colors: ThemeColors;
+  spacing: SpacingScale;
+  typography: TypographyScale;
+  elevation: ElevationScale;
   mode: ThemeMode;
   isDark: boolean;
   setMode: (mode: ThemeMode) => void;
@@ -14,6 +20,9 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue>({
   colors: lightColors,
+  spacing,
+  typography,
+  elevation,
   mode: 'system',
   isDark: false,
   setMode: () => {},
@@ -38,6 +47,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<ThemeContextValue>(
     () => ({
       colors: isDark ? darkColors : lightColors,
+      spacing,
+      typography,
+      elevation,
       mode,
       isDark,
       setMode,

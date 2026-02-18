@@ -9,22 +9,14 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { nodesById } from '../../src/data/openings';
-import { catalogByNodeId, OpeningStyle } from '../../src/data/catalog';
+import { catalogByNodeId } from '../../src/data/catalog';
 import { PRINCIPLES } from '../../src/data/principles';
 import { TreeView } from '../../src/components/TreeView';
 import { AnimatedChessBoard } from '../../src/components/AnimatedChessBoard';
 import { TrapInfo } from '../../src/types';
 import { useTheme } from '../../src/theme/ThemeContext';
-
-const STYLE_COLORS: Record<OpeningStyle, { bg: string; darkBg: string; text: string; darkText: string }> = {
-  sharp:       { bg: '#fde8e8', darkBg: '#3a1a1a', text: '#c62828', darkText: '#ef5350' },
-  solid:       { bg: '#e3eefc', darkBg: '#1a2a3a', text: '#1565c0', darkText: '#64b5f6' },
-  positional:  { bg: '#e4f5e6', darkBg: '#1a2e1a', text: '#2e7d32', darkText: '#66bb6a' },
-  aggressive:  { bg: '#fff3e0', darkBg: '#2e1e0e', text: '#e65100', darkText: '#ff8a50' },
-  flexible:    { bg: '#f0e4f6', darkBg: '#2a1a30', text: '#7b1fa2', darkText: '#ba68c8' },
-  gambit:      { bg: '#fce4ec', darkBg: '#301020', text: '#ad1457', darkText: '#f06292' },
-  hypermodern: { bg: '#dff0ee', darkBg: '#1a2e2a', text: '#00695c', darkText: '#4db6ac' },
-};
+import { openingStyleColors } from '../../src/theme/openingStyles';
+import { EcoBadge, GlassCard, PillChip, SectionCard, SectionTitle } from '../../src/components/UIPrimitives';
 
 function TrapCard({ trap }: { trap: TrapInfo }) {
   const [expanded, setExpanded] = useState(false);
@@ -58,7 +50,7 @@ type GlanceTab = 'strengths' | 'weaknesses' | 'watchOut';
 export default function MoveDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { colors, isDark } = useTheme();
+  const { colors, isDark, typography } = useTheme();
   const opening = id ? nodesById[id] : undefined;
   const catalog = id ? catalogByNodeId.get(id) : undefined;
   const [glanceTab, setGlanceTab] = useState<GlanceTab>('strengths');
@@ -113,25 +105,21 @@ export default function MoveDetailScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent}>
 
           {/* Hero */}
-          <View style={[styles.heroCard, { backgroundColor: colors.card }]}>
+          <GlassCard style={[styles.heroCard, { backgroundColor: colors.cardGlassStrong }]}>
             <Text style={[styles.heroMove, { color: colors.accent }]}>{opening.move}</Text>
-            <Text style={[styles.heroName, { color: colors.text }]}>{opening.name}</Text>
+            <Text style={[styles.heroName, typography.titleLG, { color: colors.text }]}>{opening.name}</Text>
             {catalog?.eco && (
-              <Text style={[styles.ecoBadge, { color: colors.textMuted, backgroundColor: colors.chipBg }]}>
-                {catalog.eco}
-              </Text>
+              <EcoBadge code={catalog.eco} style={styles.ecoBadge} />
             )}
             {opening.intent[0] && (
-              <Text style={[styles.heroTagline, { color: colors.textTertiary }]}>{opening.intent[0]}</Text>
+              <Text style={[styles.heroTagline, typography.bodyLG, { color: colors.textTertiary }]}>{opening.intent[0]}</Text>
             )}
             {catalog?.style && catalog.style.length > 0 && (
               <View style={styles.heroStyleRow}>
                 {catalog.style.map((s) => {
-                  const sc = STYLE_COLORS[s];
+                  const sc = openingStyleColors[s];
                   return (
-                    <View key={s} style={[styles.heroStyleTag, { backgroundColor: isDark ? sc.darkBg : sc.bg }]}>
-                      <Text style={[styles.heroStyleText, { color: isDark ? sc.darkText : sc.text }]}>{s}</Text>
-                    </View>
+                    <PillChip key={s} label={s} backgroundColor={isDark ? sc.darkBg : sc.bg} textColor={isDark ? sc.darkText : sc.text} style={styles.heroStyleTag} textStyle={styles.heroStyleText} />
                   );
                 })}
               </View>
@@ -139,12 +127,12 @@ export default function MoveDetailScreen() {
             <View style={styles.heroBoardWrapper}>
               <AnimatedChessBoard pgn={opening.boardPgn} arrows={opening.boardArrows} />
             </View>
-          </View>
+          </GlassCard>
 
           {/* Principles */}
           {hasPrinciples && (
-            <View style={[styles.section, styles.sectionCard, { backgroundColor: colors.card, borderLeftColor: colors.teal }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>How to think about this</Text>
+            <SectionCard style={styles.section} accentColor={colors.teal}>
+              <SectionTitle>How to think about this</SectionTitle>
               <View style={styles.principlesContainer}>
                 {opening.principleApplications!.map((pa, index) => {
                   const p = PRINCIPLES[pa.principleId];
@@ -160,23 +148,23 @@ export default function MoveDetailScreen() {
                   );
                 })}
               </View>
-            </View>
+            </SectionCard>
           )}
 
           {/* Why play this — node data takes priority, catalog description is fallback, intent lines as last resort */}
           {hasWhyThisMove ? (
-            <View style={[styles.section, styles.sectionCard, { backgroundColor: colors.card, borderLeftColor: colors.accent }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Why play this?</Text>
+            <SectionCard style={styles.section} accentColor={colors.accent}>
+              <SectionTitle>Why play this?</SectionTitle>
               <Text style={[styles.bodyText, { color: colors.textSecondary }]}>{opening.whyThisMove}</Text>
-            </View>
+            </SectionCard>
           ) : catalog?.description ? (
-            <View style={[styles.section, styles.sectionCard, { backgroundColor: colors.card, borderLeftColor: colors.accent }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>About this opening</Text>
+            <SectionCard style={styles.section} accentColor={colors.accent}>
+              <SectionTitle>About this opening</SectionTitle>
               <Text style={[styles.bodyText, { color: colors.textSecondary }]}>{catalog.description}</Text>
-            </View>
+            </SectionCard>
           ) : opening.intent.length > 1 ? (
-            <View style={[styles.section, styles.sectionCard, { backgroundColor: colors.card, borderLeftColor: colors.accent }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Why play this?</Text>
+            <SectionCard style={styles.section} accentColor={colors.accent}>
+              <SectionTitle>Why play this?</SectionTitle>
               <View style={styles.bulletContainer}>
                 {opening.intent.slice(1).map((line, i) => (
                   <View key={i} style={styles.bulletItem}>
@@ -185,13 +173,13 @@ export default function MoveDetailScreen() {
                   </View>
                 ))}
               </View>
-            </View>
+            </SectionCard>
           ) : null}
 
           {/* Strategic themes — node data takes priority, catalog keyIdeas is fallback */}
           {hasStrategicThemes ? (
-            <View style={[styles.section, styles.sectionCard, { backgroundColor: colors.card, borderLeftColor: colors.green }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>What you're aiming for</Text>
+            <SectionCard style={styles.section} accentColor={colors.green}>
+              <SectionTitle>What you're aiming for</SectionTitle>
               <View style={styles.bulletContainer}>
                 {opening.strategicThemes!.map((theme, index) => (
                   <View key={index} style={styles.bulletItem}>
@@ -200,10 +188,10 @@ export default function MoveDetailScreen() {
                   </View>
                 ))}
               </View>
-            </View>
+            </SectionCard>
           ) : catalog?.keyIdeas && catalog.keyIdeas.length > 0 ? (
-            <View style={[styles.section, styles.sectionCard, { backgroundColor: colors.card, borderLeftColor: colors.green }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Key ideas</Text>
+            <SectionCard style={styles.section} accentColor={colors.green}>
+              <SectionTitle>Key ideas</SectionTitle>
               <View style={styles.bulletContainer}>
                 {catalog.keyIdeas.map((idea, index) => (
                   <View key={index} style={styles.bulletItem}>
@@ -212,7 +200,7 @@ export default function MoveDetailScreen() {
                   </View>
                 ))}
               </View>
-            </View>
+            </SectionCard>
           ) : null}
 
           {/* At a Glance */}

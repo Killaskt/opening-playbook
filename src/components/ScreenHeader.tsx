@@ -20,19 +20,28 @@ const MODE_LABEL: Record<ThemeMode, string> = {
 };
 
 export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
-  const { colors, mode, cycleMode } = useTheme();
+  const { colors, mode, cycleMode, spacing, typography } = useTheme();
 
   return (
-    <View style={[styles.container, { paddingTop: Platform.OS === 'ios' ? 100 : 76 }]}>
+    <View style={[styles.container, { paddingTop: Platform.OS === 'ios' ? 100 : 76, paddingHorizontal: spacing.xl }]}>
       <View style={styles.row}>
         <View style={styles.titles}>
-          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+          <Text style={[styles.title, typography.titleXL, { color: colors.text }]}>{title}</Text>
           {subtitle && (
-            <Text style={[styles.subtitle, { color: colors.textTertiary }]}>{subtitle}</Text>
+            <Text style={[styles.subtitle, typography.bodySM, { color: colors.textTertiary }]}>{subtitle}</Text>
           )}
         </View>
         <Pressable
-          style={[styles.themeBtn, { backgroundColor: colors.chipBg }]}
+          style={[
+            styles.themeBtn,
+            {
+              backgroundColor: colors.cardGlassStrong,
+              borderColor: colors.glassBorder,
+              paddingHorizontal: spacing.md,
+              paddingVertical: spacing.sm,
+              shadowColor: colors.shadow,
+            },
+          ]}
           onPress={cycleMode}
           hitSlop={8}
         >
@@ -50,8 +59,7 @@ export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
-    paddingBottom: 4,
+    paddingBottom: 8,
   },
   row: {
     flexDirection: 'row',
@@ -62,21 +70,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 30,
     fontWeight: '800',
   },
   subtitle: {
-    fontSize: 14,
     marginTop: 4,
   },
   themeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 10,
+    borderWidth: 1,
     marginTop: 4,
     gap: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   themeIcon: {
     fontSize: 16,

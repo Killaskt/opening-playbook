@@ -34,25 +34,48 @@ function BulbIcon({ color, size }: { color: string; size: number }) {
 }
 
 export default function TabLayout() {
-  const { colors } = useTheme();
+  const { colors, spacing, typography } = useTheme();
+  const isIOS = Platform.OS === 'ios';
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          backgroundColor: colors.tabBarBg,
-          borderTopColor: colors.tabBarBorder,
+          position: 'absolute',
+          backgroundColor: colors.cardGlassStrong,
+          borderTopColor: colors.glassBorder,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 88 : 60,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
-          paddingTop: Platform.OS === 'ios' ? 16 : 8,
+          height: isIOS ? 72 : 64,
+          paddingBottom: isIOS ? spacing.sm : spacing.xs,
+          paddingTop: spacing.sm,
+          borderRadius: isIOS ? 50 : 25,
+          marginHorizontal: spacing.xxl,
+          marginBottom: isIOS ? spacing.lg : spacing.md,
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: isIOS ? 0.12 : 0.08,
+          shadowRadius: 12,
+          elevation: 8,
         },
         tabBarActiveTintColor: colors.tabBarActive,
-        tabBarInactiveTintColor: colors.tabBarInactive,
+        tabBarInactiveTintColor: colors.textTertiary,
+        tabBarActiveBackgroundColor: 'rgba(147, 197, 253, 0.15)',
+        tabBarInactiveBackgroundColor: 'transparent',
+        tabBarItemStyle: {
+          borderRadius: 25,
+          marginHorizontal: 10,
+          marginVertical: 0,
+          overflow: 'hidden',
+        },
+        tabBarIconStyle: {
+          marginTop: 0,
+        },
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
+          ...typography.label,
+          fontWeight: '700',
+          marginTop: -1,
         },
       }}
     >
@@ -60,27 +83,21 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Moves',
-          tabBarIcon: ({ color, size }) => (
-            <PawnIcon color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <PawnIcon color={color} size={size + 1} />,
         }}
       />
       <Tabs.Screen
         name="openings"
         options={{
           title: 'Openings',
-          tabBarIcon: ({ color, size }) => (
-            <LibraryIcon color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <LibraryIcon color={color} size={size + 1} />,
         }}
       />
       <Tabs.Screen
         name="learn"
         options={{
           title: 'Learn',
-          tabBarIcon: ({ color, size }) => (
-            <BulbIcon color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <BulbIcon color={color} size={size + 1} />,
         }}
       />
     </Tabs>

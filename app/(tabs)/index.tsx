@@ -7,15 +7,19 @@ import {
   Pressable,
   StyleSheet,
   Keyboard,
+  ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { startMoves } from '../../src/data/openings';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
+import { GlassCard, PillChip } from '../../src/components/UIPrimitives';
 
 export default function ExploreScreen() {
   const router = useRouter();
-  const { colors } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const { colors, spacing, typography } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredMoves = startMoves.filter((move) => {
@@ -31,53 +35,62 @@ export default function ExploreScreen() {
   const renderItem = ({ item }: { item: typeof startMoves[0] }) => (
     <Pressable
       style={({ pressed }) => [
-        styles.card,
-        { backgroundColor: colors.card, borderColor: colors.border },
-        pressed && { backgroundColor: colors.cardPressed, borderColor: colors.accent + '40' },
+        styles.cardTouch,
+        pressed && { opacity: 0.95 },
       ]}
       onPress={() => router.push(`/move/${item.id}`)}
     >
+      <GlassCard style={styles.card}>
       <View style={styles.cardRow}>
-        <View style={[styles.moveBadge, { backgroundColor: colors.accentBg }]}>
-          <Text style={[styles.moveNotation, { color: colors.accent }]}>{item.move}</Text>
+        <View style={[styles.movePane, { backgroundColor: colors.accentBg }]}>
+          <Text style={[styles.moveNotation, typography.mono, { color: colors.accent }]}>{item.move}</Text>
         </View>
-        <View style={styles.cardContent}>
-          <Text style={[styles.moveName, { color: colors.text }]}>{item.name}</Text>
-          <Text style={[styles.moveHint, { color: colors.textTertiary }]} numberOfLines={2}>
+        <View style={[styles.cardContent, { paddingHorizontal: spacing.lg, paddingVertical: spacing.md }]}>
+          <Text style={[styles.moveName, typography.titleSM, { color: colors.text }]} numberOfLines={1}>
+            {item.name}
+          </Text>
+          <Text style={[styles.moveHint, typography.bodySM, { color: colors.textTertiary }]} numberOfLines={2}>
             {item.whyThisMove
               ? item.whyThisMove.split('.')[0] + '.'
               : item.intent[0]}
           </Text>
           {item.responses.length > 0 && (
-            <View style={styles.chipsRow}>
-              {item.responses.slice(0, 3).map((resp) => (
-                <View key={resp.id} style={[styles.chip, { backgroundColor: colors.chipBg }]}>
-                  <Text style={[styles.chipText, { color: colors.textSecondary }]}>{resp.name}</Text>
-                </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.chipsScrollContent}
+              style={styles.chipsScroller}
+            >
+              {item.responses.map((resp) => (
+                <PillChip
+                  key={resp.id}
+                  label={resp.name}
+                  backgroundColor={colors.chipBg}
+                  textColor={colors.textSecondary}
+                  style={styles.chip}
+                  textStyle={styles.chipText}
+                />
               ))}
-              {item.responses.length > 3 && (
-                <Text style={[styles.moreText, { color: colors.textMuted }]}>
-                  +{item.responses.length - 3}
-                </Text>
-              )}
-            </View>
+            </ScrollView>
           )}
         </View>
         <Text style={[styles.arrow, { color: colors.textMuted }]}>{'>'}</Text>
       </View>
+      </GlassCard>
     </Pressable>
   );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <ScreenHeader title="Explore" subtitle="Step through openings move by move" />
+      <ScreenHeader title="Moves" subtitle="Step through openings move by move" />
 
-      <View style={styles.searchBar}>
+      <GlassCard style={[styles.searchBar, { padding: spacing.md, marginHorizontal: spacing.lg }]}>
         <TextInput
           style={[styles.searchInput, {
             backgroundColor: colors.inputBg,
-            borderColor: colors.inputBorder,
+            borderColor: colors.glassBorder,
             color: colors.text,
+            ...typography.bodyLG,
           }]}
           placeholder="Search moves, names, concepts..."
           value={searchQuery}
@@ -86,18 +99,15 @@ export default function ExploreScreen() {
           returnKeyType="search"
           onSubmitEditing={Keyboard.dismiss}
         />
-      </View>
+      </GlassCard>
 
       <FlatList
         data={filteredMoves}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 20 }]}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
-        ListHeaderComponent={
-          <Text style={[styles.listHeader, { color: colors.textMuted }]}>White's first move</Text>
-        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: colors.textMuted }]}>No openings found</Text>
@@ -113,88 +123,80 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchBar: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 12,
+    marginTop: 8,
+    marginBottom: 10,
+    borderRadius: 16,
   },
   searchInput: {
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 12,
     paddingHorizontal: 16,
-    fontSize: 15,
     borderWidth: 1,
   },
   listContent: {
     paddingHorizontal: 16,
     paddingBottom: 24,
   },
-  listHeader: {
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  cardTouch: {
     marginBottom: 12,
-    marginTop: 4,
   },
   card: {
     borderRadius: 14,
-    padding: 16,
-    marginBottom: 10,
-    borderWidth: 1,
+    overflow: 'hidden',
   },
   cardRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
+    minHeight: 94,
   },
-  moveBadge: {
-    width: 52,
-    height: 52,
-    borderRadius: 12,
+  movePane: {
+    width: 78,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
+    borderTopLeftRadius: 14,
+    borderBottomLeftRadius: 14,
+    alignSelf: 'stretch',
   },
   moveNotation: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    fontFamily: 'monospace',
   },
   cardContent: {
     flex: 1,
+    justifyContent: 'center',
   },
   moveName: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 3,
+    marginBottom: 8,
   },
   moveHint: {
-    fontSize: 13,
-    lineHeight: 18,
-    marginBottom: 6,
+    marginBottom: 10,
   },
-  chipsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  chipsScroller: {
+    maxHeight: 30,
+  },
+  chipsScrollContent: {
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
+    paddingRight: 6,
   },
   chip: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    minHeight: 22,
   },
   chipText: {
     fontSize: 11,
-    fontWeight: '600',
   },
   moreText: {
     fontSize: 11,
-    fontWeight: '600',
   },
   arrow: {
     fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: 4,
+    marginRight: 10,
+    alignSelf: 'center',
   },
   emptyContainer: {
     padding: 40,

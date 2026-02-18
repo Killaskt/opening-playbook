@@ -10,20 +10,13 @@ import {
   Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { openingsCatalog, catalogCategories, CatalogEntry, OpeningStyle, OpeningType } from '../../src/data/catalog';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { openingsCatalog, catalogCategories, CatalogEntry, OpeningType } from '../../src/data/catalog';
 import { nodesById } from '../../src/data/openings';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
-
-const STYLE_COLORS: Record<OpeningStyle, { bg: string; darkBg: string; text: string; darkText: string }> = {
-  sharp:       { bg: '#fde8e8', darkBg: '#3a1a1a', text: '#c62828', darkText: '#ef5350' },
-  solid:       { bg: '#e3eefc', darkBg: '#1a2a3a', text: '#1565c0', darkText: '#64b5f6' },
-  positional:  { bg: '#e4f5e6', darkBg: '#1a2e1a', text: '#2e7d32', darkText: '#66bb6a' },
-  aggressive:  { bg: '#fff3e0', darkBg: '#2e1e0e', text: '#e65100', darkText: '#ff8a50' },
-  flexible:    { bg: '#f0e4f6', darkBg: '#2a1a30', text: '#7b1fa2', darkText: '#ba68c8' },
-  gambit:      { bg: '#fce4ec', darkBg: '#301020', text: '#ad1457', darkText: '#f06292' },
-  hypermodern: { bg: '#dff0ee', darkBg: '#1a2e2a', text: '#00695c', darkText: '#4db6ac' },
-};
+import { openingStyleColors } from '../../src/theme/openingStyles';
+import { EcoBadge, GlassCard, PillChip } from '../../src/components/UIPrimitives';
 
 const TYPE_ORDER: OpeningType[] = ['opening', 'gambit', 'defense', 'system'];
 
@@ -40,7 +33,8 @@ function sectionTitle(catLabel: string, type: OpeningType): string {
 
 export default function OpeningsScreen() {
   const router = useRouter();
-  const { colors, isDark } = useTheme();
+  const tabBarHeight = useBottomTabBarHeight();
+  const { colors, isDark, spacing, typography } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
@@ -104,12 +98,13 @@ export default function OpeningsScreen() {
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <ScreenHeader title="Openings" subtitle="Browse named openings and defenses" />
 
-      <View style={styles.searchBar}>
+      <GlassCard style={[styles.searchBar, { marginHorizontal: spacing.lg, padding: spacing.md }]}>
         <TextInput
           style={[styles.searchInput, {
             backgroundColor: colors.inputBg,
-            borderColor: colors.inputBorder,
+            borderColor: colors.glassBorder,
             color: colors.text,
+            ...typography.bodyLG,
           }]}
           placeholder="Search openings, styles..."
           value={searchQuery}
@@ -118,7 +113,7 @@ export default function OpeningsScreen() {
           returnKeyType="search"
           onSubmitEditing={Keyboard.dismiss}
         />
-      </View>
+      </GlassCard>
 
       <View style={styles.filterWrapper}>
         <ScrollView
@@ -127,21 +122,27 @@ export default function OpeningsScreen() {
           contentContainerStyle={styles.filterRow}
           keyboardShouldPersistTaps="handled"
         >
-        <Pressable
-          style={[styles.filterChip, { backgroundColor: !activeCategory ? colors.accent : colors.chipBg }]}
-          onPress={() => setActiveCategory(null)}
-        >
-          <Text style={[styles.filterText, { color: !activeCategory ? '#fff' : colors.textTertiary }]}>All</Text>
+        <Pressable onPress={() => setActiveCategory(null)}>
+          <PillChip
+            label="All"
+            backgroundColor={!activeCategory ? colors.accent : colors.chipBg}
+            textColor={!activeCategory ? colors.textInverse : colors.textTertiary}
+            style={styles.filterChip}
+            textStyle={styles.filterText}
+          />
         </Pressable>
         {catalogCategories.map((cat) => (
           <Pressable
             key={cat.key}
-            style={[styles.filterChip, { backgroundColor: activeCategory === cat.key ? colors.accent : colors.chipBg }]}
             onPress={() => setActiveCategory(activeCategory === cat.key ? null : cat.key)}
           >
-            <Text style={[styles.filterText, { color: activeCategory === cat.key ? '#fff' : colors.textTertiary }]}>
-              {cat.label}
-            </Text>
+            <PillChip
+              label={cat.label}
+              backgroundColor={activeCategory === cat.key ? colors.accent : colors.chipBg}
+              textColor={activeCategory === cat.key ? colors.textInverse : colors.textTertiary}
+              style={styles.filterChip}
+              textStyle={styles.filterText}
+            />
           </Pressable>
         ))}
         </ScrollView>
@@ -161,59 +162,63 @@ export default function OpeningsScreen() {
           return (
             <Pressable
               style={({ pressed }) => [
-                styles.card,
-                { backgroundColor: colors.card, borderColor: colors.border },
-                pressed && { backgroundColor: colors.cardPressed, borderColor: colors.accent + '40' },
+                styles.cardTouch,
+                pressed && { opacity: 0.95 },
               ]}
               onPress={() => handlePress(item)}
             >
+              <GlassCard style={styles.card}>
               <View style={styles.cardTop}>
-                <Text style={[styles.openingName, { color: colors.text }]}>{item.name}</Text>
+                <Text style={[styles.openingName, typography.titleSM, { color: colors.text }]}>{item.name}</Text>
                 {item.eco && (
-                  <Text style={[styles.ecoLabel, { color: colors.textMuted, backgroundColor: colors.chipBg }]}>
-                    {item.eco}
-                  </Text>
+                  <EcoBadge code={item.eco} style={styles.ecoLabel} />
                 )}
               </View>
 
-              <Text style={[styles.pgnText, { color: colors.accent }]}>{item.pgn}</Text>
+              <Text style={[styles.pgnText, typography.mono, { color: colors.accent }]}>{item.pgn}</Text>
 
               {item.style && item.style.length > 0 && (
                 <View style={styles.styleRow}>
                   {item.style.map((s) => {
-                    const sc = STYLE_COLORS[s];
+                    const sc = openingStyleColors[s];
                     return (
-                      <View key={s} style={[styles.styleTag, { backgroundColor: isDark ? sc.darkBg : sc.bg }]}>
-                        <Text style={[styles.styleTagText, { color: isDark ? sc.darkText : sc.text }]}>{s}</Text>
-                      </View>
+                      <PillChip
+                        key={s}
+                        label={s}
+                        backgroundColor={isDark ? sc.darkBg : sc.bg}
+                        textColor={isDark ? sc.darkText : sc.text}
+                        style={styles.styleTag}
+                        textStyle={styles.styleTagText}
+                      />
                     );
                   })}
                 </View>
               )}
 
-              <Text style={[styles.descText, { color: colors.textSecondary }]}>{item.description}</Text>
+              <Text style={[styles.descText, typography.bodyMD, { color: colors.textSecondary }]}>{item.description}</Text>
 
               {item.keyIdeas && item.keyIdeas.length > 0 && (
                 <View style={styles.ideasSection}>
                   {item.keyIdeas.map((idea, i) => (
                     <View key={i} style={styles.ideaRow}>
                       <Text style={[styles.ideaDot, { color: colors.green }]}>+</Text>
-                      <Text style={[styles.ideaText, { color: colors.textTertiary }]}>{idea}</Text>
+                      <Text style={[styles.ideaText, typography.bodySM, { color: colors.textTertiary }]}>{idea}</Text>
                     </View>
                   ))}
                 </View>
               )}
 
               {item.nodeId && nodesById[item.nodeId] && (
-                <View style={[styles.linkHint, { borderTopColor: colors.borderLight }]}>
-                  <Text style={[styles.linkHintText, { color: colors.accent }]}>Explore move-by-move</Text>
+                <View style={[styles.linkHint, { borderTopColor: colors.borderLight, backgroundColor: colors.accentBg }]}>
+                  <Text style={[styles.linkHintText, typography.label, { color: colors.accent }]}>Explore move-by-move</Text>
                   <Text style={[styles.linkArrow, { color: colors.accent }]}>{'>'}</Text>
                 </View>
               )}
+              </GlassCard>
             </Pressable>
           );
         }}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 30 }]}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: colors.textMuted }]}>No openings match your search</Text>
@@ -230,15 +235,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchBar: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 10,
+    marginTop: 8,
+    marginBottom: 10,
+    borderRadius: 16,
   },
   searchInput: {
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 12,
     paddingHorizontal: 16,
-    fontSize: 15,
     borderWidth: 1,
   },
   filterWrapper: {
@@ -253,9 +257,9 @@ const styles = StyleSheet.create({
   },
   filterChip: {
     paddingHorizontal: 18,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 20,
-    minHeight: 30,
+    minHeight: 32,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -279,11 +283,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.3,
   },
+  cardTouch: {
+    marginBottom: 10,
+  },
   card: {
     borderRadius: 14,
     padding: 16,
-    marginBottom: 10,
-    borderWidth: 1,
   },
   cardTop: {
     flexDirection: 'row',
@@ -292,22 +297,15 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   openingName: {
-    fontSize: 16,
-    fontWeight: '700',
     flex: 1,
   },
   ecoLabel: {
-    fontSize: 12,
-    fontWeight: '700',
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingVertical: 3,
     marginLeft: 8,
-    overflow: 'hidden',
   },
   pgnText: {
     fontSize: 14,
-    fontFamily: 'monospace',
     marginBottom: 10,
   },
   styleRow: {
@@ -320,7 +318,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 12,
-    minHeight: 20,
+    minHeight: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -330,8 +328,6 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
   descText: {
-    fontSize: 14,
-    lineHeight: 21,
     marginBottom: 6,
   },
   ideasSection: {
@@ -349,16 +345,20 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   ideaText: {
-    fontSize: 13,
     flex: 1,
-    lineHeight: 19,
   },
   linkHint: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 12,
-    paddingTop: 10,
+    marginHorizontal: -16,
+    marginBottom: -16,
+    paddingTop: 12,
+    paddingBottom: 12,
+    paddingHorizontal: 16,
     borderTopWidth: 1,
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
   },
   linkHintText: {
     fontSize: 13,

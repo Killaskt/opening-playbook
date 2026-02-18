@@ -5,6 +5,7 @@ import Svg, { Line, Polygon } from 'react-native-svg';
 import { renderPiece } from './ChessPieces';
 import { BoardArrow } from '../types';
 import { useTheme } from '../theme/ThemeContext';
+import { elevation } from '../theme/elevation';
 
 interface AnimatedChessBoardProps {
   pgn: string;
@@ -14,7 +15,7 @@ interface AnimatedChessBoardProps {
 }
 
 export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: AnimatedChessBoardProps) {
-  const { colors } = useTheme();
+  const { colors, typography } = useTheme();
   const [game] = useState(() => new Chess());
   const [moves, setMoves] = useState<string[]>([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
@@ -245,9 +246,9 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.card }]}>
+    <View style={[styles.container, elevation.md, { backgroundColor: colors.cardGlass, borderColor: colors.glassBorder }]}>
       {label && (
-        <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
+        <Text style={[styles.label, typography.bodyLG, { color: colors.textSecondary }]}>{label}</Text>
       )}
 
       <View style={[styles.boardContainer, { borderColor: colors.boardBorder }]}>
@@ -261,8 +262,8 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
         </View>
       </View>
 
-      <View style={[styles.moveCounter, { backgroundColor: colors.moveCounterBg }]}>
-        <Text style={[styles.moveText, { color: colors.text }]}>
+      <View style={[styles.moveCounter, { backgroundColor: colors.moveCounterBg, borderColor: colors.glassBorder }]}>
+        <Text style={[styles.moveText, typography.mono, { color: colors.text }]}>
           Move {currentMoveIndex + 1} of {moves.length}
           {currentMoveIndex >= 0 && ` (${moves[currentMoveIndex]})`}
         </Text>
@@ -314,14 +315,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
   },
   label: {
-    fontSize: 15,
     fontWeight: '600',
     marginBottom: 10,
   },
@@ -351,13 +347,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     padding: 8,
     borderRadius: 6,
+    borderWidth: 1,
     minWidth: 200,
     alignItems: 'center',
   },
   moveText: {
     fontSize: 14,
     fontWeight: '600',
-    fontFamily: 'monospace',
   },
   controls: {
     flexDirection: 'row',
