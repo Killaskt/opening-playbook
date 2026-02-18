@@ -105,7 +105,7 @@ export default function ExploreScreen() {
         data={filteredMoves}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 20 }]}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 30 }]}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     marginTop: 8,
-    marginBottom: 10,
+    marginBottom: 15,
     borderRadius: 16,
   },
   searchInput: {
