@@ -141,7 +141,7 @@ export default function OpeningsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <ScreenHeader title="Library" subtitle="Browse opening encyclopedia entries" />
+      <ScreenHeader title="Library" subtitle="Browse the opening encyclopedia" />
 
       <SearchBar
         value={searchQuery}

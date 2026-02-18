@@ -61,6 +61,14 @@ function AppStack() {
             headerLeft: () => renderBackButton(() => navigation.goBack()),
           })}
         />
+        <Stack.Screen
+          name="contact"
+          options={({ navigation }) => ({
+            title: 'Contact',
+            headerBackVisible: false,
+            headerLeft: () => renderBackButton(() => navigation.goBack()),
+          })}
+        />
       </Stack>
     </>
   );

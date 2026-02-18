@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTheme, ThemeMode } from '../theme/ThemeContext';
+import { MailIcon } from './TabIcons';
 
 interface ScreenHeaderProps {
   title: string;
@@ -20,6 +22,7 @@ const MODE_LABEL: Record<ThemeMode, string> = {
 };
 
 export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
+  const router = useRouter();
   const { colors, mode, cycleMode, spacing, typography } = useTheme();
 
   return (
@@ -31,27 +34,46 @@ export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
             <Text style={[styles.subtitle, typography.bodySM, { color: colors.textTertiary }]}>{subtitle}</Text>
           )}
         </View>
-        <Pressable
-          style={[
-            styles.themeBtn,
-            {
-              backgroundColor: colors.cardGlassStrong,
-              borderColor: colors.glassBorder,
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.sm,
-              shadowColor: colors.shadow,
-            },
-          ]}
-          onPress={cycleMode}
-          hitSlop={8}
-        >
-          <Text style={[styles.themeIcon, { color: colors.textSecondary }]}>
-            {MODE_ICON[mode]}
-          </Text>
-          <Text style={[styles.themeLabel, { color: colors.textTertiary }]}>
-            {MODE_LABEL[mode]}
-          </Text>
-        </Pressable>
+        <View style={styles.buttonsRow}>
+          <Pressable
+            style={[
+              styles.themeBtn,
+              {
+                backgroundColor: colors.cardGlassStrong,
+                borderColor: colors.glassBorder,
+                paddingHorizontal: spacing.md,
+                paddingVertical: spacing.sm,
+                shadowColor: colors.shadow,
+              },
+            ]}
+            onPress={cycleMode}
+            hitSlop={8}
+          >
+            <Text style={[styles.themeIcon, { color: colors.textSecondary }]}>
+              {MODE_ICON[mode]}
+            </Text>
+            <Text style={[styles.themeLabel, { color: colors.textTertiary }]}>
+              {MODE_LABEL[mode]}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.themeBtn,
+              styles.mailBtn,
+              {
+                backgroundColor: colors.cardGlassStrong,
+                borderColor: colors.glassBorder,
+                paddingHorizontal: spacing.sm,
+                paddingVertical: spacing.sm,
+                shadowColor: colors.shadow,
+              },
+            ]}
+            onPress={() => router.push('/contact')}
+            hitSlop={8}
+          >
+            <MailIcon color={colors.textSecondary} size={18} />
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -75,17 +97,25 @@ const styles = StyleSheet.create({
   subtitle: {
     marginTop: 4,
   },
+  buttonsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
   themeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 10,
     borderWidth: 1,
-    marginTop: 4,
     gap: 4,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
+  },
+  mailBtn: {
+    paddingHorizontal: 10,
   },
   themeIcon: {
     fontSize: 16,
