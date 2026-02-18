@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
+  LayoutAnimation,
+  Platform,
   View,
   Text,
   TextInput,
@@ -7,6 +9,7 @@ import {
   Pressable,
   StyleSheet,
   ScrollView,
+  UIManager,
   Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -35,6 +38,10 @@ const TYPE_FILTERS: { key: OpeningType | null; label: string }[] = [
   { key: 'system', label: 'Systems' },
 ];
 
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 function sectionTitle(catLabel: string, type: OpeningType): string {
   return `${catLabel} \u2014 ${TYPE_SECTION_LABEL[type]}`;
 }
@@ -45,6 +52,11 @@ export default function OpeningsScreen() {
   const { colors, isDark, spacing, typography } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeType, setActiveType] = useState<OpeningType | null>(null);
+
+  const handleTypeFilterChange = (type: OpeningType | null) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setActiveType(type);
+  };
 
   const sections = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
@@ -133,7 +145,7 @@ export default function OpeningsScreen() {
           {TYPE_FILTERS.map((typeFilter) => (
             <Pressable
               key={typeFilter.label}
-              onPress={() => setActiveType(typeFilter.key)}
+              onPress={() => handleTypeFilterChange(typeFilter.key)}
             >
               <PillChip
                 label={typeFilter.label}

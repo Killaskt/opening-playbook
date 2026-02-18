@@ -1,5 +1,6 @@
+import React, { useEffect, useRef } from 'react';
 import { Tabs } from 'expo-router';
-import { Platform } from 'react-native';
+import { Animated, Platform } from 'react-native';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useTheme } from '../../src/theme/ThemeContext';
 
@@ -30,6 +31,43 @@ function BulbIcon({ color, size }: { color: string; size: number }) {
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M9 21h6M12 3a6 6 0 014 10.5V17a1 1 0 01-1 1H9a1 1 0 01-1-1v-3.5A6 6 0 0112 3z" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
+  );
+}
+
+function AnimatedTabIcon({
+  focused,
+  color,
+  size,
+  Icon,
+}: {
+  focused: boolean;
+  color: string;
+  size: number;
+  Icon: ({ color, size }: { color: string; size: number }) => React.ReactElement;
+}) {
+  const anim = useRef(new Animated.Value(focused ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.spring(anim, {
+      toValue: focused ? 1 : 0,
+      speed: 20,
+      bounciness: 6,
+      useNativeDriver: true,
+    }).start();
+  }, [anim, focused]);
+
+  return (
+    <Animated.View
+      style={{
+        transform: [
+          { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [1.5, -1.5] }) },
+          { scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.96, 1.06] }) },
+        ],
+        opacity: anim.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }),
+      }}
+    >
+      <Icon color={color} size={size} />
+    </Animated.View>
   );
 }
 
@@ -68,14 +106,15 @@ export default function TabLayout() {
           marginHorizontal: 10,
           marginVertical: 0,
           overflow: 'hidden',
+          justifyContent: 'center',
         },
         tabBarIconStyle: {
-          marginTop: 0,
+          marginTop: 1,
         },
         tabBarLabelStyle: {
           ...typography.label,
           fontWeight: '700',
-          marginTop: -1,
+          marginTop: 0,
         },
       }}
     >
@@ -83,21 +122,27 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Moves',
-          tabBarIcon: ({ color, size }) => <PawnIcon color={color} size={size + 1} />,
+          tabBarIcon: ({ focused, color, size }) => (
+            <AnimatedTabIcon focused={focused} color={color} size={size + 1} Icon={PawnIcon} />
+          ),
         }}
       />
       <Tabs.Screen
         name="openings"
         options={{
           title: 'Openings',
-          tabBarIcon: ({ color, size }) => <LibraryIcon color={color} size={size + 1} />,
+          tabBarIcon: ({ focused, color, size }) => (
+            <AnimatedTabIcon focused={focused} color={color} size={size + 1} Icon={LibraryIcon} />
+          ),
         }}
       />
       <Tabs.Screen
         name="learn"
         options={{
           title: 'Learn',
-          tabBarIcon: ({ color, size }) => <BulbIcon color={color} size={size + 1} />,
+          tabBarIcon: ({ focused, color, size }) => (
+            <AnimatedTabIcon focused={focused} color={color} size={size + 1} Icon={BulbIcon} />
+          ),
         }}
       />
     </Tabs>

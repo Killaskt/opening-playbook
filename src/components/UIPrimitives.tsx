@@ -26,7 +26,10 @@ export function GlassCard({ children, style, pressable = false, onPress }: Glass
     return (
       <Pressable
         onPress={onPress}
-        style={({ pressed }) => [baseStyle, pressed && { backgroundColor: colors.cardPressed }]}
+        style={({ pressed }) => [
+          baseStyle,
+          pressed && { backgroundColor: colors.cardPressed, transform: [{ scale: 0.988 }] },
+        ]}
       >
         {children}
       </Pressable>

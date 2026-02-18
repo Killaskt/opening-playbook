@@ -1,5 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  Animated,
+  Easing,
+  LayoutAnimation,
+  Platform,
+  UIManager,
   View,
   Text,
   ScrollView,
@@ -12,6 +17,10 @@ import { AnimatedChessBoard } from '../../src/components/AnimatedChessBoard';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { GlassCard } from '../../src/components/UIPrimitives';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const openingTypeGuideSection: FundamentalSection = {
   id: 'opening-type-guide',
@@ -27,9 +36,37 @@ const openingTypeGuideSection: FundamentalSection = {
   ],
 };
 
-function SectionCard({ section }: { section: FundamentalSection }) {
+function SectionCard({
+  section,
+  onExpandRequest,
+}: {
+  section: FundamentalSection;
+  onExpandRequest?: (cardY: number) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const [cardY, setCardY] = useState(0);
   const { colors, typography } = useTheme();
+  const expandAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(expandAnim, {
+      toValue: expanded ? 1 : 0,
+      duration: 180,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [expandAnim, expanded]);
+
+  const toggleExpanded = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpanded((prev) => {
+      const next = !prev;
+      if (next) {
+        requestAnimationFrame(() => onExpandRequest?.(cardY - 50));
+      }
+      return next;
+    });
+  };
 
   return (
     <Pressable
@@ -37,14 +74,32 @@ function SectionCard({ section }: { section: FundamentalSection }) {
         styles.card,
         { backgroundColor: colors.cardGlass, borderColor: expanded ? colors.accent + '40' : colors.glassBorder },
       ]}
-      onPress={() => setExpanded(!expanded)}
+      onPress={toggleExpanded}
+      onLayout={(event) => setCardY(event.nativeEvent.layout.y)}
     >
       <View style={styles.cardHeader}>
         <View style={styles.cardTitleGroup}>
           <Text style={[styles.cardTitle, typography.titleSM, { color: colors.text }]}>{section.title}</Text>
           <Text style={[styles.cardSubtitle, typography.bodySM, { color: colors.textTertiary }]}>{section.subtitle}</Text>
         </View>
-        <Text style={[styles.expandIcon, { color: colors.textMuted }]}>{expanded ? '\u2212' : '+'}</Text>
+        <Animated.Text
+          style={[
+            styles.expandIcon,
+            {
+              color: colors.textMuted,
+              transform: [
+                {
+                  rotate: expandAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0deg', '180deg'],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          {'\u2304'}
+        </Animated.Text>
       </View>
 
       {expanded && (
@@ -89,10 +144,21 @@ export default function LearnScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { colors, spacing, typography } = useTheme();
   const learnSections: FundamentalSection[] = [openingTypeGuideSection, ...fundamentals];
+  const scrollRef = useRef<ScrollView | null>(null);
+
+  const handleCardExpandRequest = (cardY: number) => {
+    scrollRef.current?.scrollTo({
+      y: Math.max(cardY - 12, 0),
+      animated: true,
+    });
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}>
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}
+      >
         <ScreenHeader title="Learn" subtitle="Understand the why behind the moves" />
 
         <GlassCard style={[styles.intro, { marginHorizontal: spacing.lg, padding: spacing.lg }]}>
@@ -103,7 +169,11 @@ export default function LearnScreen() {
         </GlassCard>
 
         {learnSections.map((section) => (
-          <SectionCard key={section.id} section={section} />
+          <SectionCard
+            key={section.id}
+            section={section}
+            onExpandRequest={handleCardExpandRequest}
+          />
         ))}
       </ScrollView>
     </View>

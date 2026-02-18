@@ -10,7 +10,7 @@ function AppStack() {
       onPress={onPress}
       hitSlop={12}
       style={({ pressed }) => ({
-        minWidth: 92,
+        minWidth: 50,
         paddingVertical: 6,
         paddingHorizontal: 10,
         borderRadius: 10,
