@@ -40,7 +40,7 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 
 function getTabLabel(routeName: string): string {
   if (routeName === 'index') return 'Moves';
-  if (routeName === 'openings') return 'Openings';
+  if (routeName === 'openings') return 'Library';
   if (routeName === 'learn') return 'Learn';
   return routeName;
 }
@@ -250,7 +250,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="openings"
         options={{
-          title: 'Openings',
+          title: 'Library',
         }}
       />
       <Tabs.Screen
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 10,
     borderTopWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',

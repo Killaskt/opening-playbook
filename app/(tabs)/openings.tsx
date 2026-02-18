@@ -116,7 +116,7 @@ export default function OpeningsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <ScreenHeader title="Openings" subtitle="Browse named openings and defenses" />
+      <ScreenHeader title="Library" subtitle="Browse opening encyclopedia entries" />
 
       <GlassCard style={[styles.searchBar, { marginHorizontal: spacing.lg, padding: spacing.md }]}>
         <TextInput
