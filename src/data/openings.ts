@@ -934,17 +934,53 @@ const d4_d5 = createOpening({
   ],
 });
 
-// d4 d5 needs c4 first - add intermediate
-const d4_d5_c4 = createVariation({
+const d4_d5_c4 = createOpening({
   id: 'd4_d5_c4',
   move: 'c4',
   name: "Queen's Gambit",
   boardPgn: 'd4 d5 c4',
-  intent: ['Gambit or development'],
+  intent: [
+    "One of the oldest and most famous openings in chess",
+    "White offers a pawn to seize central control",
+    "Not a true gambit — White recovers the pawn easily",
+  ],
+  whyThisMove:
+    "The Queen's Gambit is chess royalty — played by world champions for over a century, and now a cultural phenomenon thanks to the Netflix series. With c4, White challenges Black's d5 pawn. Despite the name, it's not a real gambit: if Black takes (dxc4), White wins the pawn back with ease. The real question is how Black responds: the solid QGD (e6), the flexible Slav (c6), or the daring QGA (dxc4). Each choice leads to deeply strategic play.",
+  strategicThemes: [
+    "Central tension — White wants to dominate d5 and e4",
+    "Minority attacks on the queenside (a4-b5 pawn advances)",
+    "Pawn structure defines the middlegame character",
+    "Piece maneuvering in semi-closed positions",
+  ],
+  prosAndCons: {
+    pros: [
+      "Rich strategic positions with deep plans",
+      "Over a century of grandmaster theory to learn from",
+      "Suits patient, positional players",
+    ],
+    cons: [
+      "Theory runs very deep in main lines",
+      "Positions can become slow — not for tactical firebrands",
+      "Black has many reliable equalizing methods",
+    ],
+  },
+  famousPlayers: ['José Raúl Capablanca', 'Garry Kasparov', 'Beth Harmon', 'Magnus Carlsen', 'Anatoly Karpov'],
   responses: [
-    response('d4_d5_c4_e6', 'e6', 'QGD'),
-    response('d4_d5_c4_c6', 'c6', 'Slav'),
-    response('d4_d5_c4_dxc4', 'dxc4', 'QGA'),
+    response('d4_d5_c4_e6', 'e6', "Queen's Gambit Declined"),
+    response('d4_d5_c4_c6', 'c6', 'Slav Defense'),
+    response('d4_d5_c4_dxc4', 'dxc4', "Queen's Gambit Accepted"),
+  ],
+  lines: [
+    line("Queen's Gambit Declined — Orthodox", 'd4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O'),
+    line("Slav Defense main line", 'd4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4'),
+    line("Queen's Gambit Accepted", 'd4 d5 c4 dxc4 e4 e5 Nf3'),
+  ],
+  tree: [
+    tree('d4 d5 c4', [
+      tree('e6 (QGD)', [tree('Nc3 Nf6 Bg5 — Orthodox')]),
+      tree('c6 (Slav)', [tree('Nf3 Nf6 Nc3 — main Slav')]),
+      tree('dxc4 (QGA)', [tree('e4 — central push')]),
+    ]),
   ],
 });
 const d4_d5_c4_e6 = createVariation({

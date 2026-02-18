@@ -6,13 +6,15 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
-  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { startMoves } from '../../src/data/openings';
+import { useTheme } from '../../src/theme/ThemeContext';
+import { ScreenHeader } from '../../src/components/ScreenHeader';
 
 export default function ExploreScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredMoves = startMoves.filter((move) => {
@@ -27,16 +29,20 @@ export default function ExploreScreen() {
 
   const renderItem = ({ item }: { item: typeof startMoves[0] }) => (
     <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      style={({ pressed }) => [
+        styles.card,
+        { backgroundColor: colors.card, borderColor: colors.border },
+        pressed && { backgroundColor: colors.cardPressed, borderColor: colors.accent + '40' },
+      ]}
       onPress={() => router.push(`/move/${item.id}`)}
     >
       <View style={styles.cardRow}>
-        <View style={styles.moveBadge}>
-          <Text style={styles.moveNotation}>{item.move}</Text>
+        <View style={[styles.moveBadge, { backgroundColor: colors.accentBg }]}>
+          <Text style={[styles.moveNotation, { color: colors.accent }]}>{item.move}</Text>
         </View>
         <View style={styles.cardContent}>
-          <Text style={styles.moveName}>{item.name}</Text>
-          <Text style={styles.moveHint} numberOfLines={2}>
+          <Text style={[styles.moveName, { color: colors.text }]}>{item.name}</Text>
+          <Text style={[styles.moveHint, { color: colors.textTertiary }]} numberOfLines={2}>
             {item.whyThisMove
               ? item.whyThisMove.split('.')[0] + '.'
               : item.intent[0]}
@@ -44,35 +50,38 @@ export default function ExploreScreen() {
           {item.responses.length > 0 && (
             <View style={styles.chipsRow}>
               {item.responses.slice(0, 3).map((resp) => (
-                <View key={resp.id} style={styles.chip}>
-                  <Text style={styles.chipText}>{resp.name}</Text>
+                <View key={resp.id} style={[styles.chip, { backgroundColor: colors.chipBg }]}>
+                  <Text style={[styles.chipText, { color: colors.textSecondary }]}>{resp.name}</Text>
                 </View>
               ))}
               {item.responses.length > 3 && (
-                <Text style={styles.moreText}>+{item.responses.length - 3}</Text>
+                <Text style={[styles.moreText, { color: colors.textMuted }]}>
+                  +{item.responses.length - 3}
+                </Text>
               )}
             </View>
           )}
         </View>
-        <Text style={styles.arrow}>{'>'}</Text>
+        <Text style={[styles.arrow, { color: colors.textMuted }]}>{'>'}</Text>
       </View>
     </Pressable>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.titleArea}>
-        <Text style={styles.screenTitle}>Explore</Text>
-        <Text style={styles.screenSubtitle}>Step through openings move by move</Text>
-      </View>
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      <ScreenHeader title="Explore" subtitle="Step through openings move by move" />
 
       <View style={styles.searchBar}>
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, {
+            backgroundColor: colors.inputBg,
+            borderColor: colors.inputBorder,
+            color: colors.text,
+          }]}
           placeholder="Search moves, names, concepts..."
           value={searchQuery}
           onChangeText={setSearchQuery}
-          placeholderTextColor="#aaa"
+          placeholderTextColor={colors.textMuted}
         />
       </View>
 
@@ -82,11 +91,11 @@ export default function ExploreScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
-          <Text style={styles.listHeader}>White's first move</Text>
+          <Text style={[styles.listHeader, { color: colors.textMuted }]}>White's first move</Text>
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No openings found</Text>
+            <Text style={[styles.emptyText, { color: colors.textMuted }]}>No openings found</Text>
           </View>
         }
       />
@@ -97,38 +106,18 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#faf8f5',
-  },
-  titleArea: {
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 60 : 24,
-    paddingBottom: 4,
-  },
-  screenTitle: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: '#222',
-  },
-  screenSubtitle: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 2,
   },
   searchBar: {
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 12,
-    backgroundColor: '#faf8f5',
   },
   searchInput: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 12,
     paddingHorizontal: 16,
     fontSize: 15,
     borderWidth: 1,
-    borderColor: '#e0dcd7',
-    color: '#333',
   },
   listContent: {
     paddingHorizontal: 16,
@@ -137,30 +126,22 @@ const styles = StyleSheet.create({
   listHeader: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#999',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 12,
     marginTop: 4,
   },
   card: {
-    backgroundColor: '#fff',
     borderRadius: 14,
     padding: 16,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#e8e4df',
-  },
-  cardPressed: {
-    backgroundColor: '#f0f6fb',
-    borderColor: '#c0d8ee',
   },
   cardRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   moveBadge: {
-    backgroundColor: '#eef5fb',
     width: 52,
     height: 52,
     borderRadius: 12,
@@ -171,7 +152,6 @@ const styles = StyleSheet.create({
   moveNotation: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2e78b7',
     fontFamily: 'monospace',
   },
   cardContent: {
@@ -180,12 +160,10 @@ const styles = StyleSheet.create({
   moveName: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#333',
     marginBottom: 3,
   },
   moveHint: {
     fontSize: 13,
-    color: '#777',
     lineHeight: 18,
     marginBottom: 6,
   },
@@ -196,24 +174,20 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   chip: {
-    backgroundColor: '#f0edea',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
   },
   chipText: {
     fontSize: 11,
-    color: '#666',
     fontWeight: '600',
   },
   moreText: {
     fontSize: 11,
-    color: '#aaa',
     fontWeight: '600',
   },
   arrow: {
     fontSize: 16,
-    color: '#ccc',
     fontWeight: '600',
     marginLeft: 8,
   },
@@ -223,6 +197,5 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
   },
 });

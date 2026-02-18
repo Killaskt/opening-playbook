@@ -4,6 +4,7 @@ import { Chess } from 'chess.js';
 import Svg, { Line, Polygon } from 'react-native-svg';
 import { renderPiece } from './ChessPieces';
 import { BoardArrow } from '../types';
+import { useTheme } from '../theme/ThemeContext';
 
 interface AnimatedChessBoardProps {
   pgn: string;
@@ -13,17 +14,17 @@ interface AnimatedChessBoardProps {
 }
 
 export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: AnimatedChessBoardProps) {
+  const { colors } = useTheme();
   const [game] = useState(() => new Chess());
   const [moves, setMoves] = useState<string[]>([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
   const [board, setBoard] = useState<(string | null)[][]>([]);
-  const [highlightedSquares, setHighlightedSquares] = useState<string[]>([]);
+  const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
 
   const squareSize = compact ? 34 : 42;
   const boardSize = squareSize * 8;
   const pieceSize = compact ? 28 : 36;
 
-  // Parse PGN and extract moves
   useEffect(() => {
     const tempGame = new Chess();
     const cleanPgn = pgn
@@ -46,6 +47,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
 
     setMoves(moveArray);
     setCurrentMoveIndex(-1);
+    setLastMove(null);
     game.reset();
     updateBoard();
   }, [pgn]);
@@ -70,8 +72,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
       const moveObj = game.move(nextMove);
 
       if (moveObj) {
-        setHighlightedSquares([moveObj.from, moveObj.to]);
-        setTimeout(() => setHighlightedSquares([]), 800);
+        setLastMove({ from: moveObj.from, to: moveObj.to });
       }
 
       updateBoard();
@@ -81,13 +82,22 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
 
   const handlePrevious = () => {
     if (currentMoveIndex >= 0) {
-      const undoneMove = game.undo();
-      if (undoneMove) {
-        setHighlightedSquares([undoneMove.from, undoneMove.to]);
-        setTimeout(() => setHighlightedSquares([]), 800);
-      }
+      game.undo();
       updateBoard();
-      setCurrentMoveIndex(currentMoveIndex - 1);
+      const newIndex = currentMoveIndex - 1;
+      setCurrentMoveIndex(newIndex);
+
+      if (newIndex >= 0) {
+        const tempGame = new Chess();
+        for (let i = 0; i <= newIndex; i++) {
+          const m = tempGame.move(moves[i]);
+          if (m && i === newIndex) {
+            setLastMove({ from: m.from, to: m.to });
+          }
+        }
+      } else {
+        setLastMove(null);
+      }
     }
   };
 
@@ -95,29 +105,32 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
     game.reset();
     updateBoard();
     setCurrentMoveIndex(-1);
-    setHighlightedSquares([]);
+    setLastMove(null);
   };
 
   const handleJumpToEnd = () => {
     game.reset();
-    moves.forEach(move => game.move(move));
+    let last: { from: string; to: string } | null = null;
+    moves.forEach(move => {
+      const m = game.move(move);
+      if (m) last = { from: m.from, to: m.to };
+    });
     updateBoard();
     setCurrentMoveIndex(moves.length - 1);
-    setHighlightedSquares([]);
+    setLastMove(last);
   };
 
-  // Convert algebraic notation (e.g. "e4") to pixel coordinates (center of square)
   const squareToPixel = (sq: string): { x: number; y: number } => {
-    const col = sq.charCodeAt(0) - 97; // a=0, b=1, ...
-    const row = 8 - parseInt(sq[1], 10);  // 1=7, 2=6, ...
+    const col = sq.charCodeAt(0) - 97;
+    const row = 8 - parseInt(sq[1], 10);
     return {
       x: col * squareSize + squareSize / 2,
       y: row * squareSize + squareSize / 2,
     };
   };
 
-  const renderArrows = () => {
-    if (!arrows || arrows.length === 0) return null;
+  const renderArrowSvg = (arrowList: { from: string; to: string; color?: string }[]) => {
+    if (arrowList.length === 0) return null;
 
     return (
       <Svg
@@ -126,12 +139,11 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       >
-        {arrows.map((arr, i) => {
+        {arrowList.map((arr, i) => {
           const from = squareToPixel(arr.from);
           const to = squareToPixel(arr.to);
           const color = arr.color || 'rgba(0, 150, 50, 0.6)';
 
-          // Calculate arrow direction
           const dx = to.x - from.x;
           const dy = to.y - from.y;
           const len = Math.sqrt(dx * dx + dy * dy);
@@ -140,14 +152,12 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
           const ux = dx / len;
           const uy = dy / len;
 
-          // Shorten the line so the arrowhead sits at the target
           const headSize = squareSize * 0.3;
           const endX = to.x - ux * headSize * 0.5;
           const endY = to.y - uy * headSize * 0.5;
           const startX = from.x + ux * squareSize * 0.15;
           const startY = from.y + uy * squareSize * 0.15;
 
-          // Arrowhead triangle
           const tipX = to.x - ux * 2;
           const tipY = to.y - uy * 2;
           const leftX = endX - uy * headSize * 0.4;
@@ -177,11 +187,18 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
     );
   };
 
+  const allArrows: { from: string; to: string; color?: string }[] = [];
+  if (arrows) allArrows.push(...arrows);
+  if (lastMove) {
+    allArrows.push({ from: lastMove.from, to: lastMove.to, color: 'rgba(255, 170, 0, 0.65)' });
+  }
+
   const renderSquare = (row: number, col: number) => {
     const isLight = (row + col) % 2 === 0;
     const piece = board[row]?.[col];
     const squareName = `${String.fromCharCode(97 + col)}${8 - row}`;
-    const isHighlighted = highlightedSquares.includes(squareName);
+    const isFrom = lastMove?.from === squareName;
+    const isTo = lastMove?.to === squareName;
 
     let pieceType = '';
     let isWhite = true;
@@ -195,19 +212,31 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
       <View
         key={`${row}-${col}`}
         style={[
-          { width: squareSize, height: squareSize, justifyContent: 'center', alignItems: 'center', position: 'relative' as const },
-          isLight ? styles.lightSquare : styles.darkSquare,
-          isHighlighted && styles.highlightedSquare,
+          {
+            width: squareSize,
+            height: squareSize,
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'relative' as const,
+            backgroundColor: isLight ? colors.lightSquare : colors.darkSquare,
+          },
+          (isFrom || isTo) && { backgroundColor: isLight ? '#e8d44d' : '#daa520' },
         ]}
       >
         {piece && renderPiece(pieceType, isWhite, pieceSize)}
         {!compact && col === 0 && (
-          <Text style={[styles.coordinateRank, isLight ? styles.darkText : styles.lightText]}>
+          <Text style={[
+            styles.coordinateRank,
+            { color: isLight ? colors.darkSquare : colors.lightSquare },
+          ]}>
             {8 - row}
           </Text>
         )}
         {!compact && row === 7 && (
-          <Text style={[styles.coordinateFile, isLight ? styles.darkText : styles.lightText]}>
+          <Text style={[
+            styles.coordinateFile,
+            { color: isLight ? colors.darkSquare : colors.lightSquare },
+          ]}>
             {String.fromCharCode(97 + col)}
           </Text>
         )}
@@ -216,35 +245,33 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.card }]}>
       {label && (
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>
       )}
 
-      <View style={styles.boardContainer}>
+      <View style={[styles.boardContainer, { borderColor: colors.boardBorder }]}>
         <View style={{ position: 'relative' }}>
           {[...Array(8)].map((_, row) => (
             <View key={row} style={styles.row}>
               {[...Array(8)].map((_, col) => renderSquare(row, col))}
             </View>
           ))}
-          {renderArrows()}
+          {renderArrowSvg(allArrows)}
         </View>
       </View>
 
-      {/* Move counter */}
-      <View style={styles.moveCounter}>
-        <Text style={styles.moveText}>
+      <View style={[styles.moveCounter, { backgroundColor: colors.moveCounterBg }]}>
+        <Text style={[styles.moveText, { color: colors.text }]}>
           Move {currentMoveIndex + 1} of {moves.length}
           {currentMoveIndex >= 0 && ` (${moves[currentMoveIndex]})`}
         </Text>
       </View>
 
-      {/* Controls */}
       <View style={styles.controls}>
         {!compact && (
           <Pressable
-            style={[styles.button, currentMoveIndex < 0 && styles.buttonDisabled]}
+            style={[styles.button, { backgroundColor: colors.buttonBg }, currentMoveIndex < 0 && { backgroundColor: colors.buttonDisabledBg, opacity: 0.5 }]}
             onPress={handleReset}
             disabled={currentMoveIndex < 0}
           >
@@ -253,7 +280,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
         )}
 
         <Pressable
-          style={[styles.button, currentMoveIndex < 0 && styles.buttonDisabled]}
+          style={[styles.button, { backgroundColor: colors.buttonBg }, currentMoveIndex < 0 && { backgroundColor: colors.buttonDisabledBg, opacity: 0.5 }]}
           onPress={handlePrevious}
           disabled={currentMoveIndex < 0}
         >
@@ -261,7 +288,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
         </Pressable>
 
         <Pressable
-          style={[styles.button, currentMoveIndex >= moves.length - 1 && styles.buttonDisabled]}
+          style={[styles.button, { backgroundColor: colors.buttonBg }, currentMoveIndex >= moves.length - 1 && { backgroundColor: colors.buttonDisabledBg, opacity: 0.5 }]}
           onPress={handleNext}
           disabled={currentMoveIndex >= moves.length - 1}
         >
@@ -270,7 +297,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
 
         {!compact && (
           <Pressable
-            style={[styles.button, currentMoveIndex >= moves.length - 1 && styles.buttonDisabled]}
+            style={[styles.button, { backgroundColor: colors.buttonBg }, currentMoveIndex >= moves.length - 1 && { backgroundColor: colors.buttonDisabledBg, opacity: 0.5 }]}
             onPress={handleJumpToEnd}
             disabled={currentMoveIndex >= moves.length - 1}
           >
@@ -285,7 +312,6 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
     shadowColor: '#000',
@@ -297,27 +323,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#555',
     marginBottom: 10,
   },
   boardContainer: {
     borderWidth: 2,
-    borderColor: '#333',
     borderRadius: 4,
   },
   row: {
     flexDirection: 'row',
-  },
-  lightSquare: {
-    backgroundColor: '#f0d9b5',
-  },
-  darkSquare: {
-    backgroundColor: '#b58863',
-  },
-  highlightedSquare: {
-    backgroundColor: '#9fff9f',
-    borderWidth: 2,
-    borderColor: '#00aa00',
   },
   coordinateRank: {
     position: 'absolute',
@@ -333,17 +346,10 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: 'bold',
   },
-  darkText: {
-    color: '#b58863',
-  },
-  lightText: {
-    color: '#f0d9b5',
-  },
   moveCounter: {
     marginTop: 16,
     marginBottom: 8,
     padding: 8,
-    backgroundColor: '#f4f4f4',
     borderRadius: 6,
     minWidth: 200,
     alignItems: 'center',
@@ -351,7 +357,6 @@ const styles = StyleSheet.create({
   moveText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
     fontFamily: 'monospace',
   },
   controls: {
@@ -360,16 +365,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   button: {
-    backgroundColor: '#2e78b7',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 6,
     minWidth: 70,
     alignItems: 'center',
-  },
-  buttonDisabled: {
-    backgroundColor: '#ccc',
-    opacity: 0.5,
   },
   buttonText: {
     color: '#fff',

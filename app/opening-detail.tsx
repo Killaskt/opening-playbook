@@ -11,25 +11,27 @@ import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { AnimatedChessBoard } from '../src/components/AnimatedChessBoard';
 import { nodesById } from '../src/data/openings';
 import { openingsCatalog, OpeningStyle } from '../src/data/catalog';
+import { useTheme } from '../src/theme/ThemeContext';
 
-const STYLE_COLORS: Record<OpeningStyle, { bg: string; text: string }> = {
-  sharp: { bg: '#fde8e8', text: '#c62828' },
-  solid: { bg: '#e8f0fe', text: '#1565c0' },
-  positional: { bg: '#e8f5e9', text: '#2e7d32' },
-  aggressive: { bg: '#fff3e0', text: '#e65100' },
-  flexible: { bg: '#f3e5f5', text: '#7b1fa2' },
-  gambit: { bg: '#fce4ec', text: '#ad1457' },
-  hypermodern: { bg: '#e0f2f1', text: '#00695c' },
+const STYLE_COLORS: Record<OpeningStyle, { bg: string; darkBg: string; text: string; darkText: string }> = {
+  sharp:       { bg: '#fde8e8', darkBg: '#3a1a1a', text: '#c62828', darkText: '#ef5350' },
+  solid:       { bg: '#e3eefc', darkBg: '#1a2a3a', text: '#1565c0', darkText: '#64b5f6' },
+  positional:  { bg: '#e4f5e6', darkBg: '#1a2e1a', text: '#2e7d32', darkText: '#66bb6a' },
+  aggressive:  { bg: '#fff3e0', darkBg: '#2e1e0e', text: '#e65100', darkText: '#ff8a50' },
+  flexible:    { bg: '#f0e4f6', darkBg: '#2a1a30', text: '#7b1fa2', darkText: '#ba68c8' },
+  gambit:      { bg: '#fce4ec', darkBg: '#301020', text: '#ad1457', darkText: '#f06292' },
+  hypermodern: { bg: '#dff0ee', darkBg: '#1a2e2a', text: '#00695c', darkText: '#4db6ac' },
 };
 
-const TYPE_COLORS: Record<string, string> = {
-  opening: '#2e78b7',
-  defense: '#7b1fa2',
-  system: '#00695c',
-  gambit: '#c62828',
+const TYPE_COLORS: Record<string, { light: string; dark: string }> = {
+  opening: { light: '#2e78b7', dark: '#5b9fd6' },
+  defense: { light: '#7b1fa2', dark: '#ba68c8' },
+  system:  { light: '#00695c', dark: '#4db6ac' },
+  gambit:  { light: '#c62828', dark: '#ef5350' },
 };
 
 export default function OpeningDetailScreen() {
+  const { colors, isDark } = useTheme();
   const params = useLocalSearchParams<{
     pgn: string;
     name: string;
@@ -52,62 +54,67 @@ export default function OpeningDetailScreen() {
   );
   const linkedNode = catalogEntry?.nodeId ? nodesById[catalogEntry.nodeId] : undefined;
 
+  const typeColor = type ? (isDark ? TYPE_COLORS[type]?.dark : TYPE_COLORS[type]?.light) || colors.textMuted : colors.textMuted;
+
   return (
     <>
       <Stack.Screen options={{ title: name || 'Opening' }} />
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.heroCard}>
+          <View style={[styles.heroCard, { backgroundColor: colors.card }]}>
             <View style={styles.heroTopRow}>
-              <Text style={styles.heroName}>{name}</Text>
+              <Text style={[styles.heroName, { color: colors.text }]}>{name}</Text>
               {type && (
-                <View style={[styles.typeBadge, { backgroundColor: (TYPE_COLORS[type] || '#888') + '18' }]}>
-                  <Text style={[styles.typeBadgeText, { color: TYPE_COLORS[type] || '#888' }]}>
+                <View style={[styles.typeBadge, { backgroundColor: typeColor + '20' }]}>
+                  <Text style={[styles.typeBadgeText, { color: typeColor }]}>
                     {type.charAt(0).toUpperCase() + type.slice(1)}
                   </Text>
                 </View>
               )}
             </View>
             {eco && (
-              <Text style={styles.ecoLabel}>{eco}</Text>
+              <Text style={[styles.ecoLabel, { color: colors.textMuted, backgroundColor: colors.chipBg }]}>{eco}</Text>
             )}
             <View style={styles.boardWrapper}>
               <AnimatedChessBoard pgn={pgn || ''} />
             </View>
           </View>
 
-          <View style={styles.pgnSection}>
-            <Text style={styles.sectionTitle}>Moves</Text>
-            <Text style={styles.pgnText}>{pgn}</Text>
+          <View style={[styles.infoCard, { backgroundColor: colors.card, borderLeftColor: colors.accent }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Moves</Text>
+            <Text style={[styles.pgnText, { color: colors.accent }]}>{pgn}</Text>
           </View>
 
           {styleList.length > 0 && (
-            <View style={styles.styleSection}>
-              <Text style={styles.sectionTitle}>Style</Text>
+            <View style={[styles.infoCard, { backgroundColor: colors.card, borderLeftColor: colors.purple }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Style</Text>
               <View style={styles.styleRow}>
-                {styleList.map((s) => (
-                  <View key={s} style={[styles.styleTag, { backgroundColor: STYLE_COLORS[s]?.bg || '#eee' }]}>
-                    <Text style={[styles.styleTagText, { color: STYLE_COLORS[s]?.text || '#666' }]}>{s}</Text>
-                  </View>
-                ))}
+                {styleList.map((s) => {
+                  const sc = STYLE_COLORS[s];
+                  return (
+                    <View key={s} style={[styles.styleTag, { backgroundColor: isDark ? sc.darkBg : sc.bg }]}>
+                      <Text style={[styles.styleTagText, { color: isDark ? sc.darkText : sc.text }]}>{s}</Text>
+                    </View>
+                  );
+                })}
               </View>
             </View>
           )}
 
           {desc && (
-            <View style={styles.descSection}>
-              <Text style={styles.sectionTitle}>About this opening</Text>
-              <Text style={styles.descText}>{desc}</Text>
+            <View style={[styles.infoCard, { backgroundColor: colors.card, borderLeftColor: colors.green }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>About this opening</Text>
+              <Text style={[styles.descText, { color: colors.textSecondary }]}>{desc}</Text>
             </View>
           )}
 
           {keyIdeas.length > 0 && (
-            <View style={styles.ideasSection}>
-              <Text style={styles.sectionTitle}>Key ideas</Text>
+            <View style={[styles.infoCard, { backgroundColor: colors.card, borderLeftColor: colors.orange }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Key ideas</Text>
               {keyIdeas.map((idea, i) => (
                 <View key={i} style={styles.ideaRow}>
-                  <Text style={styles.ideaDot}>+</Text>
-                  <Text style={styles.ideaText}>{idea}</Text>
+                  <Text style={[styles.ideaDot, { color: colors.green }]}>+</Text>
+                  <Text style={[styles.ideaText, { color: colors.textSecondary }]}>{idea}</Text>
                 </View>
               ))}
             </View>
@@ -115,7 +122,7 @@ export default function OpeningDetailScreen() {
 
           {linkedNode && (
             <Pressable
-              style={({ pressed }) => [styles.exploreBtn, pressed && styles.exploreBtnPressed]}
+              style={({ pressed }) => [styles.exploreBtn, { backgroundColor: colors.accent }, pressed && { opacity: 0.85 }]}
               onPress={() => router.push(`/move/${linkedNode.id}`)}
             >
               <Text style={styles.exploreBtnText}>Explore move-by-move</Text>
@@ -131,14 +138,12 @@ export default function OpeningDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#faf8f5',
   },
   scrollContent: {
     padding: 16,
     paddingBottom: 40,
   },
   heroCard: {
-    backgroundColor: '#fff',
     padding: 24,
     borderRadius: 16,
     marginBottom: 24,
@@ -158,24 +163,24 @@ const styles = StyleSheet.create({
   heroName: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#333',
     textAlign: 'center',
   },
   typeBadge: {
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 8,
+    minHeight: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   typeBadgeText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     letterSpacing: 0.3,
   },
   ecoLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#999',
-    backgroundColor: '#f0edea',
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 6,
@@ -185,33 +190,21 @@ const styles = StyleSheet.create({
   boardWrapper: {
     marginTop: 4,
   },
-  pgnSection: {
-    backgroundColor: '#fff',
+  infoCard: {
     padding: 20,
     borderRadius: 12,
     marginBottom: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#2e78b7',
   },
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#444',
     marginBottom: 10,
   },
   pgnText: {
     fontSize: 16,
     fontFamily: 'monospace',
-    color: '#2e78b7',
     lineHeight: 24,
-  },
-  styleSection: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#7b1fa2',
   },
   styleRow: {
     flexDirection: 'row',
@@ -219,64 +212,44 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   styleTag: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    minHeight: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   styleTagText: {
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-  },
-  descSection: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#43a047',
+    fontSize: 14,
+    fontWeight: '700',
+    includeFontPadding: false,
   },
   descText: {
     fontSize: 15,
-    color: '#444',
     lineHeight: 24,
-  },
-  ideasSection: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: '#ff9800',
-    gap: 6,
   },
   ideaRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    marginBottom: 6,
   },
   ideaDot: {
     fontSize: 15,
-    color: '#43a047',
     fontWeight: 'bold',
     width: 20,
     marginTop: 1,
   },
   ideaText: {
     fontSize: 14,
-    color: '#444',
     flex: 1,
     lineHeight: 21,
   },
   exploreBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2e78b7',
     padding: 18,
     borderRadius: 12,
     marginTop: 8,
-  },
-  exploreBtnPressed: {
-    backgroundColor: '#1a5f9a',
   },
   exploreBtnText: {
     fontSize: 16,

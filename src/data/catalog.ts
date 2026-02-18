@@ -291,6 +291,17 @@ export const openingsCatalog: CatalogEntry[] = [
 
   // Queen's Gambit family
   {
+    name: "Queen's Gambit",
+    pgn: 'd4 d5 c4',
+    nodeId: 'd4_d5_c4',
+    category: 'd4',
+    description: "One of the oldest and most storied openings in chess — and yes, the one from the Netflix show. White offers a pawn to fight for central control. Black must decide: accept, decline, or counter with the Slav.",
+    eco: 'D06',
+    type: 'opening',
+    style: ['positional', 'solid'],
+    keyIdeas: ['c4 challenges Black\'s d5 pawn — not a true gambit since White recovers easily', 'Leads to rich strategic play with minority attacks and pawn breaks', 'Has been played at the highest level for over a century — Capablanca, Kasparov, Carlsen'],
+  },
+  {
     name: "Queen's Gambit Declined",
     pgn: 'd4 d5 c4 e6',
     nodeId: 'd4_d5_c4_e6',
