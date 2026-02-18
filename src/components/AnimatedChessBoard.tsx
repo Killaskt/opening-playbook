@@ -188,7 +188,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
   };
 
   const allArrows: { from: string; to: string; color?: string }[] = [];
-  if (arrows) allArrows.push(...arrows);
+  if (arrows && currentMoveIndex === moves.length - 1) allArrows.push(...arrows);
   if (lastMove) {
     allArrows.push({ from: lastMove.from, to: lastMove.to, color: 'rgba(255, 170, 0, 0.65)' });
   }

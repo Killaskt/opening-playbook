@@ -541,3 +541,7 @@ export const catalogCategories: { key: CatalogEntry['category']; label: string }
   { key: 'nf3', label: 'Nf3 / Réti' },
   { key: 'other', label: 'Other' },
 ];
+
+export const catalogByNodeId = new Map<string, CatalogEntry>(
+  openingsCatalog.filter(e => e.nodeId).map(e => [e.nodeId!, e])
+);

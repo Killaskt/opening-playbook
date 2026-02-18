@@ -7,6 +7,7 @@ import {
   Pressable,
   StyleSheet,
   ScrollView,
+  Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { openingsCatalog, catalogCategories, CatalogEntry, OpeningStyle, OpeningType } from '../../src/data/catalog';
@@ -24,18 +25,17 @@ const STYLE_COLORS: Record<OpeningStyle, { bg: string; darkBg: string; text: str
   hypermodern: { bg: '#dff0ee', darkBg: '#1a2e2a', text: '#00695c', darkText: '#4db6ac' },
 };
 
-const TYPE_LABELS: Record<OpeningType, { label: string; color: string; darkColor: string }> = {
-  opening: { label: 'Opening', color: '#2e78b7', darkColor: '#5b9fd6' },
-  defense: { label: 'Defense', color: '#7b1fa2', darkColor: '#ba68c8' },
-  system:  { label: 'System',  color: '#00695c', darkColor: '#4db6ac' },
-  gambit:  { label: 'Gambit',  color: '#c62828', darkColor: '#ef5350' },
-};
-
 const TYPE_ORDER: OpeningType[] = ['opening', 'gambit', 'defense', 'system'];
 
+const TYPE_SECTION_LABEL: Record<OpeningType, string> = {
+  opening: 'Openings',
+  defense: 'Defenses',
+  system: 'Systems',
+  gambit: 'Gambits',
+};
+
 function sectionTitle(catLabel: string, type: OpeningType): string {
-  const suffix = TYPE_LABELS[type].label + 's';
-  return `${catLabel} \u2014 ${suffix}`;
+  return `${catLabel} \u2014 ${TYPE_SECTION_LABEL[type]}`;
 }
 
 export default function OpeningsScreen() {
@@ -115,6 +115,8 @@ export default function OpeningsScreen() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholderTextColor={colors.textMuted}
+          returnKeyType="search"
+          onSubmitEditing={Keyboard.dismiss}
         />
       </View>
 
@@ -123,6 +125,7 @@ export default function OpeningsScreen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterRow}
+          keyboardShouldPersistTaps="handled"
         >
         <Pressable
           style={[styles.filterChip, { backgroundColor: !activeCategory ? colors.accent : colors.chipBg }]}
@@ -147,15 +150,14 @@ export default function OpeningsScreen() {
       <SectionList
         sections={sections}
         keyExtractor={(item, index) => item.name + index}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
         renderSectionHeader={({ section }) => (
           <View style={[styles.sectionHeader, { borderBottomColor: colors.border }]}>
             <Text style={[styles.sectionHeaderText, { color: colors.textTertiary }]}>{section.title}</Text>
           </View>
         )}
         renderItem={({ item }) => {
-          const tl = TYPE_LABELS[item.type];
-          const typeColor = isDark ? tl.darkColor : tl.color;
-
           return (
             <Pressable
               style={({ pressed }) => [
@@ -166,14 +168,7 @@ export default function OpeningsScreen() {
               onPress={() => handlePress(item)}
             >
               <View style={styles.cardTop}>
-                <View style={styles.cardTopLeft}>
-                  <Text style={[styles.openingName, { color: colors.text }]}>{item.name}</Text>
-                  <View style={[styles.typeBadge, { backgroundColor: typeColor + '20' }]}>
-                    <Text style={[styles.typeBadgeText, { color: typeColor }]}>
-                      {tl.label}
-                    </Text>
-                  </View>
-                </View>
+                <Text style={[styles.openingName, { color: colors.text }]}>{item.name}</Text>
                 {item.eco && (
                   <Text style={[styles.ecoLabel, { color: colors.textMuted, backgroundColor: colors.chipBg }]}>
                     {item.eco}
@@ -247,20 +242,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   filterWrapper: {
-    height: 56,
-    marginBottom: 4,
+    height: 45,
+    marginBottom: 10,
   },
   filterRow: {
     paddingHorizontal: 16,
     paddingVertical: 6,
-    gap: 8,
+    gap: 10,
     alignItems: 'center',
   },
   filterChip: {
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 20,
-    minHeight: 40,
+    minHeight: 30,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -274,7 +269,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   sectionHeader: {
-    marginTop: 14,
+    marginTop: 8,
     marginBottom: 10,
     paddingBottom: 6,
     borderBottomWidth: 1,
@@ -293,33 +288,13 @@ const styles = StyleSheet.create({
   cardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 6,
-  },
-  cardTopLeft: {
-    flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-    flexWrap: 'wrap',
-    gap: 8,
+    marginBottom: 6,
   },
   openingName: {
     fontSize: 16,
     fontWeight: '700',
-  },
-  typeBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    minHeight: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  typeBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-    includeFontPadding: false,
+    flex: 1,
   },
   ecoLabel: {
     fontSize: 12,
@@ -342,7 +317,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   styleTag: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 12,
     minHeight: 20,

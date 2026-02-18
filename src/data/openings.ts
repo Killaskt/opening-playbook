@@ -469,7 +469,11 @@ const e4_c5_nf3 = createVariation({
   move: 'Nf3',
   name: 'Open Sicilian',
   boardPgn: 'e4 c5 Nf3',
-  intent: ['Main line — open center with d4 next'],
+  intent: [
+    'The main move — White develops the knight and prepares to open the center with d4',
+    'Leads to the Open Sicilian, the most critical and theory-heavy battleground in chess',
+    'Black must choose a setup: d6 (Najdorf/Dragon) or Nc6 (Classical) — each leads to vastly different games',
+  ],
   responses: [
     response('e4_c5_nf3_d6', 'd6', 'Najdorf / Dragon'),
     response('e4_c5_nf3_nc6', 'Nc6', 'Accelerated Dragon'),
@@ -480,7 +484,11 @@ const e4_c5_nf3_d6 = createVariation({
   move: 'd6',
   name: 'Najdorf / Dragon setup',
   boardPgn: 'e4 c5 Nf3 d6',
-  intent: ['Most popular Sicilian — leads to Najdorf, Dragon, Scheveningen'],
+  intent: [
+    'Black commits to the most popular Sicilian setup — the gateway to the Najdorf, Dragon, and Scheveningen',
+    'Keeps options flexible: the knight can go to f6 while Black decides between ...a6 (Najdorf) or ...g6 (Dragon)',
+    'White almost always plays d4 next, opening the position for a sharp tactical fight',
+  ],
   responses: [response('e4_c5_nf3_d6_d4', 'd4', 'Open Sicilian main')],
 });
 const e4_c5_nf3_d6_d4 = createVariation({
@@ -488,28 +496,71 @@ const e4_c5_nf3_d6_d4 = createVariation({
   move: 'd4',
   name: 'Open Sicilian main',
   boardPgn: 'e4 c5 Nf3 d6 d4 cxd4 Nxd4',
-  intent: ['Critical position — Nf6, Nf6 a6 (Najdorf), g6 (Dragon)'],
+  intent: [
+    'The critical Open Sicilian tabiya — White has a central majority, Black has the semi-open c-file',
+    'Black chooses their system now: ...Nf6 + ...a6 = Najdorf (sharp, flexible); ...g6 = Dragon (fianchetto attack)',
+    'White often aims for a kingside attack (Be3, f3, Qd2, O-O-O) while Black counterattacks on the queenside',
+  ],
 });
 const e4_c5_nf3_nc6 = createVariation({
   id: 'e4_c5_nf3_nc6',
   move: 'Nc6',
   name: 'Accelerated Dragon',
   boardPgn: 'e4 c5 Nf3 Nc6',
-  intent: ['Flexible — can transpose to Classical or Accelerated Dragon'],
+  intent: [
+    'A flexible move — Black develops the knight and keeps multiple Sicilian systems open',
+    'Can transpose to the Classical Sicilian (...d6 next) or Accelerated Dragon (...g6 without ...d6)',
+    'The Accelerated Dragon avoids the Yugoslav Attack that regular Dragon players must face',
+  ],
 });
-const e4_c5_c3 = createVariation({
+const e4_c5_c3 = createOpening({
   id: 'e4_c5_c3',
   move: 'c3',
   name: 'Alapin Sicilian',
   boardPgn: 'e4 c5 c3',
-  intent: ['Anti-Sicilian — solid, less theory'],
+  intent: [
+    'Anti-Sicilian — avoid the main lines, play d4 next',
+    'A practical weapon that leads to clear play',
+  ],
+  whyThisMove:
+    "Don't want to wade through decades of Najdorf theory? The Alapin says 'I'm playing d4 next and you can't stop me.' White aims for a strong center quickly. Black can take on d4, challenge with d5, or develop normally. It's a sound, practical choice that avoids the sharpest Sicilian lines while giving White a meaningful game.",
+  strategicThemes: [
+    'White aims for d4 establishing a strong center',
+    'Often leads to IQP (isolated d-pawn) positions after d5 exd5 Qxd5 d4',
+    'Simpler to learn than the Open Sicilian',
+  ],
+  prosAndCons: {
+    pros: ['Avoids deep Sicilian theory', 'Sound and principled', 'Good surprise weapon'],
+    cons: ['Less ambitious than the Open Sicilian', 'Black equalizes with accurate play'],
+  },
+  lines: [
+    line('Main line', 'e4 c5 c3 d5 exd5 Qxd5 d4'),
+    line('Nf6 line', 'e4 c5 c3 Nf6 e5 Nd5 d4'),
+  ],
 });
-const e4_c5_nc3 = createVariation({
+const e4_c5_nc3 = createOpening({
   id: 'e4_c5_nc3',
   move: 'Nc3',
   name: 'Closed Sicilian',
   boardPgn: 'e4 c5 Nc3',
-  intent: ['Slow, strategic — fianchetto or d3 systems'],
+  intent: [
+    'System approach — fianchetto with g3 and Bg2',
+    'Avoids the open Sicilian entirely',
+  ],
+  whyThisMove:
+    "The Closed Sicilian is a system where White plays g3, Bg2, d3, and f4 regardless of what Black does. It avoids the theoretical jungle of the Open Sicilian and gives both sides clear plans: White builds a kingside attack with f4-f5, while Black expands on the queenside. Excellent for players who prefer understanding plans over memorizing moves.",
+  strategicThemes: [
+    'White fianchettoes and builds a kingside attack',
+    'f4-f5 pawn push is the key attacking idea',
+    'Black expands on the queenside with a6, b5, Rb8',
+  ],
+  prosAndCons: {
+    pros: ['System-based — fewer forced lines', 'Clear plans for both sides', 'Good at club level'],
+    cons: ['Less objectively testing than the Open Sicilian', 'Black knows the plans too'],
+  },
+  lines: [
+    line('Main setup', 'e4 c5 Nc3 Nc6 g3 g6 Bg2 Bg7 d3 d6'),
+  ],
 });
 
 const e4_e5 = createOpening({
@@ -606,7 +657,11 @@ const e4_e5_nf3 = createVariation({
   move: 'Nf3',
   name: 'Knight to f3',
   boardPgn: 'e4 e5 Nf3',
-  intent: ['Main continuation — Ruy Lopez, Italian, or Petrov'],
+  intent: [
+    'The most natural developing move — attacks the e5 pawn and develops toward the center',
+    'Sets up the great fork: Bb5 (Ruy Lopez), Bc4 (Italian), or Black can play ...Nf6 (Petrov)',
+    'This is the starting point for all the classical Open Games that have been played for centuries',
+  ],
   responses: [
     response('e4_e5_nf3_nc6', 'Nc6', 'Spanish / Italian'),
     response('e4_e5_nf3_nf6', 'Nf6', 'Petrov Defense'),
@@ -617,39 +672,188 @@ const e4_e5_nf3_nc6 = createVariation({
   move: 'Nc6',
   name: 'Spanish / Italian',
   boardPgn: 'e4 e5 Nf3 Nc6',
-  intent: ['Ruy Lopez (Bb5) or Italian (Bc4) next'],
+  intent: [
+    'Black defends the e5 pawn while developing — the most classical response',
+    'White now chooses: Bb5 (Ruy Lopez) for long-term strategic pressure, or Bc4 (Italian) for direct play against f7',
+    'This is the defining moment — the bishop move determines whether you enter Spanish or Italian territory',
+  ],
   responses: [
     response('e4_e5_nf3_nc6_bb5', 'Bb5', 'Ruy Lopez'),
     response('e4_e5_nf3_nc6_bc4', 'Bc4', 'Italian Game'),
   ],
 });
-const e4_e5_nf3_nc6_bb5 = createVariation({
+const e4_e5_nf3_nc6_bb5 = createOpening({
   id: 'e4_e5_nf3_nc6_bb5',
   move: 'Bb5',
   name: 'Ruy Lopez',
   boardPgn: 'e4 e5 Nf3 Nc6 Bb5',
-  intent: ['The Spanish — pins Nc6, deep theory'],
+  intent: [
+    'The Spanish Game — the most strategic of the open games',
+    'Bb5 pins the knight defending e5, creating long-term pressure',
+    'Leads to rich positional and tactical middlegames',
+  ],
+  whyThisMove:
+    "The Ruy Lopez has been the gold standard of e4 e5 chess for centuries. Bb5 doesn't immediately win the e5 pawn (Bxc6 dxc6 Nxe5? Qd4 wins it back), but it creates lasting strategic pressure. White builds a strong center with d3 and c3, maneuvers pieces behind the pawn chain, and slowly squeezes. Black has many ways to fight back — the Morphy Defense (a6), the Berlin Wall (Nf6), the Marshall Attack (sacrificing a pawn for initiative) — making this one of the deepest openings in chess.",
+  strategicThemes: [
+    'Long-term positional pressure on e5 and the center',
+    'White builds with c3, d4 to challenge the center later',
+    'Maneuvering game — knights reroute, bishops find diagonals',
+    'Pawn structure decisions define the middlegame character',
+  ],
+  prosAndCons: {
+    pros: [
+      'Extremely rich strategic and tactical play',
+      'White gets long-term initiative without risk',
+      'Played by every world champion from Steinitz to Carlsen',
+    ],
+    cons: [
+      'Theory runs incredibly deep — some lines go 30+ moves',
+      'The Berlin Defense can lead to dry endgames',
+      'Requires patience — not a quick attacking opening',
+    ],
+  },
+  famousPlayers: ['Bobby Fischer', 'Garry Kasparov', 'Magnus Carlsen', 'Anatoly Karpov'],
+  lines: [
+    line('Morphy Defense', 'e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O'),
+    line('Berlin Defense', 'e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4'),
+    line('Marshall Attack', 'e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5'),
+  ],
+  tree: [
+    tree('e4 e5 Nf3 Nc6 Bb5', [
+      tree('a6 (Morphy)', [tree('Ba4 Nf6 O-O — main line')]),
+      tree('Nf6 (Berlin)', [tree('O-O Nxe4 — Berlin Wall')]),
+      tree('d6 (Steinitz)'),
+    ]),
+  ],
 });
-const e4_e5_nf3_nc6_bc4 = createVariation({
+const e4_e5_nf3_nc6_bc4 = createOpening({
   id: 'e4_e5_nf3_nc6_bc4',
   move: 'Bc4',
   name: 'Italian Game',
   boardPgn: 'e4 e5 Nf3 Nc6 Bc4',
-  intent: ['Direct attack on f7 — Evans, Giuoco Piano'],
+  intent: [
+    'Targets the f7 square — the weakest point in Black\'s position',
+    'Leads to the Giuoco Piano or the Evans Gambit',
+    'More directly tactical than the Ruy Lopez',
+  ],
+  whyThisMove:
+    "Bc4 aims straight at f7, the most vulnerable square for the uncastled king. The Italian Game leads to positions where both sides develop quickly and tactical fireworks can erupt at any moment. The Giuoco Piano ('quiet game') with Bc5 leads to rich middlegames. The Evans Gambit (b4!?) sacrifices a pawn for rapid development and a fierce attack. This is an excellent opening for players who enjoy sharp, principled chess.",
+  strategicThemes: [
+    'Pressure on f7 creates attacking chances',
+    'Rapid development and early central tension',
+    'd3 and d4 pawn breaks are key for White',
+    'Both sides castle kingside — direct play in the center',
+  ],
+  prosAndCons: {
+    pros: [
+      'Natural developing moves — easy to learn',
+      'Active piece play from the start',
+      'Many tactical opportunities for both sides',
+    ],
+    cons: [
+      'The Giuoco Piano can become very theoretical',
+      'Black equalizes fairly easily in some lines',
+      'Less long-term strategic edge than the Ruy Lopez',
+    ],
+  },
+  famousPlayers: ['Paul Morphy', 'Mikhail Tal', 'Wesley So', 'Fabiano Caruana'],
+  lines: [
+    line('Giuoco Piano', 'e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4'),
+    line('Evans Gambit', 'e4 e5 Nf3 Nc6 Bc4 Bc5 b4'),
+    line('Two Knights Defense', 'e4 e5 Nf3 Nc6 Bc4 Nf6 d4'),
+  ],
+  tree: [
+    tree('e4 e5 Nf3 Nc6 Bc4', [
+      tree('Bc5 (Giuoco Piano)', [tree('c3 Nf6 d4'), tree('b4 (Evans Gambit)')]),
+      tree('Nf6 (Two Knights)'),
+    ]),
+  ],
 });
-const e4_e5_nf3_nf6 = createVariation({
+const e4_e5_nf3_nf6 = createOpening({
   id: 'e4_e5_nf3_nf6',
   move: 'Nf6',
   name: 'Petrov Defense',
   boardPgn: 'e4 e5 Nf3 Nf6',
-  intent: ['Solid exchange — symmetrical, draws common'],
+  intent: [
+    'Counter-attack the e4 pawn instead of defending e5',
+    'Leads to symmetrical, solid positions',
+    'A drawing weapon trusted at the highest level',
+  ],
+  whyThisMove:
+    "Instead of defending e5, Black mirrors White's attack on the center. The Petrov is the ultimate solid defense — if you're content with a draw as Black, this is your weapon. But don't be fooled: there are sharp lines too, especially if White goes for 3. Nxe5 d6 4. Nf3 Nxe4 5. d4. The Petrov rewards precise calculation and endgame skill over flashy tactics.",
+  strategicThemes: [
+    'Symmetrical pawn structure — equality is Black\'s goal',
+    'Simplification toward endgames where Black holds easily',
+    'White must play actively or face a dead draw',
+    'Tactical traps exist for unprepared opponents',
+  ],
+  prosAndCons: {
+    pros: [
+      'Extremely solid — very hard for White to crack',
+      'Trusted by world champions as a drawing weapon',
+      'Fewer sharp lines to memorize than Sicilian or French',
+    ],
+    cons: [
+      'Can feel passive — Black defends more than attacks',
+      'Drawing tendencies may not suit aggressive players',
+      'White can aim for a small edge with careful play',
+    ],
+  },
+  famousPlayers: ['Vladimir Kramnik', 'Fabiano Caruana', 'Sergey Karjakin'],
+  lines: [
+    line('Classical Petrov', 'e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4'),
+    line('Stafford Gambit (tricky)', 'e4 e5 Nf3 Nf6 Nxe5 Nc6'),
+  ],
+  tree: [
+    tree('e4 e5 Nf3 Nf6', [
+      tree('Nxe5 (main)', [tree('d6 Nf3 Nxe4 d4')]),
+      tree('d4 (Scotch Petrov)'),
+    ]),
+  ],
 });
-const e4_e5_f4 = createVariation({
+const e4_e5_f4 = createOpening({
   id: 'e4_e5_f4',
   move: 'f4',
   name: 'King\'s Gambit',
   boardPgn: 'e4 e5 f4',
-  intent: ['Romantic — sacrifices f-pawn for attack'],
+  intent: [
+    'The ultimate romantic gambit — sacrifice a pawn for a wild attack',
+    'Opens the f-file for the rook and clears diagonals',
+    'Beloved by attacking players for 400+ years',
+  ],
+  whyThisMove:
+    "The King's Gambit is chess at its most daring. White throws f4 at the board on move two, offering a pawn to rip open lines toward Black's king. If Black accepts with exf4, White gets a strong center (d4, e4) and an open f-file after castling. The Fischer Defense (d6), the Falkbeer Counter-Gambit (d5), and the Classical (Bc5) all give Black fighting chances. This isn't an opening for the faint-hearted — both sides need to play with courage.",
+  strategicThemes: [
+    'Sacrifice f-pawn for rapid development and open lines',
+    'After castling, the f-file becomes a highway for the rook',
+    'Strong center with d4 + e4 if Black takes',
+    'Attack the king before Black can consolidate the extra pawn',
+  ],
+  prosAndCons: {
+    pros: [
+      'Explosive attacking chances from the very start',
+      'Opponents are often unprepared for it',
+      'Incredibly fun and creative play',
+    ],
+    cons: [
+      'Weakens the king position (f2 to f4 opens the diagonal)',
+      'Black can decline and hold a solid position',
+      'Modern engines evaluate it as slightly dubious',
+    ],
+  },
+  famousPlayers: ['Adolf Anderssen', 'Boris Spassky', 'Bobby Fischer', 'Hikaru Nakamura'],
+  lines: [
+    line('King\'s Gambit Accepted', 'e4 e5 f4 exf4 Nf3 d6'),
+    line('Falkbeer Counter-Gambit', 'e4 e5 f4 d5 exd5 e4'),
+    line('Classical Defense', 'e4 e5 f4 Bc5'),
+  ],
+  tree: [
+    tree('e4 e5 f4', [
+      tree('exf4 (Accepted)', [tree('Nf3 — main line'), tree('Bc4 — Bishop\'s Gambit')]),
+      tree('d5 (Falkbeer)'),
+      tree('Bc5 (Classical)'),
+    ]),
+  ],
 });
 
 const e4_e6 = createOpening({
@@ -727,7 +931,10 @@ const e4_e6_d4 = createVariation({
   move: 'd4',
   name: 'd4',
   boardPgn: 'e4 e6 d4',
-  intent: ['Central pawn break'],
+  intent: [
+    'Claim the center with d4 — leads to the main French Defense tabiya',
+    'Black must commit: ...d5 creates the classic French pawn chain, where the battle revolves around e4 vs d5',
+  ],
   responses: [response('e4_e6_d4_d5', 'd5', 'French main')],
 });
 const e4_e6_d4_d5 = createVariation({
@@ -735,7 +942,11 @@ const e4_e6_d4_d5 = createVariation({
   move: 'd5',
   name: 'French main',
   boardPgn: 'e4 e6 d4 d5',
-  intent: ['Classical pawn structure'],
+  intent: [
+    'The defining French structure — pawns lock horns on e4 vs d5, creating a tense center',
+    'White must decide how to handle the tension: defend (Nc3/Nd2), advance (e5), or exchange (exd5)',
+    'Each choice leads to a fundamentally different type of game — this is where the French truly branches',
+  ],
   responses: [
     response('e4_e6_d4_d5_nc3', 'Nc3', 'Classical'),
     response('e4_e6_d4_d5_nd2', 'Nd2', 'Tarrasch'),
@@ -747,21 +958,33 @@ const e4_e6_d4_d5_nc3 = createVariation({
   move: 'Nc3',
   name: 'French Classical',
   boardPgn: 'e4 e6 d4 d5 Nc3',
-  intent: ['Main line — Nf6 (Classical), Bb4 (Winawer)'],
+  intent: [
+    'The main line — White defends e4 with the knight, keeping maximum tension',
+    'Black can play ...Nf6 (Classical, solid) or ...Bb4 (Winawer, sharp and provocative)',
+    'The Winawer leads to wild, double-edged play; the Classical is more strategic',
+  ],
 });
 const e4_e6_d4_d5_nd2 = createVariation({
   id: 'e4_e6_d4_d5_nd2',
   move: 'Nd2',
   name: 'Tarrasch',
   boardPgn: 'e4 e6 d4 d5 Nd2',
-  intent: ['Avoids Winawer — solid, flexible'],
+  intent: [
+    'The Tarrasch variation — White sidesteps the sharp Winawer by blocking the bishop pin',
+    'Leads to solid, maneuvering positions where White aims to exploit the French bishop on c8',
+    'Less forcing than Nc3, but avoids Black\'s most dynamic counterplay',
+  ],
 });
 const e4_e6_d4_d5_e5 = createVariation({
   id: 'e4_e6_d4_d5_e5',
   move: 'e5',
   name: 'French Advance',
   boardPgn: 'e4 e6 d4 d5 e5',
-  intent: ['Space advantage — Black breaks with c5'],
+  intent: [
+    'White grabs space and locks the center — a pawn chain from d4 to e5 controls the board',
+    'Black\'s plan is clear: break the chain with ...c5, then attack the base at d4',
+    'Leads to strategic battles over pawn breaks; Black\'s light-squared bishop is cramped but the position is playable',
+  ],
 });
 
 const e4_c6 = createOpening({
@@ -839,7 +1062,10 @@ const e4_c6_d4 = createVariation({
   move: 'd4',
   name: 'd4',
   boardPgn: 'e4 c6 d4',
-  intent: ['Central claim'],
+  intent: [
+    'White builds the ideal center — e4 + d4 controls the key central squares',
+    'Black\'s ...c6 prepared ...d5 to challenge this center, so the real battle starts next move',
+  ],
   responses: [response('e4_c6_d4_d5', 'd5', 'Caro main')],
 });
 const e4_c6_d4_d5 = createVariation({
@@ -847,7 +1073,11 @@ const e4_c6_d4_d5 = createVariation({
   move: 'd5',
   name: 'Caro main',
   boardPgn: 'e4 c6 d4 d5',
-  intent: ['Key tabiya'],
+  intent: [
+    'The key Caro-Kann tabiya — Black challenges the e4 pawn with the c6-d5 pawn chain',
+    'White must decide: defend e4 (Nc3), advance (e5), or exchange (exd5) — each gives a completely different game',
+    'Unlike the French, Black\'s light-squared bishop stays free (it can go to f5 or g4)',
+  ],
   responses: [
     response('e4_c6_d4_d5_nc3', 'Nc3', 'Classical'),
     response('e4_c6_d4_d5_e5', 'e5', 'Advance'),
@@ -859,21 +1089,33 @@ const e4_c6_d4_d5_nc3 = createVariation({
   move: 'Nc3',
   name: 'Caro-Kann Classical',
   boardPgn: 'e4 c6 d4 d5 Nc3 dxe4 Nxe4',
-  intent: ['Main line — Bf5 or Nd7'],
+  intent: [
+    'The Classical main line — after ...dxe4 Nxe4, the center opens and piece play takes over',
+    'Black plays ...Bf5 (most popular, developing the "good" bishop) or ...Nd7 (more flexible)',
+    'Leads to clear, structured positions where both sides have defined plans',
+  ],
 });
 const e4_c6_d4_d5_e5 = createVariation({
   id: 'e4_c6_d4_d5_e5',
   move: 'e5',
   name: 'Caro-Kann Advance',
   boardPgn: 'e4 c6 d4 d5 e5',
-  intent: ['Space — Black plays c5, Bf5'],
+  intent: [
+    'White grabs space with e5, creating a pawn chain similar to the French Advance',
+    'Black typically plays ...Bf5 (keeping the bishop active) then ...c5 to undermine White\'s center',
+    'More strategic than the Classical — both sides maneuver around the pawn chain',
+  ],
 });
 const e4_c6_d4_d5_exd5 = createVariation({
   id: 'e4_c6_d4_d5_exd5',
   move: 'exd5',
   name: 'Exchange Variation',
   boardPgn: 'e4 c6 d4 d5 exd5 cxd5',
-  intent: ['Simplifies — isolated d-pawn positions'],
+  intent: [
+    'Simplifies the center — leads to symmetrical pawn structures that can feel drawish',
+    'White often tries to exploit the isolated d-pawn or play for a minority attack on the queenside',
+    'Considered less ambitious, but can surprise opponents who expect the main line fight',
+  ],
 });
 
 // ============================================================================
@@ -983,26 +1225,82 @@ const d4_d5_c4 = createOpening({
     ]),
   ],
 });
-const d4_d5_c4_e6 = createVariation({
+const d4_d5_c4_e6 = createOpening({
   id: 'd4_d5_c4_e6',
   move: 'e6',
   name: "Queen's Gambit Declined",
   boardPgn: 'd4 d5 c4 e6',
-  intent: ['Solid — Nc3, Nf3, or e3 next'],
+  intent: [
+    'The most classical response — solid and reliable',
+    'e6 holds d5 firmly and prepares development',
+  ],
+  whyThisMove:
+    "The QGD is the bedrock of classical chess. Black says 'no thanks' to the gambit and holds the center with e6. The resulting positions are rich and strategic — White often plays for a minority attack on the queenside, while Black aims for a c5 or e5 pawn break. It's the opening that defined world championship matches for decades.",
+  strategicThemes: [
+    'Solid central structure — d5 is firmly defended',
+    'Minority attack (a4-b5) is White\'s main queenside plan',
+    'Black aims for c5 or e5 pawn breaks for counterplay',
+  ],
+  prosAndCons: {
+    pros: ['Rock solid — extremely hard to crack', 'Rich strategic play', 'Trusted at the highest level'],
+    cons: ['Can feel passive early on', 'Light-squared bishop is often blocked by e6'],
+  },
+  famousPlayers: ['Anatoly Karpov', 'Vladimir Kramnik', 'Ding Liren'],
+  lines: [
+    line('Orthodox QGD', 'd4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3'),
+    line('Tartakower', 'd4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 h6 Bh4 b6'),
+  ],
 });
-const d4_d5_c4_c6 = createVariation({
+const d4_d5_c4_c6 = createOpening({
   id: 'd4_d5_c4_c6',
   move: 'c6',
   name: 'Slav Defense',
   boardPgn: 'd4 d5 c4 c6',
-  intent: ['Solid — avoids Bg5 pin, dxc4 possible'],
+  intent: [
+    'Supports d5 without blocking the light-squared bishop',
+    'Flexible — dxc4 is always an option',
+  ],
+  whyThisMove:
+    "The Slav is the QGD's cooler sibling. By playing c6 instead of e6, Black keeps the light-squared bishop free to develop to f5 or g4, which is the main drawback of the QGD. The Semi-Slav (c6 + e6) is one of the sharpest systems in all of chess. The Slav is a favorite of modern grandmasters who want a solid but dynamic position.",
+  strategicThemes: [
+    'Light-squared bishop stays active (unlike QGD)',
+    'dxc4 followed by b5 grabs space on the queenside',
+    'Semi-Slav (adding e6) leads to incredibly sharp play',
+  ],
+  prosAndCons: {
+    pros: ['Bishop on c8 stays active', 'Flexible pawn structure', 'Can transpose to many systems'],
+    cons: ['c6 doesn\'t help develop pieces', 'Some lines require precise knowledge'],
+  },
+  famousPlayers: ['Magnus Carlsen', 'Viswanathan Anand', 'Vladimir Kramnik'],
+  lines: [
+    line('Main Slav', 'd4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4'),
+    line('Semi-Slav', 'd4 d5 c4 c6 Nf3 Nf6 Nc3 e6 Bg5'),
+  ],
 });
-const d4_d5_c4_dxc4 = createVariation({
+const d4_d5_c4_dxc4 = createOpening({
   id: 'd4_d5_c4_dxc4',
   move: 'dxc4',
   name: "Queen's Gambit Accepted",
   boardPgn: 'd4 d5 c4 dxc4',
-  intent: ['Sharp — White regains pawn, Black develops'],
+  intent: [
+    'Take the pawn and let White prove compensation',
+    'Active piece play — not as passive as it looks',
+  ],
+  whyThisMove:
+    "Taking the pawn isn't about holding onto it — White can always recover it. The QGA is about giving White a broad center and then undermining it. Black develops quickly with Nf6, e6, c5 and challenges White to prove the center is an advantage, not a target. Modern grandmasters have shown the QGA is perfectly sound and leads to active play for Black.",
+  strategicThemes: [
+    'Black gives up the center temporarily for piece activity',
+    'c5 pawn break challenges White\'s d4',
+    'White gets a central majority but Black gets counterplay',
+  ],
+  prosAndCons: {
+    pros: ['Active piece play for Black', 'Less theory than QGD', 'Surprise value at all levels'],
+    cons: ['White gets a strong center', 'Black must play accurately to equalize', 'Can feel like defending early on'],
+  },
+  lines: [
+    line('Main line', 'd4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5'),
+    line('Central variation', 'd4 d5 c4 dxc4 e4 e5 Nf3'),
+  ],
 });
 
 const d4_nf6 = createOpening({
@@ -1070,7 +1368,11 @@ const d4_nf6_c4 = createVariation({
   move: 'c4',
   name: 'c4',
   boardPgn: 'd4 Nf6 c4',
-  intent: ['Broad center'],
+  intent: [
+    'White expands in the center with c4 — controlling d5 and preparing a broad pawn center',
+    'This is the gateway to all the Indian Defenses: Black chooses between ...g6 (King\'s Indian), ...e6 (Nimzo/Queen\'s Indian), or ...c5',
+    'The move says "I want a big center" — Black must decide whether to challenge it or play around it',
+  ],
   responses: [
     response('d4_nf6_c4_g6', 'g6', "King's Indian"),
     response('d4_nf6_c4_e6', 'e6', "Queen's Indian / Nimzo"),
@@ -1081,7 +1383,11 @@ const d4_nf6_c4_g6 = createVariation({
   move: 'g6',
   name: "King's Indian",
   boardPgn: 'd4 Nf6 c4 g6',
-  intent: ['Fianchetto — Nc3 Bg7 next'],
+  intent: [
+    'Black signals the King\'s Indian — fianchetto the bishop to g7 and build a kingside attack',
+    'Black concedes the center initially (...d6 next), then strikes back with ...e5 to create dynamic counterplay',
+    'One of the most combative defenses — leads to opposite-side attacks and sharp tactical battles',
+  ],
   responses: [response('d4_nf6_c4_g6_nc3', 'Nc3', 'KID main')],
 });
 const d4_nf6_c4_g6_nc3 = createVariation({
@@ -1089,14 +1395,22 @@ const d4_nf6_c4_g6_nc3 = createVariation({
   move: 'Nc3',
   name: "King's Indian main",
   boardPgn: 'd4 Nf6 c4 g6 Nc3 Bg7',
-  intent: ['Bg7, d6 — kingside attack'],
+  intent: [
+    'White develops the knight to support the center — after ...Bg7, ...d6, the King\'s Indian structure is set',
+    'White can push e4 to build a massive center, then Black counters with ...e5 creating tension',
+    'The classic King\'s Indian battle: White attacks on the queenside (c5), Black attacks on the kingside (f5, g5)',
+  ],
 });
 const d4_nf6_c4_e6 = createVariation({
   id: 'd4_nf6_c4_e6',
   move: 'e6',
   name: "Queen's Indian / Nimzo",
   boardPgn: 'd4 Nf6 c4 e6',
-  intent: ['Nf3 b6 (QID) or Nc3 Bb4 (Nimzo)'],
+  intent: [
+    'Black keeps options flexible — waiting to see White\'s third move before committing',
+    'If White plays Nc3, Black can pin with ...Bb4 (Nimzo-Indian) — one of the most respected defenses',
+    'If White plays Nf3, Black plays ...b6 (Queen\'s Indian) — a solid hypermodern setup controlling the center with pieces',
+  ],
 });
 
 // ============================================================================

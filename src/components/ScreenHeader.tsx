@@ -62,12 +62,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 26,
+    fontSize: 30,
     fontWeight: '800',
   },
   subtitle: {
     fontSize: 14,
-    marginTop: 2,
+    marginTop: 4,
   },
   themeBtn: {
     flexDirection: 'row',

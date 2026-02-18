@@ -6,6 +6,7 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
+  Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { startMoves } from '../../src/data/openings';
@@ -82,6 +83,8 @@ export default function ExploreScreen() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholderTextColor={colors.textMuted}
+          returnKeyType="search"
+          onSubmitEditing={Keyboard.dismiss}
         />
       </View>
 
@@ -90,6 +93,8 @@ export default function ExploreScreen() {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
           <Text style={[styles.listHeader, { color: colors.textMuted }]}>White's first move</Text>
         }
