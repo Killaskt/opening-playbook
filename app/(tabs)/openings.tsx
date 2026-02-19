@@ -56,19 +56,33 @@ export default function OpeningsScreen() {
   }, []);
 
   const sections = useMemo(() => {
-    const query = searchQuery.toLowerCase().trim();
+    const rawQuery = searchQuery.trim().toLowerCase();
+    const terms = rawQuery ? rawQuery.split(/\s+/).filter(Boolean) : [];
 
     const filtered = openingsCatalog.filter((entry) => {
-      const matchesSearch =
-        !query ||
-        entry.name.toLowerCase().includes(query) ||
-        entry.description.toLowerCase().includes(query) ||
-        entry.pgn.toLowerCase().includes(query) ||
-        (entry.eco?.toLowerCase().includes(query) ?? false) ||
-        (entry.style?.some(s => s.toLowerCase().includes(query)) ?? false);
+      if (terms.length === 0) {
+        const matchesType = !activeType || entry.type === activeType;
+        return matchesType;
+      }
 
+      // Build one searchable string: name, description, pgn, eco, styles, key ideas, famous players (from node)
+      const searchParts = [
+        entry.name,
+        entry.description,
+        entry.pgn,
+        entry.eco ?? '',
+        (entry.style ?? []).join(' '),
+        (entry.keyIdeas ?? []).join(' '),
+      ];
+      const node = entry.nodeId ? nodesById[entry.nodeId] : undefined;
+      if (node?.famousPlayers?.length) {
+        searchParts.push(node.famousPlayers.join(' '));
+      }
+      const searchText = searchParts.join(' ').toLowerCase();
+
+      // Every search term must appear somewhere (partial word match across any field)
+      const matchesSearch = terms.every((term) => searchText.includes(term));
       const matchesType = !activeType || entry.type === activeType;
-
       return matchesSearch && matchesType;
     });
 
@@ -146,7 +160,7 @@ export default function OpeningsScreen() {
       <SearchBar
         value={searchQuery}
         onChangeText={setSearchQuery}
-        placeholder="Search openings, styles..."
+        placeholder="Search by name, style, ECO, or player..."
       />
 
       <View style={styles.filterWrapper}>
