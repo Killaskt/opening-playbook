@@ -171,23 +171,25 @@ export function LiquidTabBar({ state, navigation }: BottomTabBarProps) {
               top: highlightTop,
               transform: [{ translateX: highlightX }],
               backgroundColor: colors.highlightBg,
-              borderColor: colors.highlightBg,
+              borderColor: isDark ? colors.accent + '30' : colors.highlightBg,
             },
           ]}
         >
-          <BlurView
-            intensity={isDark ? 26 : 38}
-            tint={isDark ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFillObject}
-          />
-          <View
-            style={[
-              styles.highlightFrost,
-              {
-                backgroundColor: colors.highlightFrost,
-              },
-            ]}
-          />
+          {!isDark && (
+            <BlurView
+              intensity={38}
+              tint="light"
+              style={StyleSheet.absoluteFillObject}
+            />
+          )}
+          {!isDark && (
+            <View
+              style={[
+                styles.highlightFrost,
+                { backgroundColor: colors.highlightFrost },
+              ]}
+            />
+          )}
         </Animated.View>
       )}
       {state.routes.map((route, index) => {

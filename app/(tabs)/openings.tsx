@@ -20,7 +20,6 @@ import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { SearchBar } from '../../src/components/SearchBar';
 import { openingStyleColors } from '../../src/theme/openingStyles';
 import { EcoBadge, GlassCard, PillChip } from '../../src/components/UIPrimitives';
-import { BulletRow } from '../../src/components/BulletRow';
 import { SectionJumper } from '../../src/components/SectionJumper';
 
 const TYPE_ORDER: OpeningType[] = ['opening', 'gambit', 'defense', 'system'];
@@ -204,24 +203,18 @@ export default function OpeningsScreen() {
             <Text style={[styles.sectionHeaderText, { color: colors.textTertiary }]}>{section.title}</Text>
           </View>
         )}
-        renderItem={({ item }) => {
-          return (
-            <Pressable
-              style={({ pressed }) => [
-                styles.cardTouch,
-                pressed && { opacity: 0.95 },
-              ]}
-              onPress={() => handlePress(item)}
-            >
-              <GlassCard style={styles.card}>
+        renderItem={({ item }) => (
+          <Pressable
+            style={({ pressed }) => [styles.cardTouch, pressed && { opacity: 0.95 }]}
+            onPress={() => handlePress(item)}
+          >
+            <GlassCard style={styles.card}>
               <View style={styles.cardTop}>
-                <Text style={[styles.openingName, typography.titleSM, { color: colors.text }]}>{item.name}</Text>
-                {item.eco && (
-                  <EcoBadge code={item.eco} style={styles.ecoLabel} />
-                )}
+                <Text style={[styles.openingName, typography.titleSM, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
+                {item.eco && <EcoBadge code={item.eco} style={styles.ecoLabel} />}
               </View>
 
-              <Text style={[styles.pgnText, typography.mono, { color: colors.accent }]}>{item.pgn}</Text>
+              <Text style={[styles.pgnText, typography.mono, { color: colors.accent }]} numberOfLines={1}>{item.pgn}</Text>
 
               {item.style && item.style.length > 0 && (
                 <View style={styles.styleRow}>
@@ -241,15 +234,12 @@ export default function OpeningsScreen() {
                 </View>
               )}
 
-              <Text style={[styles.descText, typography.bodyMD, { color: colors.textSecondary }]}>{item.description}</Text>
-
-              {item.keyIdeas && item.keyIdeas.length > 0 && (
-                <View style={styles.ideasSection}>
-                  {item.keyIdeas.map((idea, i) => (
-                    <BulletRow key={i} icon="idea" iconColor={colors.green} text={idea} />
-                  ))}
-                </View>
-              )}
+              <Text
+                style={[styles.descText, typography.bodyMD, { color: colors.textSecondary }]}
+                numberOfLines={2}
+              >
+                {item.description}
+              </Text>
 
               {item.nodeId && nodesById[item.nodeId] && (
                 <View style={[styles.linkHint, { borderTopColor: colors.borderLight, backgroundColor: colors.accentBg }]}>
@@ -257,10 +247,9 @@ export default function OpeningsScreen() {
                   <Text style={[styles.linkArrow, { color: colors.accent }]}>{'>'}</Text>
                 </View>
               )}
-              </GlassCard>
-            </Pressable>
-          );
-        }}
+            </GlassCard>
+          </Pressable>
+        )}
         contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 30 }]}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
@@ -380,10 +369,6 @@ const styles = StyleSheet.create({
   },
   descText: {
     marginBottom: 6,
-  },
-  ideasSection: {
-    marginTop: 6,
-    gap: 5,
   },
   linkHint: {
     flexDirection: 'row',

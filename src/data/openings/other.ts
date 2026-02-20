@@ -1,4 +1,4 @@
-import { createOpening, response, tree, line, trap, game, arrow, principle } from '../builders';
+import { createOpening, createVariation, response, tree, line, trap, game, arrow, principle } from '../builders';
 
 // ============================================================================
 // WHITE'S FIRST MOVE: c4 (English Opening)
@@ -124,7 +124,17 @@ export const nf3 = createOpening({
       'Requires broad opening knowledge to use well',
     ],
   },
-  famousPlayers: ['Richard Réti', 'Vladimir Kramnik', 'Levon Aronian'],
+  famousPlayers: ['Richard Réti', 'Levon Aronian', 'Magnus Carlsen', 'Hikaru Nakamura'],
+  famousGames: [
+    game(
+      'Réti vs Capablanca, 1924',
+      'Réti defeats the reigning World Champion with his own opening — one of the great upsets in chess history and a landmark game for hypermodern theory.'
+    ),
+    game(
+      'Aronian vs Anand, 2013 Candidates',
+      'Aronian uses the Réti to outmaneuver Anand in a brilliant positional squeeze — a modern masterclass in the opening\'s strategic depth.'
+    ),
+  ],
   responses: [
     response('nf3_d5', 'd5', 'Réti Proper'),
     response('nf3_nf6', 'Nf6', 'Double Fianchetto'),
@@ -185,6 +195,16 @@ export const b3 = createOpening({
     ],
   },
   famousPlayers: ['Bent Larsen', 'Richard Rapport'],
+  famousGames: [
+    game(
+      'Spassky vs Larsen, 1970',
+      'Larsen plays his namesake opening and defeats World Champion Boris Spassky — one of the most famous victories by the creative Danish grandmaster.'
+    ),
+    game(
+      'Rapport vs Vidit, 2023',
+      'Richard Rapport — the modern standard-bearer for 1.b3 — uses the Larsen to create a completely original strategic masterpiece at the top level.'
+    ),
+  ],
   responses: [
     response('b3_e5', 'e5', 'Central Counter'),
     response('b3_d5', 'd5', 'Solid Center'),
@@ -235,6 +255,9 @@ export const c4_e5 = createOpening({
       'Can transpose into positions where White is comfortable',
     ],
   },
+  responses: [
+    response('c4_e5_nc3', 'Nc3', 'Reversed Sicilian main'),
+  ],
   lines: [line('Main Line', 'c4 e5 Nc3 Nf6 Nf3 Nc6')],
   tree: [tree('c4 e5', [tree('Nc3', [tree('Nf6')])])],
 });
@@ -307,6 +330,10 @@ export const nf3_d5 = createOpening({
       'The d5 pawn may become a target after c4',
     ],
   },
+  responses: [
+    response('nf3_d5_c4', 'c4', 'Réti with c4'),
+    response('nf3_d5_g3', 'g3', 'Réti Fianchetto'),
+  ],
   lines: [
     line('With c4', 'Nf3 d5 c4 d4 e3'),
     line('Fianchetto', 'Nf3 d5 g3 Nf6 Bg2'),
@@ -418,4 +445,133 @@ export const b3_d5 = createOpening({
   },
   lines: [line('Main Line', 'b3 d5 Bb2 Nf6 Nf3 e6')],
   tree: [tree('b3 d5', [tree('Bb2', [tree('Nf6')])])],
+});
+
+// ============================================================================
+// ENGLISH OPENING — DEPTH NODES (3rd–5th level)
+// ============================================================================
+
+export const c4_e5_nc3 = createVariation({
+  id: 'c4_e5_nc3',
+  move: 'Nc3',
+  name: 'Reversed Sicilian main',
+  boardPgn: 'c4 e5 Nc3',
+  intent: [
+    'The most natural follow-up — White develops the knight and eyes d5',
+    'Black typically responds with ...Nf6 (active) or ...Nc6 (solid) — both lead to rich Reversed Sicilian positions',
+    'White has the extra tempo of a Sicilian with colors reversed, giving a subtle but real advantage',
+    'The structure favors long-term positional maneuvering — piece activity over pawn breaks',
+  ],
+  responses: [
+    response('c4_e5_nc3_nf6', 'Nf6', 'Reversed Sicilian Nf6'),
+  ],
+});
+
+export const c4_e5_nc3_nf6 = createVariation({
+  id: 'c4_e5_nc3_nf6',
+  move: 'Nf6',
+  name: 'Reversed Sicilian Nf6',
+  boardPgn: 'c4 e5 Nc3 Nf6',
+  intent: [
+    'Black develops the knight actively — attacking c4 and controlling the center',
+    'White often plays Nf3 or g3 (preparing Bg2) — the fianchetto setup is very common in English positions',
+    'After Nf3 Nc6, both sides have active piece positions with no major weaknesses — a balanced, dynamic middlegame awaits',
+    'The Reversed Sicilian is a favorite of Magnus Carlsen — patient maneuvering and small advantages accumulate',
+  ],
+  responses: [
+    response('c4_e5_nc3_nf6_nf3', 'Nf3', 'English Nf3'),
+  ],
+});
+
+export const c4_e5_nc3_nf6_nf3 = createVariation({
+  id: 'c4_e5_nc3_nf6_nf3',
+  move: 'Nf3',
+  name: 'English Nf3',
+  boardPgn: 'c4 e5 Nc3 Nf6 Nf3',
+  intent: [
+    'White develops the second knight — now both central squares d5 and e4 are controlled by pieces',
+    'Black plays ...Nc6, completing the symmetrical development; both sides aim to fianchetto and castle kingside',
+    'The resulting positions are strategic and balanced — no immediate tension, but long plans of piece maneuvering',
+    'Hikaru Nakamura and Magnus Carlsen are masters of these positions, grinding small advantages over many moves',
+  ],
+});
+
+// ============================================================================
+// RÉTI OPENING — DEPTH NODES (3rd–5th level)
+// ============================================================================
+
+export const nf3_d5_c4 = createVariation({
+  id: 'nf3_d5_c4',
+  move: 'c4',
+  name: 'Réti with c4',
+  boardPgn: 'Nf3 d5 c4',
+  intent: [
+    'White finally reveals their plan — c4 challenges Black\'s d5 pawn, transposing toward a Queen\'s Gambit type structure',
+    'The key difference from a normal QGD: Black has already committed to ...d5, so White has avoided certain Black setups',
+    'Black can hold with ...e6 (solid, QGD-like), exchange with ...dxc4 (active), or push ...d4 (space-grabbing)',
+    'The ...d4 push is the most interesting — Black advances to gain space, White attacks the advanced pawn with e3',
+  ],
+  responses: [
+    response('nf3_d5_c4_e6', 'e6', 'Réti QGD-style'),
+    response('nf3_d5_c4_d4', 'd4', 'Réti d4 push'),
+  ],
+});
+
+export const nf3_d5_c4_e6 = createVariation({
+  id: 'nf3_d5_c4_e6',
+  move: 'e6',
+  name: 'Réti QGD-style',
+  boardPgn: 'Nf3 d5 c4 e6',
+  intent: [
+    'Black transposes to a solid QGD structure — supporting d5 and keeping the light-squared bishop temporarily locked',
+    'White typically plays g3-Bg2 (fianchetto), keeping the Réti character rather than going into pure QGD theory',
+    'The resulting positions are subtle — White\'s bishop on g2 eyes the long diagonal, Black plays for a ...c5 or ...e5 break',
+    'These positions favor players with deep positional understanding — both sides maneuver for piece activity',
+  ],
+});
+
+export const nf3_d5_c4_d4 = createVariation({
+  id: 'nf3_d5_c4_d4',
+  move: 'd4',
+  name: 'Réti d4 push',
+  boardPgn: 'Nf3 d5 c4 d4',
+  intent: [
+    'An ambitious choice — Black grabs space by advancing the d-pawn, creating a passed pawn chain',
+    'White typically responds with e3, immediately attacking the advanced pawn and creating queenside tension',
+    'After e3 dxe3 fxe3, White has a semi-open f-file and an asymmetrical pawn structure that leads to dynamic play',
+    'The Réti d4 push leads to uncharted territory — ideal for players who want to avoid theory and fight for every inch',
+  ],
+});
+
+// ============================================================================
+// RÉTI / ENGLISH — FIANCHETTO DEPTH NODE
+// ============================================================================
+
+export const nf3_d5_g3 = createVariation({
+  id: 'nf3_d5_g3',
+  move: 'g3',
+  name: 'Réti Fianchetto',
+  boardPgn: 'Nf3 d5 g3',
+  intent: [
+    'White chooses the pure fianchetto setup — g3 prepares Bg2, putting the bishop on a powerful diagonal',
+    'This is the purest Réti — White delays any central pawn commitment to see how Black develops',
+    'Black typically plays ...Nf6, ...c6, and ...Bf5, building a solid setup before deciding on ...e5 or ...c5',
+    'The Bg2 bishop on the long diagonal a1-h8 is White\'s main long-term asset in this structure',
+  ],
+  responses: [
+    response('nf3_d5_g3_nf6', 'Nf6', 'Réti Fianchetto Nf6'),
+  ],
+});
+
+export const nf3_d5_g3_nf6 = createVariation({
+  id: 'nf3_d5_g3_nf6',
+  move: 'Nf6',
+  name: 'Réti Fianchetto Nf6',
+  boardPgn: 'Nf3 d5 g3 Nf6',
+  intent: [
+    'Black develops naturally — ...Nf6 is flexible and waits to see White\'s bishop placement',
+    'After Bg2, the tension builds — the g2 bishop eyes d5 and the queenside, while Black must reinforce the center',
+    'Both sides often castle kingside and enter a long maneuvering battle — Réti mastered these slow squeeze positions',
+    'Key plan for Black: play ...c5 to fight for the center before White\'s positional advantage becomes permanent',
+  ],
 });
