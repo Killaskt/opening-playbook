@@ -98,7 +98,7 @@ export function ChessPiece({ type, isWhite, size }: PieceProps) {
   const paths = getPiecePaths(type, isWhite);
 
   return (
-    <Svg width={size} height={size} viewBox="0 0 45 45">
+    <Svg width={size} height={size} viewBox="0 0 45 45" pointerEvents="none">
       <G>
         {paths.map((p, i) => (
           <Path

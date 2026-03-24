@@ -19,7 +19,6 @@ import { EcoBadge, GlassCard, PillChip, SectionCard, SectionTitle } from '../../
 import { BulletRow } from '../../src/components/BulletRow';
 import { IdeaIcon, IdeaIconKind } from '../../src/components/IdeaIcons';
 import { GlanceSection } from '../../src/components/GlanceSection';
-import { ResponseGrid } from '../../src/components/ResponseGrid';
 
 export default function MoveDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -56,7 +55,6 @@ export default function MoveDetailScreen() {
   const hasThreats = !!opening.threats?.length;
   const hasTraps = !!opening.traps?.length;
   const hasGlance = hasPros || hasCons || hasThreats || hasTraps;
-  const hasResponses = opening.responses.length > 0;
   const hasLines = opening.lines.length > 0;
   const hasFamousPlayers = !!opening.famousPlayers?.length;
   const hasFamousGames = !!opening.famousGames?.length;
@@ -91,7 +89,12 @@ export default function MoveDetailScreen() {
               </View>
             )}
             <View style={styles.heroBoardWrapper}>
-              <AnimatedChessBoard pgn={opening.boardPgn} arrows={opening.boardArrows} />
+              <AnimatedChessBoard
+                pgn={opening.boardPgn}
+                arrows={opening.boardArrows}
+                responses={opening.responses}
+                onResponsePress={(respId) => router.push(`/move/${respId}`)}
+              />
             </View>
           </GlassCard>
 
@@ -173,24 +176,6 @@ export default function MoveDetailScreen() {
                 traps={opening.traps ?? []}
               />
             </View>
-          )}
-
-          {/* Where this goes next — redesigned */}
-          {hasResponses && (
-            <SectionCard style={styles.section} accentColor={colors.orange}>
-              <View style={styles.responsesHeader}>
-                <SectionTitle style={[styles.responsesTitle, { color: colors.text }]}>
-                  Continue the line
-                </SectionTitle>
-                <Text style={[styles.responsesSubtitle, { color: colors.textTertiary }]}>
-                  {opening.responses.length} {opening.responses.length === 1 ? 'response' : 'responses'}
-                </Text>
-              </View>
-              <ResponseGrid
-                responses={opening.responses}
-                onPress={(id) => router.push(`/move/${id}`)}
-              />
-            </SectionCard>
           )}
 
           {/* Go deeper */}
@@ -376,21 +361,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-  // Responses — redesigned
-  responsesHeader: {
-    marginBottom: 12,
-    paddingRight: 6,
-  },
-  responsesTitle: {
-    fontSize: 19,
-    fontWeight: '700',
-    lineHeight: 24,
-    marginBottom: 3,
-  },
-  responsesSubtitle: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
   deepDiveToggle: {
     flexDirection: 'row',
     justifyContent: 'space-between',

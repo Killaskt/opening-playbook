@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Chess } from 'chess.js';
 import Svg, { Line, Polygon } from 'react-native-svg';
@@ -12,15 +12,35 @@ interface AnimatedChessBoardProps {
   compact?: boolean;
   label?: string;
   arrows?: BoardArrow[];
+  responses?: { id: string; move: string; name: string }[];
+  onResponsePress?: (id: string) => void;
 }
 
-export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: AnimatedChessBoardProps) {
+export function AnimatedChessBoard({ pgn, compact = false, label, arrows, responses, onResponsePress }: AnimatedChessBoardProps) {
   const { colors, typography } = useTheme();
   const [game] = useState(() => new Chess());
   const [moves, setMoves] = useState<string[]>([]);
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
   const [board, setBoard] = useState<(string | null)[][]>([]);
   const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
+
+  const isAtEnd = currentMoveIndex >= moves.length - 1;
+
+  const responseSquares = useMemo<Map<string, string>>(() => {
+    const map = new Map<string, string>();
+    if (!responses || responses.length === 0 || !isAtEnd) return map;
+    const tempGame = new Chess(game.fen());
+    for (const resp of responses) {
+      try {
+        const m = tempGame.move(resp.move);
+        if (m) {
+          map.set(m.from, resp.id);
+          tempGame.undo();
+        }
+      } catch {}
+    }
+    return map;
+  }, [isAtEnd, responses, currentMoveIndex]);
 
   const squareSize = compact ? 34 : 42;
   const boardSize = squareSize * 8;
@@ -134,11 +154,11 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
     if (arrowList.length === 0) return null;
 
     return (
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <Svg
         width={boardSize}
         height={boardSize}
         style={StyleSheet.absoluteFill}
-        pointerEvents="none"
       >
         {arrowList.map((arr, i) => {
           const from = squareToPixel(arr.from);
@@ -185,6 +205,7 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
           );
         })}
       </Svg>
+      </View>
     );
   };
 
@@ -200,6 +221,8 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
     const squareName = `${String.fromCharCode(97 + col)}${8 - row}`;
     const isFrom = lastMove?.from === squareName;
     const isTo = lastMove?.to === squareName;
+    const responseId = responseSquares.get(squareName);
+    const isResponseSquare = !!responseId && !!onResponsePress;
 
     let pieceType = '';
     let isWhite = true;
@@ -209,38 +232,56 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
       isWhite = color === 'w';
     }
 
-    return (
-      <View
-        key={`${row}-${col}`}
-        style={[
-          {
-            width: squareSize,
-            height: squareSize,
-            justifyContent: 'center',
-            alignItems: 'center',
-            position: 'relative' as const,
-            backgroundColor: isLight ? colors.lightSquare : colors.darkSquare,
-          },
-          (isFrom || isTo) && { backgroundColor: isLight ? colors.squareHighlightLight : colors.squareHighlightDark },
-        ]}
-      >
+    const bgColor = (isFrom || isTo)
+      ? (isLight ? colors.squareHighlightLight : colors.squareHighlightDark)
+      : (isLight ? colors.lightSquare : colors.darkSquare);
+
+    const baseStyle = {
+      width: squareSize,
+      height: squareSize,
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
+      position: 'relative' as const,
+      backgroundColor: bgColor,
+    };
+
+    const innerContent = (
+      <>
+        {isResponseSquare && (
+          <View
+            style={[StyleSheet.absoluteFill, { backgroundColor: colors.green + '55' }]}
+            pointerEvents="none"
+          />
+        )}
         {piece && renderPiece(pieceType, isWhite, pieceSize)}
         {!compact && col === 0 && (
-          <Text style={[
-            styles.coordinateRank,
-            { color: isLight ? colors.darkSquare : colors.lightSquare },
-          ]}>
+          <Text style={[styles.coordinateRank, { color: isLight ? colors.darkSquare : colors.lightSquare }]}>
             {8 - row}
           </Text>
         )}
         {!compact && row === 7 && (
-          <Text style={[
-            styles.coordinateFile,
-            { color: isLight ? colors.darkSquare : colors.lightSquare },
-          ]}>
+          <Text style={[styles.coordinateFile, { color: isLight ? colors.darkSquare : colors.lightSquare }]}>
             {String.fromCharCode(97 + col)}
           </Text>
         )}
+      </>
+    );
+
+    if (isResponseSquare) {
+      return (
+        <Pressable
+          key={`${row}-${col}`}
+          style={({ pressed }) => [baseStyle, pressed && { opacity: 0.65 }]}
+          onPress={() => onResponsePress!(responseId!)}
+        >
+          {innerContent}
+        </Pressable>
+      );
+    }
+
+    return (
+      <View key={`${row}-${col}`} style={baseStyle}>
+        {innerContent}
       </View>
     );
   };
@@ -268,6 +309,12 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows }: Anim
           {currentMoveIndex >= 0 && ` (${moves[currentMoveIndex]})`}
         </Text>
       </View>
+
+      {!compact && isAtEnd && responseSquares.size > 0 && (
+        <Text style={[styles.responseHint, { color: colors.green }]}>
+          Tap a highlighted piece to continue
+        </Text>
+      )}
 
       <View style={[styles.controls, { backgroundColor: colors.cardGlassStrong, borderColor: colors.glassBorder }]}>
         {!compact && (
@@ -374,6 +421,12 @@ const styles = StyleSheet.create({
   moveText: {
     fontSize: 14,
     fontWeight: '600',
+  },
+  responseHint: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    marginTop: 2,
+    marginBottom: 4,
   },
   controls: {
     flexDirection: 'row',
