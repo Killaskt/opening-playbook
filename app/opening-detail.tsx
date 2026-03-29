@@ -5,9 +5,11 @@ import {
   ScrollView,
   Pressable,
   StyleSheet,
+  Button,
   SafeAreaView,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import * as Sentry from '@sentry/react-native';
 import { AnimatedChessBoard } from '../src/components/AnimatedChessBoard';
 import { nodesById } from '../src/data/openings';
 import { openingsCatalog, OpeningStyle } from '../src/data/catalog';
@@ -71,6 +73,7 @@ export default function OpeningDetailScreen() {
             <SectionTitle>Moves</SectionTitle>
             <Text style={[styles.pgnText, typography.mono, { color: colors.accent }]}>{pgn}</Text>
           </SectionCard>
+
 
           {styleList.length > 0 && (
             <SectionCard accentColor={colors.purple} style={styles.infoCard}>

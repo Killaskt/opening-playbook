@@ -8,9 +8,11 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Button,
   ActivityIndicator,
 } from 'react-native';
 import { Stack } from 'expo-router';
+import * as Sentry from '@sentry/react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../src/theme/ThemeContext';
 import { GlassCard } from '../src/components/UIPrimitives';
@@ -126,6 +128,8 @@ export default function ContactScreen() {
               </GlassCard>
             ) : (
               <GlassCard style={[styles.card, { padding: spacing.xl }]}>
+<Button title='Try!' onPress={ () => { Sentry.captureException(new Error('First error')) }}/>
+                
                 <Text style={[styles.label, typography.label, { color: colors.textTertiary }]}>
                   CATEGORY
                 </Text>

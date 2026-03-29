@@ -32,7 +32,15 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "react-native",
+          "organization": "devhivex"
+        }
+      ]
     ],
     "extra": {
       "privacyPolicyUrl": "https://github.com/Killaskt/opening-playbook-legal",

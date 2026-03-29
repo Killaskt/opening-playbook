@@ -4,13 +4,16 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
+    "dev": "expo start --dev-client",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@expo/metro-runtime": "~55.0.6",
     "@expo/vector-icons": "^15.0.3",
+    "@sentry/react-native": "^8.6.0",
     "chess.js": "^1.4.0",
     "expo": "^55.0.8",
     "expo-blur": "~55.0.10",
