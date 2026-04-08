@@ -21,6 +21,7 @@ import { SearchBar } from '../../src/components/SearchBar';
 import { openingStyleColors } from '../../src/theme/openingStyles';
 import { EcoBadge, GlassCard, PillChip } from '../../src/components/UIPrimitives';
 import { SectionJumper } from '../../src/components/SectionJumper';
+import { AdBanner, AD_BANNER_HEIGHT } from '../../src/components/AdBanner';
 
 const TYPE_ORDER: OpeningType[] = ['opening', 'gambit', 'defense', 'system'];
 
@@ -186,6 +187,10 @@ export default function OpeningsScreen() {
         </ScrollView>
       </View>
 
+      <View style={[styles.adWrapper, { bottom: tabBarHeight }]}>
+        <AdBanner />
+      </View>
+
       <SectionList
         ref={sectionListRef}
         sections={sections}
@@ -250,7 +255,7 @@ export default function OpeningsScreen() {
             </GlassCard>
           </Pressable>
         )}
-        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 30 }]}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + AD_BANNER_HEIGHT + 30 }]}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: colors.textMuted }]}>No openings match your search</Text>
@@ -285,6 +290,12 @@ export default function OpeningsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  adWrapper: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 10,
   },
   filterWrapper: {
     marginBottom: 10,

@@ -17,6 +17,7 @@ import { AnimatedChessBoard } from '../../src/components/AnimatedChessBoard';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { GlassCard } from '../../src/components/UIPrimitives';
+import { AdBanner, AD_BANNER_HEIGHT } from '../../src/components/AdBanner';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -141,9 +142,13 @@ export default function LearnScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      <View style={[styles.adWrapper, { bottom: tabBarHeight }]}>
+        <AdBanner />
+      </View>
+
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + 24 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarHeight + AD_BANNER_HEIGHT + 24 }]}
       >
         <ScreenHeader title="Learn" subtitle="Understand the why behind the moves" />
 
@@ -169,6 +174,12 @@ export default function LearnScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  adWrapper: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 10,
   },
   scrollContent: {
     paddingHorizontal: 0,

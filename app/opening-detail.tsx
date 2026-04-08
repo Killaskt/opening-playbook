@@ -9,7 +9,6 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import * as Sentry from '@sentry/react-native';
 import { AnimatedChessBoard } from '../src/components/AnimatedChessBoard';
 import { nodesById } from '../src/data/openings';
 import { openingsCatalog, OpeningStyle } from '../src/data/catalog';

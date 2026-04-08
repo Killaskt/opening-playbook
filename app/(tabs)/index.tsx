@@ -14,6 +14,7 @@ import { useTheme } from '../../src/theme/ThemeContext';
 import { ScreenHeader } from '../../src/components/ScreenHeader';
 import { SearchBar } from '../../src/components/SearchBar';
 import { GlassCard, PillChip } from '../../src/components/UIPrimitives';
+import { AdBanner, AD_BANNER_HEIGHT } from '../../src/components/AdBanner';
 
 export default function ExploreScreen() {
   const router = useRouter();
@@ -89,11 +90,15 @@ export default function ExploreScreen() {
         placeholder="Search moves, names, concepts..."
       />
 
+      <View style={[styles.adWrapper, { bottom: tabBarHeight }]}>
+        <AdBanner />
+      </View>
+
       <FlatList
         data={filteredMoves}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 30 }]}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + AD_BANNER_HEIGHT + 30 }]}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
         removeClippedSubviews={true}
@@ -113,6 +118,12 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  adWrapper: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 10,
   },
   listContent: {
     paddingHorizontal: 16,

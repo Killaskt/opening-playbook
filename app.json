@@ -35,11 +35,10 @@
     "plugins": [
       "expo-router",
       [
-        "@sentry/react-native/expo",
+        "react-native-google-mobile-ads",
         {
-          "url": "https://sentry.io/",
-          "project": "react-native",
-          "organization": "devhivex"
+          "androidAppId": "ca-app-pub-4145314521757592~9681570627",
+          "iosAppId": "ca-app-pub-XXXXXXXXXX~XXXXXXXXXX"
         }
       ]
     ],
