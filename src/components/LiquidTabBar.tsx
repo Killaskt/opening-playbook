@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, GestureResponderEvent, Platform, StyleSheet, Text, View } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { BlurView } from 'expo-blur';
 import { useTheme } from '../theme/ThemeContext';
 import { PawnIcon, LibraryIcon, BulbIcon } from './TabIcons';
 
@@ -175,13 +174,6 @@ export function LiquidTabBar({ state, navigation }: BottomTabBarProps) {
             },
           ]}
         >
-          {!isDark && (
-            <BlurView
-              intensity={38}
-              tint="light"
-              style={StyleSheet.absoluteFillObject}
-            />
-          )}
           {!isDark && (
             <View
               style={[
