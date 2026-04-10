@@ -65,7 +65,24 @@ EVERYTHING WORKS
 | Dark mode | | |
 
 **Overall:** Pass / Fail  
-**Notes:** Testing hypothesis that `expo-blur` BlurView in LiquidTabBar causes TurboModule crash at startup in light mode.
+**Notes:** Testing hypothesis that `expo-blur` BlurView in LiquidTabBar causes TurboModule crash at startup in light mode. Still crashed — expo-blur ruled out.
+
+---
+
+## Preview Build — Attempt 4 (SVG tab icons replaced with plain text)
+**Command:** `eas build --platform ios --profile preview`  
+**Build ID:**  
+**Commit:** (pending)  
+**Date:** 2026-04-10  
+
+| Test | Result | Notes |
+|---|---|---|
+| App launches | | |
+| Navigation works | | |
+| Tab bar renders | | |
+
+**Overall:** Pass / Fail  
+**Notes:** Testing hypothesis that react-native-svg TurboModule calls from tab bar icons cause crash at startup.
 
 ---
 

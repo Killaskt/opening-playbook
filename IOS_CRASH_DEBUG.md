@@ -100,6 +100,6 @@ Dev builds don't crash because `expo-dev-client` uses a different initialization
 ## Next Steps (in order)
 
 1. ~~Remove `newArchEnabled: false`~~ — Done, still crashes. Ruled out.
-2. **Replace `BlurView` in `LiquidTabBar.tsx` with plain `View`** — `expo-blur` makes native TurboModule calls at startup in light mode. Exact match for crash pattern. Building now.
-3. If still crashing — remove `react-native-svg` and rebuild to isolate
+2. ~~Replace `BlurView` with plain `View`~~ — Done, still crashes. expo-blur ruled out.
+3. **Replace SVG tab icons with plain text** — `react-native-svg` renders 3 icons at startup via tab bar. TurboModule calls on mount. Building now.
 4. If still crashing — check RN 0.83.2 GitHub issues for TurboModule crashes on bundled builds
