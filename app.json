@@ -15,8 +15,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.killaskt.openingplaybook",
       "buildNumber": "1",
-      "newArchEnabled": false,
-      "infoPlist": {
+"infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
