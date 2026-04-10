@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Chess } from 'chess.js';
-import Svg, { Line, Polygon } from 'react-native-svg';
 import { renderPiece } from './ChessPieces';
 import { BoardArrow } from '../types';
 import { useTheme } from '../theme/ThemeContext';
@@ -150,63 +149,8 @@ export function AnimatedChessBoard({ pgn, compact = false, label, arrows, respon
     };
   };
 
-  const renderArrowSvg = (arrowList: { from: string; to: string; color?: string }[]) => {
-    if (arrowList.length === 0) return null;
-
-    return (
-      <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <Svg
-        width={boardSize}
-        height={boardSize}
-        style={StyleSheet.absoluteFill}
-      >
-        {arrowList.map((arr, i) => {
-          const from = squareToPixel(arr.from);
-          const to = squareToPixel(arr.to);
-          const color = arr.color || colors.arrowAnnotation;
-
-          const dx = to.x - from.x;
-          const dy = to.y - from.y;
-          const len = Math.sqrt(dx * dx + dy * dy);
-          if (len === 0) return null;
-
-          const ux = dx / len;
-          const uy = dy / len;
-
-          const headSize = squareSize * 0.3;
-          const endX = to.x - ux * headSize * 0.5;
-          const endY = to.y - uy * headSize * 0.5;
-          const startX = from.x + ux * squareSize * 0.15;
-          const startY = from.y + uy * squareSize * 0.15;
-
-          const tipX = to.x - ux * 2;
-          const tipY = to.y - uy * 2;
-          const leftX = endX - uy * headSize * 0.4;
-          const leftY = endY + ux * headSize * 0.4;
-          const rightX = endX + uy * headSize * 0.4;
-          const rightY = endY - ux * headSize * 0.4;
-
-          return (
-            <React.Fragment key={i}>
-              <Line
-                x1={startX}
-                y1={startY}
-                x2={endX}
-                y2={endY}
-                stroke={color}
-                strokeWidth={squareSize * 0.15}
-                strokeLinecap="round"
-              />
-              <Polygon
-                points={`${tipX},${tipY} ${leftX},${leftY} ${rightX},${rightY}`}
-                fill={color}
-              />
-            </React.Fragment>
-          );
-        })}
-      </Svg>
-      </View>
-    );
+  const renderArrowSvg = (_arrowList: { from: string; to: string; color?: string }[]) => {
+    return null;
   };
 
   const allArrows: { from: string; to: string; color?: string }[] = [];
