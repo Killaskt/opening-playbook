@@ -7,12 +7,14 @@
     "dev": "expo start --dev-client",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@expo/metro-runtime": "~55.0.6",
     "@expo/vector-icons": "^15.0.3",
     "chess.js": "^1.4.0",
+    "patch-package": "^8.0.1",
     "expo": "^55.0.8",
     "expo-blur": "~55.0.10",
     "expo-constants": "~55.0.9",
