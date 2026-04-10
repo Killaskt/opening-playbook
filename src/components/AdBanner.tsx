@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
-const PROD_BANNER_ID = 'ca-app-pub-4145314521757592/7831199265';
+enum AdUnitId {
+  IOS_BANNER = 'ca-app-pub-4145314521757592/6937611922',
+  ANDROID_BANNER = 'ca-app-pub-4145314521757592/7831199265',
+}
+
+const PROD_BANNER_ID = Platform.OS === 'ios' ? AdUnitId.IOS_BANNER : AdUnitId.ANDROID_BANNER;
 const AD_UNIT_ID = __DEV__ ? TestIds.BANNER : PROD_BANNER_ID;
 
 export const AD_BANNER_HEIGHT = 52;
