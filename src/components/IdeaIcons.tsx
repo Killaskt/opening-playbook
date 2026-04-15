@@ -1,6 +1,3 @@
-import React from 'react';
-import { Text } from 'react-native';
-
 export type IdeaIconKind =
   | 'center'
   | 'development'
@@ -14,12 +11,16 @@ export type IdeaIconKind =
   | 'warning'
   | 'line';
 
-interface IdeaIconProps {
-  kind: IdeaIconKind;
-  color: string;
-  size?: number;
-}
-
-export function IdeaIcon({ color, size = 15 }: IdeaIconProps) {
-  return <Text style={{ color, fontSize: size }}>•</Text>;
-}
+export const IDEA_ICONS: Record<IdeaIconKind, string> = {
+  idea: '●',
+  pro: '✓',
+  con: '✗',
+  warning: '⚠',
+  line: '→',
+  center: '⊞',
+  development: '▶',
+  kingSafety: '♚',
+  pawnStructure: '≡',
+  spaceTempo: '↑',
+  planning: '★',
+};

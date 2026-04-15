@@ -1,36 +1,9 @@
-import { Platform } from 'react-native';
-
-const ios = {
-  none: {
-    shadowOpacity: 0,
-  },
-  sm: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 2,
-  },
-  md: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.09,
-    shadowRadius: 6,
-  },
-  lg: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-  },
+// Web elevation via CSS box-shadow strings
+export const elevation = {
+  none: { boxShadow: 'none' },
+  sm:   { boxShadow: '0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)' },
+  md:   { boxShadow: '0 2px 6px rgba(0,0,0,0.09), 0 1px 3px rgba(0,0,0,0.05)' },
+  lg:   { boxShadow: '0 4px 10px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.06)' },
 } as const;
-
-const android = {
-  none: { elevation: 0 },
-  sm: { elevation: 1 },
-  md: { elevation: 3 },
-  lg: { elevation: 5 },
-} as const;
-
-export const elevation = Platform.OS === 'android' ? android : ios;
 
 export type ElevationScale = typeof elevation;

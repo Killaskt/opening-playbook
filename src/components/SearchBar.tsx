@@ -1,5 +1,4 @@
-import React from 'react';
-import { Keyboard, StyleSheet, TextInput, View, Pressable, Text } from 'react-native';
+import type { CSSProperties } from 'react';
 import { useTheme } from '../theme/ThemeContext';
 import { GlassCard } from './UIPrimitives';
 
@@ -13,68 +12,71 @@ export function SearchBar({ value, onChangeText, placeholder }: SearchBarProps) 
   const { colors, spacing, typography } = useTheme();
   const showClear = value.length > 0;
 
-  return (
-    <GlassCard style={[styles.wrapper, { padding: spacing.md, marginHorizontal: spacing.lg }]}>
-      <View style={styles.inputRow}>
-        <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: colors.inputBg,
-              borderColor: colors.glassBorder,
-              color: colors.text,
-              ...typography.bodyLG,
-              paddingRight: showClear ? 44 : 16,
-            },
-          ]}
-          placeholder={placeholder}
-          value={value}
-          onChangeText={onChangeText}
-          placeholderTextColor={colors.textMuted}
-          returnKeyType="search"
-          onSubmitEditing={Keyboard.dismiss}
-        />
-        {showClear && (
-          <Pressable
-            style={({ pressed }) => [styles.clearBtn, { opacity: pressed ? 0.7 : 1 }]}
-            onPress={() => onChangeText('')}
-            hitSlop={8}
-            accessibilityLabel="Clear search"
-          >
-            <Text style={[styles.clearText, { color: colors.textMuted }]}>×</Text>
-          </Pressable>
-        )}
-      </View>
-    </GlassCard>
-  );
-}
-
-const styles = StyleSheet.create({
-  wrapper: {
-    marginTop: 8,
+  const wrapperStyle: CSSProperties = {
+    padding: spacing.md,
+    marginLeft: spacing.lg,
+    marginRight: spacing.lg,
+    marginTop: spacing.sm,
     marginBottom: 15,
-    borderRadius: 16,
-  },
-  inputRow: {
+  };
+
+  const rowStyle: CSSProperties = {
     position: 'relative',
-  },
-  input: {
+    display: 'flex',
+    alignItems: 'center',
+  };
+
+  const inputStyle: CSSProperties = {
+    width: '100%',
+    boxSizing: 'border-box',
     borderRadius: 12,
-    padding: 12,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-  },
-  clearBtn: {
+    border: `1px solid ${colors.glassBorder}`,
+    backgroundColor: colors.inputBg,
+    color: colors.text,
+    fontSize: typography.bodyLG.fontSize,
+    lineHeight: `${typography.bodyLG.lineHeight}px`,
+    padding: `${spacing.md}px ${showClear ? 44 : 16}px ${spacing.md}px 16px`,
+    outline: 'none',
+  };
+
+  const clearBtnStyle: CSSProperties = {
     position: 'absolute',
     right: 10,
     top: 0,
     bottom: 0,
+    display: 'flex',
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 6,
-  },
-  clearText: {
+    padding: `0 ${spacing.xs}px`,
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    color: colors.textMuted,
     fontSize: 22,
-    lineHeight: 24,
+    lineHeight: '24px',
     fontWeight: '300',
-  },
-});
+  };
+
+  return (
+    <GlassCard style={wrapperStyle}>
+      <div style={rowStyle}>
+        <input
+          type="text"
+          style={inputStyle}
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChangeText(e.target.value)}
+        />
+        {showClear && (
+          <button
+            style={clearBtnStyle}
+            onClick={() => onChangeText('')}
+            aria-label="Clear search"
+          >
+            ×
+          </button>
+        )}
+      </div>
+    </GlassCard>
+  );
+}

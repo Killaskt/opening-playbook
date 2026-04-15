@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useTheme } from '../theme/ThemeContext';
 
 interface ResponseGridProps {
@@ -8,71 +8,70 @@ interface ResponseGridProps {
 }
 
 export function ResponseGrid({ responses, onPress }: ResponseGridProps) {
-  const { colors } = useTheme();
+  const [pressedId, setPressedId] = useState<string | null>(null);
+  const { colors, spacing } = useTheme();
 
-  return (
-    <View style={styles.responsesGrid}>
-      {responses.map((resp) => (
-        <Pressable
-          key={resp.id}
-          style={({ pressed }) => [
-            styles.responseCard,
-            {
-              backgroundColor: colors.cardGlassStrong,
-              borderColor: colors.glassBorder,
-            },
-            pressed && { backgroundColor: colors.accentBg },
-          ]}
-          onPress={() => onPress(resp.id)}
-        >
-          <View
-            style={[
-              styles.responseMoveCircle,
-              { backgroundColor: colors.accentBg, borderColor: colors.accent + '40' },
-            ]}
-          >
-            <Text style={[styles.responseMove, { color: colors.accent }]}>{resp.move}</Text>
-          </View>
-          <Text style={[styles.responseName, { color: colors.text }]} numberOfLines={2}>{resp.name}</Text>
-          <Text style={[styles.responseArrow, { color: colors.accent }]}>{'\u203A'}</Text>
-        </Pressable>
-      ))}
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  responsesGrid: {
+  const gridStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
     gap: 10,
-  },
-  responseCard: {
+  };
+
+  const cardStyle = (id: string): CSSProperties => ({
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: spacing.md,
     borderRadius: 14,
-    borderWidth: 1,
-    gap: 12,
-  },
-  responseMoveCircle: {
+    border: `1px solid ${colors.glassBorder}`,
+    backgroundColor: pressedId === id ? colors.accentBg : colors.cardGlassStrong,
+    cursor: 'pointer',
+    gap: spacing.md,
+    transition: 'background-color 0.1s ease',
+  });
+
+  const moveCircleStyle: CSSProperties = {
     width: 48,
     height: 48,
     borderRadius: 14,
-    borderWidth: 1,
-    justifyContent: 'center',
+    border: `1px solid ${colors.accent}40`,
+    backgroundColor: colors.accentBg,
+    display: 'flex',
     alignItems: 'center',
-  },
-  responseMove: {
+    justifyContent: 'center',
+    flexShrink: 0,
+  };
+
+  const moveTextStyle: CSSProperties = {
     fontSize: 17,
     fontWeight: 'bold',
     fontFamily: 'monospace',
-  },
-  responseName: {
-    fontSize: 15,
-    fontWeight: '600',
-    flex: 1,
-  },
-  responseArrow: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-});
+    color: colors.accent,
+  };
+
+  return (
+    <div style={gridStyle}>
+      {responses.map((resp) => (
+        <div
+          key={resp.id}
+          style={cardStyle(resp.id)}
+          onClick={() => onPress(resp.id)}
+          onMouseDown={() => setPressedId(resp.id)}
+          onMouseUp={() => setPressedId(null)}
+          onMouseLeave={() => setPressedId(null)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && onPress(resp.id)}
+        >
+          <div style={moveCircleStyle}>
+            <span style={moveTextStyle}>{resp.move}</span>
+          </div>
+          <span style={{ fontSize: 15, fontWeight: '600', color: colors.text, flex: 1 }}>
+            {resp.name}
+          </span>
+          <span style={{ fontSize: 24, fontWeight: '600', color: colors.accent }}>›</span>
+        </div>
+      ))}
+    </div>
+  );
+}
