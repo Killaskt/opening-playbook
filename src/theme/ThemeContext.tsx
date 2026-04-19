@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
-import { useColorScheme } from 'react-native';
+import { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 import { ThemeColors, lightColors, darkColors } from './colors';
 import { spacing, SpacingScale } from './spacing';
 import { typography, TypographyScale } from './typography';
@@ -31,11 +30,24 @@ const ThemeContext = createContext<ThemeContextValue>({
 
 const MODE_CYCLE: ThemeMode[] = ['system', 'light', 'dark'];
 
+function useSystemDark(): boolean {
+  const [systemDark, setSystemDark] = useState(
+    () => window.matchMedia('(prefers-color-scheme: dark)').matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => setSystemDark(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return systemDark;
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const systemScheme = useColorScheme();
+  const systemDark = useSystemDark();
   const [mode, setMode] = useState<ThemeMode>('system');
 
-  const isDark = mode === 'dark' || (mode === 'system' && systemScheme === 'dark');
+  const isDark = mode === 'dark' || (mode === 'system' && systemDark);
 
   const cycleMode = useCallback(() => {
     setMode((prev) => {

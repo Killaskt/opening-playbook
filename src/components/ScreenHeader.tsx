@@ -1,6 +1,5 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
+import type { CSSProperties } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme, ThemeMode } from '../theme/ThemeContext';
 import { MailIcon } from './TabIcons';
 
@@ -10,9 +9,9 @@ interface ScreenHeaderProps {
 }
 
 const MODE_ICON: Record<ThemeMode, string> = {
-  light: '\u2600',   // sun
-  dark: '\u263D',     // moon
-  system: '\u25D1',   // half circle
+  light: '☀',
+  dark: '☽',
+  system: '◑',
 };
 
 const MODE_LABEL: Record<ThemeMode, string> = {
@@ -22,106 +21,100 @@ const MODE_LABEL: Record<ThemeMode, string> = {
 };
 
 export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
-  const router = useRouter();
-  const { colors, mode, cycleMode, spacing, typography } = useTheme();
+  const navigate = useNavigate();
+  const { colors, mode, cycleMode, spacing, typography, elevation } = useTheme();
 
-  return (
-    <View style={[styles.container, { paddingTop: Platform.OS === 'ios' ? 100 : 76, paddingHorizontal: spacing.xl }]}>
-      <View style={styles.row}>
-        <View style={styles.titles}>
-          <Text style={[styles.title, typography.titleXL, { color: colors.text }]}>{title}</Text>
-          {subtitle && (
-            <Text style={[styles.subtitle, typography.bodySM, { color: colors.textTertiary }]}>{subtitle}</Text>
-          )}
-        </View>
-        <View style={styles.buttonsRow}>
-          <Pressable
-            style={[
-              styles.themeBtn,
-              {
-                backgroundColor: colors.cardGlassStrong,
-                borderColor: colors.glassBorder,
-                paddingHorizontal: spacing.md,
-                paddingVertical: spacing.sm,
-                shadowColor: colors.shadow,
-              },
-            ]}
-            onPress={cycleMode}
-            hitSlop={8}
-          >
-            <Text style={[styles.themeIcon, { color: colors.textSecondary }]}>
-              {MODE_ICON[mode]}
-            </Text>
-            <Text style={[styles.themeLabel, { color: colors.textTertiary }]}>
-              {MODE_LABEL[mode]}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[
-              styles.themeBtn,
-              styles.mailBtn,
-              {
-                backgroundColor: colors.cardGlassStrong,
-                borderColor: colors.glassBorder,
-                paddingHorizontal: spacing.sm,
-                paddingVertical: spacing.sm,
-                shadowColor: colors.shadow,
-              },
-            ]}
-            onPress={() => router.push('/contact')}
-            hitSlop={8}
-          >
-            <MailIcon color={colors.textSecondary} size={18} />
-          </Pressable>
-        </View>
-      </View>
-    </View>
-  );
-}
+  const containerStyle: CSSProperties = {
+    paddingTop: `calc(env(safe-area-inset-top, 0px) + ${spacing.xl}px)`,
+    paddingBottom: spacing.sm,
+    paddingLeft: spacing.xl,
+    paddingRight: spacing.xl,
+  };
 
-const styles = StyleSheet.create({
-  container: {
-    paddingBottom: 8,
-  },
-  row: {
+  const rowStyle: CSSProperties = {
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-  },
-  titles: {
-    flex: 1,
-  },
-  title: {
-    fontWeight: '800',
-  },
-  subtitle: {
+  };
+
+  const titleStyle: CSSProperties = {
+    fontSize: typography.titleXL.fontSize,
+    fontWeight: typography.titleXL.fontWeight,
+    lineHeight: `${typography.titleXL.lineHeight}px`,
+    color: colors.text,
+    margin: 0,
+  };
+
+  const subtitleStyle: CSSProperties = {
+    fontSize: typography.bodySM.fontSize,
+    lineHeight: `${typography.bodySM.lineHeight}px`,
+    color: colors.textTertiary,
     marginTop: 4,
-  },
-  buttonsRow: {
+    marginBottom: 0,
+  };
+
+  const buttonsRowStyle: CSSProperties = {
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
     marginTop: 4,
-  },
-  themeBtn: {
+    flexShrink: 0,
+  };
+
+  const themeBtnStyle: CSSProperties = {
+    display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 10,
-    borderWidth: 1,
     gap: 4,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  mailBtn: {
-    paddingHorizontal: 10,
-  },
-  themeIcon: {
-    fontSize: 16,
-  },
-  themeLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-});
+    borderRadius: 10,
+    border: `1px solid ${colors.glassBorder}`,
+    backgroundColor: colors.cardGlassStrong,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
+    cursor: 'pointer',
+    ...elevation.sm,
+  };
+
+  const mailBtnStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    border: `1px solid ${colors.glassBorder}`,
+    backgroundColor: colors.cardGlassStrong,
+    paddingLeft: spacing.sm,
+    paddingRight: spacing.sm,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
+    cursor: 'pointer',
+    ...elevation.sm,
+  };
+
+  return (
+    <div style={containerStyle}>
+      <div style={rowStyle}>
+        <div style={{ flex: 1 }}>
+          <h1 style={titleStyle}>{title}</h1>
+          {subtitle && <p style={subtitleStyle}>{subtitle}</p>}
+        </div>
+        <div style={buttonsRowStyle}>
+          <button style={themeBtnStyle} onClick={cycleMode} aria-label={`Theme: ${MODE_LABEL[mode]}`}>
+            <span style={{ fontSize: 16, color: colors.textSecondary, userSelect: 'none' }}>
+              {MODE_ICON[mode]}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: '600', color: colors.textTertiary, userSelect: 'none' }}>
+              {MODE_LABEL[mode]}
+            </span>
+          </button>
+          <button style={mailBtnStyle} onClick={() => navigate('/contact')} aria-label="Contact">
+            <MailIcon color={colors.textSecondary} size={18} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

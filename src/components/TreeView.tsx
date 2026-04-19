@@ -1,6 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { TreeNode } from '../types';
+import type { CSSProperties } from 'react';
+import type { TreeNode } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 
 interface TreeViewProps {
@@ -8,32 +7,33 @@ interface TreeViewProps {
   level?: number;
 }
 
-export const TreeView: React.FC<TreeViewProps> = ({ nodes, level = 0 }) => {
-  const { colors } = useTheme();
+export function TreeView({ nodes, level = 0 }: TreeViewProps) {
+  const { colors, spacing, typography } = useTheme();
+
+  const containerStyle: CSSProperties = { width: '100%' };
 
   return (
-    <View style={styles.container}>
+    <div style={containerStyle}>
       {nodes.map((node, index) => (
-        <View key={`${level}-${index}`} style={[styles.nodeContainer, { marginLeft: level * 16 }]}>
-          <Text style={[styles.nodeText, { color: colors.text }]}>{node.text}</Text>
+        <div
+          key={`${level}-${index}`}
+          style={{ marginLeft: level * 16, marginTop: spacing.xxs, marginBottom: spacing.xxs }}
+        >
+          <span
+            style={{
+              fontSize: typography.bodySM.fontSize,
+              lineHeight: `${typography.bodySM.lineHeight}px`,
+              color: colors.text,
+              fontFamily: 'monospace',
+            }}
+          >
+            {node.text}
+          </span>
           {node.children && node.children.length > 0 && (
             <TreeView nodes={node.children} level={level + 1} />
           )}
-        </View>
+        </div>
       ))}
-    </View>
+    </div>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  nodeContainer: {
-    marginVertical: 2,
-  },
-  nodeText: {
-    fontSize: 14,
-    fontFamily: 'monospace',
-  },
-});
+}

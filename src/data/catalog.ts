@@ -548,7 +548,7 @@ export const openingsCatalog: CatalogEntry[] = [
   {
     name: "Queen's Indian Defense",
     pgn: 'd4 Nf6 c4 e6 Nf3 b6',
-    nodeId: 'd4_nf6_c4_e6',
+    nodeId: 'd4_nf6_c4_e6_nf3',
     category: 'd4',
     description: "Black fianchettoes the bishop to b7 where it controls the long diagonal and prevents White from easily playing e4. A solid, deep opening favored by positional players. Kasparov used it to great effect in world championship matches, often transitioning into complex strategic middlegames.",
     eco: 'E15',
@@ -565,7 +565,6 @@ export const openingsCatalog: CatalogEntry[] = [
   {
     name: 'Nimzo-Indian Defense',
     pgn: 'd4 Nf6 c4 e6 Nc3 Bb4',
-    nodeId: 'd4_nf6_c4_e6',
     category: 'd4',
     description: "Black immediately pins the knight with Bb4, threatening to double White's c-pawns. One of the most respected and theoretically rich openings in chess. Nimzowitch created it, every world champion has faced it. Black gets excellent piece activity and long-term structural pressure.",
     eco: 'E20',
