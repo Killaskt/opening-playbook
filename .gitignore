@@ -44,3 +44,7 @@ yarn-error.*
 
 # Logs
 OpeningPlaybook*.ips
+
+# Test output
+test-results.json
+test-output.txt

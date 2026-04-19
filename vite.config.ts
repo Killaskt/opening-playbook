@@ -9,4 +9,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.ts'],
+    reporters: ['verbose', 'json'],
+    outputFile: 'test-results.json',
+  },
 })

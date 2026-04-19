@@ -5,16 +5,103 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm run build
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        id: tests
+        run: |
+          npm test -- --reporter=verbose --reporter=json --outputFile=test-results.json 2>&1 | tee test-output.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+
+      - name: Build
+        id: build
+        run: npm run build
+
+      - name: Post PR comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Parse test results
+            let testSummary = '⚠️ Test results unavailable';
+            let testDetails = '';
+            try {
+              const raw = fs.readFileSync('test-results.json', 'utf8');
+              const results = JSON.parse(raw);
+              const total = results.numTotalTests ?? 0;
+              const passed = results.numPassedTests ?? 0;
+              const failed = results.numFailedTests ?? 0;
+              const emoji = failed === 0 ? '✅' : '❌';
+              testSummary = `${emoji} **Tests:** ${passed}/${total} passed`;
+              if (failed > 0) {
+                const failedTests = (results.testResults ?? [])
+                  .flatMap(f => (f.assertionResults ?? []).filter(t => t.status === 'failed'))
+                  .map(t => `- \`${t.fullName}\`: ${t.failureMessages?.[0]?.split('\n')[0] ?? ''}`)
+                  .join('\n');
+                testDetails = `\n\n**Failed tests:**\n${failedTests}`;
+              }
+            } catch (e) {
+              testSummary = '⚠️ Could not parse test results';
+            }
+
+            // Build status
+            const buildStatus = '${{ steps.build.outcome }}' === 'success'
+              ? '✅ **Build:** passed'
+              : '❌ **Build:** failed';
+
+            // Typecheck status
+            const typecheckStatus = '${{ steps.tests.outputs.exit_code }}' !== undefined
+              ? '' : '';
+
+            const body = [
+              '## PR Check Results',
+              '',
+              testSummary,
+              buildStatus,
+              testDetails,
+            ].filter(Boolean).join('\n');
+
+            // Find existing bot comment and update, or create new
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.startsWith('## PR Check Results')
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
