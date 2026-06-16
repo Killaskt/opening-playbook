@@ -15,7 +15,7 @@ workflows:
       xcode: latest
       vars:
         BUNDLE_ID: com.killaskt.openingplaybook
-        XCODE_PROJECT: ios/App/App.xcodeproj
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
         XCODE_SCHEME: App
     scripts:
       - name: Install dependencies
@@ -29,7 +29,7 @@ workflows:
       - name: Resolve Swift Package dependencies
         script: |
           xcodebuild -resolvePackageDependencies \
-            -project "$XCODE_PROJECT" \
+            -workspace "$XCODE_WORKSPACE" \
             -scheme "$XCODE_SCHEME"
       - name: Set up keychain
         script: keychain initialize
@@ -45,7 +45,7 @@ workflows:
       - name: Build IPA
         script: |
           xcode-project build-ipa \
-            --project "$XCODE_PROJECT" \
+            --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
