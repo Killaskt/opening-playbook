@@ -10,7 +10,7 @@ workflows:
           include: true
     environment:
       groups:
-        - ShazamApps
+        - chess
       node: 22.14.0
       xcode: latest
       vars:
