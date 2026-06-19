@@ -42,6 +42,12 @@ workflows:
         script: keychain add-certificates
       - name: Apply signing to Xcode project
         script: xcode-project use-profiles
+      - name: Set build number
+        script: |
+          APP_APPLE_ID=$(app-store-connect apps list --bundle-id-identifier "$BUNDLE_ID" --json | jq -r '.[0].id')
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number "$APP_APPLE_ID" --platform IOS --all-versions)
+          cd ios/App
+          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       - name: Build IPA
         script: |
           xcode-project build-ipa \
