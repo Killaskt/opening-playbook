@@ -6,6 +6,7 @@ import { openingsCatalog } from '../data/catalog';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { SearchBar } from '../components/SearchBar';
 import { SectionJumper } from '../components/SectionJumper';
+import { useTabSwipe } from '../hooks/useTabSwipe';
 import { EcoBadge, PillChip } from '../components/UIPrimitives';
 import { openingStyleColors, openingTypeColors } from '../theme/openingStyles';
 import type { CatalogEntry, OpeningType } from '../data/catalog';
@@ -39,6 +40,7 @@ type CategoryKey = (typeof CATEGORIES)[number];
 export default function LibraryPage() {
   const { colors, spacing, typography } = useTheme();
   const navigate = useNavigate();
+  const swipeRef = useTabSwipe<HTMLDivElement>();
 
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<OpeningType | null>(null);
@@ -112,7 +114,7 @@ export default function LibraryPage() {
   };
 
   return (
-    <div style={pagePad}>
+    <div ref={swipeRef} style={pagePad}>
       <ScreenHeader title="Library" subtitle="Opening encyclopedia" />
       <SearchBar value={query} onChangeText={setQuery} placeholder="Search openings, ECO codes…" />
 
