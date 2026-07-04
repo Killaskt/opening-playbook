@@ -5,6 +5,8 @@ import { nodesById } from '../data/openings';
 import { openingStyleColors } from '../theme/openingStyles';
 import { EcoBadge, PillChip, SectionCard, SectionTitle } from '../components/UIPrimitives';
 import { BulletRow } from '../components/BulletRow';
+import { DetailHeader } from '../components/DetailHeader';
+import { useSwipeBack } from '../hooks/useSwipeBack';
 import type { OpeningStyle } from '../data/catalog';
 
 interface OpeningDetailState {
@@ -21,14 +23,17 @@ export default function OpeningDetailPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { colors, spacing, typography, isDark } = useTheme();
+  const swipeRef = useSwipeBack<HTMLDivElement>();
 
   const state = location.state as OpeningDetailState | null;
 
   if (!state) {
     return (
-      <div style={{ padding: 40, textAlign: 'center', color: colors.textMuted }}>
-        <button onClick={() => navigate(-1)} style={backBtnStyle(colors, spacing)}>← Back</button>
-        <p>No opening data provided.</p>
+      <div ref={swipeRef}>
+        <DetailHeader />
+        <div style={{ padding: 40, textAlign: 'center', color: colors.textMuted }}>
+          <p>No opening data provided.</p>
+        </div>
       </div>
     );
   }
@@ -39,13 +44,6 @@ export default function OpeningDetailPage() {
     backgroundColor: 'transparent',
     paddingBottom: 80,
     minHeight: '100dvh',
-  };
-
-  const topBarStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    padding: `${spacing.lg}px`,
-    paddingTop: `max(${spacing.xl}px, env(safe-area-inset-top))`,
   };
 
   const heroStyle: CSSProperties = {
@@ -82,10 +80,8 @@ export default function OpeningDetailPage() {
   };
 
   return (
-    <div style={pageStyle}>
-      <div style={topBarStyle}>
-        <button style={backBtnStyle(colors, spacing)} onClick={() => navigate(-1)}>← Back</button>
-      </div>
+    <div ref={swipeRef} style={pageStyle}>
+      <DetailHeader title={name} />
 
       <div style={heroStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap' as const }}>
@@ -148,17 +144,4 @@ export default function OpeningDetailPage() {
       </div>
     </div>
   );
-}
-
-function backBtnStyle(colors: { text: string; chipBg: string; border: string }, spacing: { sm: number; md: number; lg: number }): CSSProperties {
-  return {
-    background: 'none',
-    border: `1px solid ${colors.border}`,
-    borderRadius: 20,
-    padding: `${spacing.sm}px ${spacing.md}px`,
-    fontSize: 15,
-    color: colors.text,
-    cursor: 'pointer',
-    backgroundColor: colors.chipBg,
-  };
 }
