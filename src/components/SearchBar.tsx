@@ -33,7 +33,8 @@ export function SearchBar({ value, onChangeText, placeholder }: SearchBarProps) 
     border: `1px solid ${colors.glassBorder}`,
     backgroundColor: colors.inputBg,
     color: colors.text,
-    fontSize: typography.bodyLG.fontSize,
+    // 16px min prevents iOS WKWebView from auto-zooming when the field is focused
+    fontSize: 16,
     lineHeight: `${typography.bodyLG.lineHeight}px`,
     padding: `${spacing.md}px ${showClear ? 44 : 16}px ${spacing.md}px 16px`,
     outline: 'none',

@@ -7,12 +7,22 @@
 ## Overview of what you're setting up
 
 ```
-GitHub PR/Push
-    → GitHub Actions (runs typecheck + build + tests)
-        → calls Codemagic API
-            → Codemagic builds IPA (signs with Apple certs)
+GitHub PR / push to main
+    ├→ GitHub Actions "validate" (typecheck + build + web tests)   ← fast web check
+    └→ GitHub webhook  →  Codemagic  (triggered by push + pull_request events)
+            → Codemagic builds signed IPA (auto-increments build number)
                 → submits to TestFlight
 ```
+
+Two independent lanes: GitHub Actions validates the **web** side on every PR; the
+GitHub **webhook** drives Codemagic to build and publish the **iOS** side. They do
+not call each other — Codemagic is triggered by the webhook, not by GitHub Actions.
+
+> **The single most important gotcha:** the `triggering:` block in `codemagic.yaml`
+> only *filters* events GitHub sends. Without a GitHub webhook subscribed to **both**
+> Pushes and Pull requests, nothing builds automatically — see
+> [Build triggering](#build-triggering-webhook--branch-patterns) below and
+> `KNOWN_ISSUES.md`.
 
 ---
 
@@ -115,18 +125,56 @@ These let GitHub Actions call the Codemagic API.
 
 ---
 
-## Step 5: Verify the full pipeline
+## Build triggering (webhook + branch patterns)
 
-### On a PR:
-1. Open a PR from any non-main branch
-2. GitHub Actions runs `validate` (typecheck + build + tests)
-3. If passing, `trigger-codemagic-preview` calls Codemagic API → starts `ios-feature-preview` build
-4. GH Actions polls until build finishes — PR check turns green or red based on result
+Codemagic builds are driven by a **GitHub webhook**, not by GitHub Actions. This is
+the part that most often silently fails to work, so set it up deliberately.
 
-### On merge to main:
-1. GitHub Actions runs `validate` again
-2. If passing, `trigger-codemagic` calls Codemagic API → starts `ios-testflight` build
-3. GH Actions polls until done — publishes IPA to TestFlight automatically
+### 5a. Create the webhook
+
+1. In Codemagic, open the app → **right sidebar → Create webhook**. Copy the URL,
+   which looks like `https://api.codemagic.io/hooks/<id>`.
+2. In GitHub → **repo Settings → Webhooks → Add webhook**:
+   - **Payload URL:** the Codemagic hook URL (exact)
+   - **Content type:** `application/json`  ← **not** the default `x-www-form-urlencoded`
+   - **SSL verification:** Enabled
+   - **Events:** *Let me select individual events* → check **Pushes** and **Pull requests** (only these two)
+   - **Active:** checked
+3. Save, then open **Recent Deliveries** and confirm the `ping` returns **200**.
+
+> If the app was connected via the Codemagic **GitHub App**, this webhook is created
+> automatically — but verify it's subscribed to **Pull requests**, not just Pushes.
+> A push-only webhook is why `main` builds while PRs never do.
+
+### 5b. Match the right branch in `codemagic.yaml`
+
+`branch_patterns` **default to matching a pull request's source (head) branch**, so a
+bare `pattern: main` never matches a PR *into* main. Always set `source` explicitly:
+
+```yaml
+triggering:
+  events:
+    - push
+    - pull_request
+  branch_patterns:
+    - pattern: main
+      include: true
+      source: false   # match the PR TARGET (main), not the source branch
+```
+
+- **push** to `main` → matches (merge builds).
+- **pull_request** into `main` from any feature branch → matches because `source: false`.
+
+### 5c. Verify the full pipeline
+
+1. Open or push to a PR targeting `main`.
+2. GitHub Actions runs `validate` (typecheck + build + web tests).
+3. The webhook fires a `pull_request` delivery → **Codemagic → Builds** shows a new
+   build for the feature branch → IPA published to TestFlight for on-device testing.
+4. On merge, the `push` to `main` fires again → a fresh TestFlight build of merged code.
+
+If GitHub Actions runs but no Codemagic build appears, the problem is the webhook or the
+branch pattern — see the troubleshooting table and `KNOWN_ISSUES.md`.
 
 ---
 

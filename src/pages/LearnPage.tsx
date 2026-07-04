@@ -5,10 +5,12 @@ import { fundamentals } from '../data/fundamentals';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { BulletRow } from '../components/BulletRow';
 import { AnimatedChessBoard } from '../components/AnimatedChessBoard';
+import { useTabSwipe } from '../hooks/useTabSwipe';
 import type { FundamentalSection } from '../data/fundamentals';
 
 export default function LearnPage() {
   const { spacing } = useTheme();
+  const swipeRef = useTabSwipe<HTMLDivElement>();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -36,7 +38,7 @@ export default function LearnPage() {
   };
 
   return (
-    <div style={pageStyle}>
+    <div ref={swipeRef} style={pageStyle}>
       <ScreenHeader title="Learn" subtitle="Chess fundamentals" />
       <div style={listStyle}>
         {fundamentals.map((section) => (

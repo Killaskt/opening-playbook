@@ -5,6 +5,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { nodesById } from '../data/openings';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { SearchBar } from '../components/SearchBar';
+import { useTabSwipe } from '../hooks/useTabSwipe';
 import type { OpeningNode } from '../types';
 
 const START_MOVE_IDS = ['e4', 'd4', 'c4', 'nf3', 'b3'];
@@ -25,6 +26,7 @@ function matchesSearch(node: OpeningNode, terms: string[]): boolean {
 export default function MovesPage() {
   const { colors, spacing, typography } = useTheme();
   const navigate = useNavigate();
+  const swipeRef = useTabSwipe<HTMLDivElement>();
   const [query, setQuery] = useState('');
 
   const terms = query
@@ -55,7 +57,7 @@ export default function MovesPage() {
   };
 
   return (
-    <div style={pageStyle}>
+    <div ref={swipeRef} style={pageStyle}>
       <ScreenHeader title="Opening Playbook" subtitle="Choose your first move" />
       <SearchBar value={query} onChangeText={setQuery} placeholder="Search openings…" />
 

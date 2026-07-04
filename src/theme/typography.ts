@@ -1,8 +1,8 @@
 export const typography = {
   titleXL: {
-    fontSize: 30,
+    fontSize: 27,
     fontWeight: '800' as const,
-    lineHeight: 36,
+    lineHeight: 33,
   },
   titleLG: {
     fontSize: 22,

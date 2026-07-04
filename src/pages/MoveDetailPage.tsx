@@ -10,8 +10,10 @@ import { AnimatedChessBoard } from '../components/AnimatedChessBoard';
 import { GlanceSection } from '../components/GlanceSection';
 import { TreeView } from '../components/TreeView';
 import { BulletRow } from '../components/BulletRow';
+import { DetailHeader } from '../components/DetailHeader';
 import { EcoBadge, GlassCard, PillChip, SectionCard, SectionTitle } from '../components/UIPrimitives';
 import type { IdeaIconKind } from '../components/IdeaIcons';
+import { useSwipeBack } from '../hooks/useSwipeBack';
 
 const PRINCIPLE_ICON_MAP: Record<string, IdeaIconKind> = {
   center: 'center',
@@ -27,15 +29,18 @@ export default function MoveDetailPage() {
   const navigate = useNavigate();
   const { colors, spacing, typography, isDark } = useTheme();
   const [goDeeperOpen, setGoDeeperOpen] = useState(false);
+  const swipeRef = useSwipeBack<HTMLDivElement>();
 
   const node = id ? nodesById[id] : undefined;
   const catalogEntry = id ? catalogByNodeId.get(id) : undefined;
 
   if (!node) {
     return (
-      <div style={{ padding: 40, textAlign: 'center', color: colors.textMuted }}>
-        <button onClick={() => navigate(-1)} style={backBtnStyle(colors, spacing)}>← Back</button>
-        <p>Opening not found</p>
+      <div ref={swipeRef}>
+        <DetailHeader />
+        <div style={{ padding: 40, textAlign: 'center', color: colors.textMuted }}>
+          <p>Opening not found</p>
+        </div>
       </div>
     );
   }
@@ -51,18 +56,6 @@ export default function MoveDetailPage() {
     backgroundColor: 'transparent',
     paddingBottom: 80,
     minHeight: '100dvh',
-  };
-
-  const topBarStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    padding: `${spacing.lg}px ${spacing.lg}px ${spacing.sm}px`,
-    paddingTop: `max(${spacing.xl}px, env(safe-area-inset-top))`,
-    gap: spacing.sm,
-  };
-
-  const backStyle: CSSProperties = {
-    ...backBtnStyle(colors, spacing),
   };
 
   const heroStyle: CSSProperties = {
@@ -126,11 +119,8 @@ export default function MoveDetailPage() {
   };
 
   return (
-    <div style={pageStyle}>
-      {/* Top nav */}
-      <div style={topBarStyle}>
-        <button style={backStyle} onClick={() => navigate(-1)}>← Back</button>
-      </div>
+    <div ref={swipeRef} style={pageStyle}>
+      <DetailHeader title={node.name} />
 
       {/* Hero */}
       <div style={heroStyle}>
@@ -279,17 +269,4 @@ export default function MoveDetailPage() {
       </div>
     </div>
   );
-}
-
-function backBtnStyle(colors: { text: string; chipBg: string; border: string }, spacing: { sm: number; md: number; lg: number }): CSSProperties {
-  return {
-    background: 'none',
-    border: `1px solid ${colors.border}`,
-    borderRadius: 20,
-    padding: `${spacing.sm}px ${spacing.md}px`,
-    fontSize: 15,
-    color: colors.text,
-    cursor: 'pointer',
-    backgroundColor: colors.chipBg,
-  };
 }

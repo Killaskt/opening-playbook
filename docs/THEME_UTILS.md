@@ -55,7 +55,7 @@ const spacing = {
 
 ```typescript
 const typography = {
-  titleXL:  { fontSize: 30, fontWeight: '800' },
+  titleXL:  { fontSize: 27, fontWeight: '800' },
   titleLG:  { fontSize: 22, fontWeight: '700' },
   titleMD:  { fontSize: 19, fontWeight: '600' },
   titleSM:  { fontSize: 17, fontWeight: '600' },

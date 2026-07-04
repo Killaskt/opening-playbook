@@ -64,45 +64,26 @@ definitions:
     - /tmp/xcodebuild_logs/*.log
 
 workflows:
-  # Runs on every PR targeting main. Builds a signed IPA to prove the iOS
-  # pipeline works (signing, compile, export compliance) but does NOT publish
-  # to TestFlight. Catches failures before they reach main.
-  ios-pr-validation:
-    name: iOS PR Validation
-    max_build_duration: 60
-    instance_type: mac_mini_m2
-    triggering:
-      events: [pull_request]
-      cancel_previous_builds: true
-      branch_patterns:
-        - pattern: main
-          include: true
-    environment: *env
-    scripts:
-      - *npm_install
-      - *build_web
-      - *cap_add
-      - *cap_sync
-      - *export_compliance
-      - *resolve_spm
-      - *keychain_init
-      - *fetch_signing
-      - *add_certs
-      - *use_profiles
-      - *build_ipa
-    artifacts: *artifacts
-
-  # Runs on push to main. Full build + auto-incremented build number +
-  # publish to TestFlight.
+  # Single workflow that builds a signed IPA and publishes it to TestFlight,
+  # triggered both on pull requests targeting main (so branch work is testable
+  # on-device before merge) and on pushes to main (so the merged code gets a
+  # fresh TestFlight build). Build number is auto-incremented every run.
   ios-testflight:
     name: iOS TestFlight
     max_build_duration: 60
     instance_type: mac_mini_m2
     triggering:
-      events: [push]
+      events:
+        - push
+        - pull_request
+      cancel_previous_builds: true
       branch_patterns:
+        # source: false → match the PR's TARGET branch (main), so PRs from any
+        # feature branch into main trigger a build. Push events still match the
+        # pushed branch against this pattern, so pushes to main build too.
         - pattern: main
           include: true
+          source: false
     environment: *env
     scripts:
       - *npm_install
