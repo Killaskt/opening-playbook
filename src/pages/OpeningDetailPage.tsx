@@ -22,7 +22,7 @@ interface OpeningDetailState {
 export default function OpeningDetailPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { colors, spacing, typography, elevation, isDark } = useTheme();
+  const { colors, spacing, typography, isDark } = useTheme();
   const swipeRef = useSwipeBack<HTMLDivElement>();
 
   const state = location.state as OpeningDetailState | null;
@@ -47,7 +47,7 @@ export default function OpeningDetailPage() {
   };
 
   const heroStyle: CSSProperties = {
-    padding: `${spacing.lg}px ${spacing.lg}px ${spacing.md}px`,
+    padding: `${spacing.md}px ${spacing.lg}px`,
     display: 'flex',
     flexDirection: 'column',
     gap: spacing.md,
@@ -60,14 +60,9 @@ export default function OpeningDetailPage() {
   };
 
   const pgnStyle: CSSProperties = {
-    alignSelf: 'flex-start',
-    fontSize: typography.bodySM.fontSize,
+    fontSize: typography.bodyMD.fontSize,
     fontFamily: 'monospace',
     color: colors.textSecondary,
-    backgroundColor: colors.chipBg,
-    border: `1px solid ${colors.border}`,
-    borderRadius: 8,
-    padding: `${spacing.xs}px ${spacing.sm}px`,
   };
 
   const tagsRowStyle: CSSProperties = {
@@ -131,16 +126,15 @@ export default function OpeningDetailPage() {
         {nodeId && nodesById[nodeId] && (
           <button
             style={{
-              width: '100%',
               padding: `${spacing.md}px ${spacing.xl}px`,
               borderRadius: 14,
               border: `1px solid ${colors.accent}`,
               backgroundColor: colors.accentBg,
               color: colors.accent,
-              fontSize: typography.bodyMD.fontSize,
-              fontWeight: '700',
+              fontSize: typography.label.fontSize,
+              fontWeight: '600',
               cursor: 'pointer',
-              ...elevation.sm,
+              alignSelf: 'flex-start',
             }}
             onClick={() => navigate(`/move/${nodeId}`)}
           >
