@@ -64,10 +64,43 @@ definitions:
     - /tmp/xcodebuild_logs/*.log
 
 workflows:
-  # Single workflow that builds a signed IPA and publishes it to TestFlight,
-  # triggered both on pull requests targeting main (so branch work is testable
-  # on-device before merge) and on pushes to main (so the merged code gets a
-  # fresh TestFlight build). Build number is auto-incremented every run.
+  # PR validation: build a signed IPA to prove the branch compiles and signs,
+  # but do NOT publish to TestFlight. Splitting this out from the push workflow
+  # removes the concurrency race where multiple concurrent PR builds all ran
+  # *set_build_number and fought over the same auto-incremented TestFlight build
+  # number. PR builds skip *set_build_number entirely since nothing is uploaded.
+  ios-pr-validation:
+    name: iOS PR Validation
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    triggering:
+      events:
+        - pull_request
+      cancel_previous_builds: true
+      branch_patterns:
+        # source: false → match the PR's TARGET branch (main), so PRs from any
+        # feature branch into main trigger a validation build.
+        - pattern: main
+          include: true
+          source: false
+    environment: *env
+    scripts:
+      - *npm_install
+      - *build_web
+      - *cap_add
+      - *cap_sync
+      - *export_compliance
+      - *resolve_spm
+      - *keychain_init
+      - *fetch_signing
+      - *add_certs
+      - *use_profiles
+      - *build_ipa
+    artifacts: *artifacts
+
+  # Push to main: build a signed IPA and publish it to TestFlight. Only pushes
+  # to main run this, so *set_build_number runs serially and the build-number
+  # race no longer happens.
   ios-testflight:
     name: iOS TestFlight
     max_build_duration: 60
@@ -75,15 +108,9 @@ workflows:
     triggering:
       events:
         - push
-        - pull_request
-      cancel_previous_builds: true
       branch_patterns:
-        # source: false → match the PR's TARGET branch (main), so PRs from any
-        # feature branch into main trigger a build. Push events still match the
-        # pushed branch against this pattern, so pushes to main build too.
         - pattern: main
           include: true
-          source: false
     environment: *env
     scripts:
       - *npm_install
