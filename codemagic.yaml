@@ -1,4 +1,99 @@
+definitions:
+  env: &env
+    groups:
+      - chess
+    node: 22.14.0
+    xcode: latest
+    vars:
+      BUNDLE_ID: com.killaskt.openingplaybook
+      XCODE_WORKSPACE: ios/App/App.xcworkspace
+      XCODE_SCHEME: App
+  scripts:
+    - &npm_install
+      name: Install dependencies
+      script: npm install
+    - &build_web
+      name: Build web app
+      script: npm run build
+    - &cap_add
+      name: Add iOS platform
+      script: npx cap add ios
+    - &cap_sync
+      name: Sync Capacitor
+      script: npx cap sync ios
+    - &export_compliance
+      name: Set export compliance
+      script: |
+        plutil -replace ITSAppUsesNonExemptEncryption -bool false ios/App/App/Info.plist
+    - &resolve_spm
+      name: Resolve Swift Package dependencies
+      script: |
+        xcodebuild -resolvePackageDependencies \
+          -workspace "$XCODE_WORKSPACE" \
+          -scheme "$XCODE_SCHEME"
+    - &keychain_init
+      name: Set up keychain
+      script: keychain initialize
+    - &fetch_signing
+      name: Fetch signing files
+      script: |
+        app-store-connect fetch-signing-files "$BUNDLE_ID" \
+          --type IOS_APP_STORE \
+          --create
+    - &add_certs
+      name: Add certificates to keychain
+      script: keychain add-certificates
+    - &use_profiles
+      name: Apply signing to Xcode project
+      script: xcode-project use-profiles
+    - &set_build_number
+      name: Set build number
+      script: |
+        APP_APPLE_ID=$(app-store-connect apps list --bundle-id-identifier "$BUNDLE_ID" --json | jq -r '.[0].id')
+        LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number "$APP_APPLE_ID" --platform IOS --all-versions)
+        cd ios/App
+        agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+    - &build_ipa
+      name: Build IPA
+      script: |
+        xcode-project build-ipa \
+          --workspace "$XCODE_WORKSPACE" \
+          --scheme "$XCODE_SCHEME"
+  artifacts: &artifacts
+    - build/ios/ipa/*.ipa
+    - /tmp/xcodebuild_logs/*.log
+
 workflows:
+  # Runs on every PR targeting main. Builds a signed IPA to prove the iOS
+  # pipeline works (signing, compile, export compliance) but does NOT publish
+  # to TestFlight. Catches failures before they reach main.
+  ios-pr-validation:
+    name: iOS PR Validation
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    triggering:
+      events: [pull_request]
+      cancel_previous_builds: true
+      branch_patterns:
+        - pattern: main
+          include: true
+    environment: *env
+    scripts:
+      - *npm_install
+      - *build_web
+      - *cap_add
+      - *cap_sync
+      - *export_compliance
+      - *resolve_spm
+      - *keychain_init
+      - *fetch_signing
+      - *add_certs
+      - *use_profiles
+      - *build_ipa
+    artifacts: *artifacts
+
+  # Runs on push to main. Full build + auto-incremented build number +
+  # publish to TestFlight.
   ios-testflight:
     name: iOS TestFlight
     max_build_duration: 60
@@ -8,48 +103,21 @@ workflows:
       branch_patterns:
         - pattern: main
           include: true
-    environment:
-      groups:
-        - chess
-      node: 22.14.0
-      xcode: latest
-      vars:
-        BUNDLE_ID: com.killaskt.openingplaybook
-        XCODE_WORKSPACE: ios/App/App.xcworkspace
-        XCODE_SCHEME: App
+    environment: *env
     scripts:
-      - name: Install dependencies
-        script: npm install
-      - name: Build web app
-        script: npm run build
-      - name: Add iOS platform
-        script: npx cap add ios
-      - name: Sync Capacitor
-        script: npx cap sync ios
-      - name: Resolve Swift Package dependencies
-        script: |
-          xcodebuild -resolvePackageDependencies \
-            -workspace "$XCODE_WORKSPACE" \
-            -scheme "$XCODE_SCHEME"
-      - name: Set up keychain
-        script: keychain initialize
-      - name: Fetch signing files
-        script: |
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
-      - name: Add certificates to keychain
-        script: keychain add-certificates
-      - name: Apply signing to Xcode project
-        script: xcode-project use-profiles
-      - name: Build IPA
-        script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME"
-    artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
+      - *npm_install
+      - *build_web
+      - *cap_add
+      - *cap_sync
+      - *export_compliance
+      - *resolve_spm
+      - *keychain_init
+      - *fetch_signing
+      - *add_certs
+      - *use_profiles
+      - *set_build_number
+      - *build_ipa
+    artifacts: *artifacts
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY

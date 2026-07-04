@@ -13,6 +13,9 @@ export default function App() {
   const { colors } = useTheme();
   const location = useLocation();
 
+  const TAB_PATHS = ['/', '/library', '/learn'];
+  const showTabBar = TAB_PATHS.includes(location.pathname);
+
   const appStyle: CSSProperties = {
     minHeight: '100dvh',
     backgroundColor: colors.bg,
@@ -20,10 +23,8 @@ export default function App() {
     fontFamily:
       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
     WebkitFontSmoothing: 'antialiased',
+    paddingBottom: showTabBar ? 'max(calc(env(safe-area-inset-bottom, 0px) + 96px), 104px)' : 0,
   };
-
-  const TAB_PATHS = ['/', '/library', '/learn'];
-  const showTabBar = TAB_PATHS.includes(location.pathname);
 
   return (
     <div style={appStyle}>
