@@ -27,7 +27,7 @@ const PRINCIPLE_ICON_MAP: Record<string, IdeaIconKind> = {
 export default function MoveDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { colors, spacing, typography, isDark } = useTheme();
+  const { colors, spacing, typography, elevation, isDark } = useTheme();
   const [goDeeperOpen, setGoDeeperOpen] = useState(false);
   const swipeRef = useSwipeBack<HTMLDivElement>();
 
@@ -59,10 +59,10 @@ export default function MoveDetailPage() {
   };
 
   const heroStyle: CSSProperties = {
-    padding: `${spacing.md}px ${spacing.lg}px`,
+    padding: `${spacing.lg}px ${spacing.lg}px ${spacing.md}px`,
     display: 'flex',
     flexDirection: 'column',
-    gap: spacing.md,
+    gap: spacing.lg,
   };
 
   const moveRowStyle: CSSProperties = {
@@ -75,12 +75,13 @@ export default function MoveDetailPage() {
 
   const moveBoxStyle: CSSProperties = {
     backgroundColor: colors.accent,
-    borderRadius: 10,
+    borderRadius: 12,
     padding: `${spacing.sm}px ${spacing.md}px`,
     fontSize: typography.titleLG.fontSize,
     fontWeight: '800',
     color: '#fff',
     fontFamily: 'monospace',
+    ...elevation.md,
   };
 
   const nameStyle: CSSProperties = {
