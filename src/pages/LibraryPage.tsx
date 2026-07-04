@@ -6,6 +6,7 @@ import { openingsCatalog } from '../data/catalog';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { SearchBar } from '../components/SearchBar';
 import { SectionJumper } from '../components/SectionJumper';
+import { SponsoredCard } from '../components/SponsoredCard';
 import { useTabSwipe } from '../hooks/useTabSwipe';
 import { EcoBadge, PillChip } from '../components/UIPrimitives';
 import { openingStyleColors, openingTypeColors } from '../theme/openingStyles';
@@ -162,6 +163,8 @@ export default function LibraryPage() {
                 }}
               />
             ))}
+            {/* In-feed ad slot after the first section, styled like an entry card. */}
+            {idx === 0 && <SponsoredCard variant="library" />}
           </div>
         </div>
       ))}

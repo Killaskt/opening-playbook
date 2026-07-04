@@ -5,6 +5,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { nodesById } from '../data/openings';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { SearchBar } from '../components/SearchBar';
+import { SponsoredCard } from '../components/SponsoredCard';
 import { useTabSwipe } from '../hooks/useTabSwipe';
 import type { OpeningNode } from '../types';
 
@@ -64,6 +65,8 @@ export default function MovesPage() {
         {moves.map((node) => (
           <MoveCard key={node.id} node={node} onPress={() => navigate(`/move/${node.id}`)} />
         ))}
+        {/* In-feed ad slot after all the moves, styled to match the cards. */}
+        {moves.length > 0 && <SponsoredCard variant="move" />}
         {moves.length === 0 && (
           <p style={{ color: colors.textMuted, textAlign: 'center', marginTop: spacing.xxl, fontSize: typography.bodyMD.fontSize }}>
             No results for "{query}"
