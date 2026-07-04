@@ -99,6 +99,7 @@ workflows:
       - *cap_add
       - *cap_sync
       - *export_compliance
+      - *configure_admob
       - *resolve_spm
       - *keychain_init
       - *fetch_signing
