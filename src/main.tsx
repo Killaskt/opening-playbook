@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './theme/ThemeContext';
 import App from './App';
 import { initLiveUpdates } from './lib/liveUpdates';
+import { initializeAds } from './lib/ads';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Root element not found');
@@ -18,5 +19,5 @@ createRoot(root).render(
   </StrictMode>,
 );
 
-// Confirm the booted bundle is healthy so live-update rollback doesn't kick in.
 void initLiveUpdates();
+void initializeAds();

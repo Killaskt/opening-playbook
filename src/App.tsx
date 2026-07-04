@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useTheme } from './theme/ThemeContext';
 import { LiquidTabBar } from './components/LiquidTabBar';
+import { AdBanner } from './components/AdBanner';
 import MovesPage from './pages/MovesPage';
 import LibraryPage from './pages/LibraryPage';
 import LearnPage from './pages/LearnPage';
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/contact" element={<ContactPage />} />
       </Routes>
       {showTabBar && <LiquidTabBar />}
+      <AdBanner />
     </div>
   );
 }

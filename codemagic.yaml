@@ -25,6 +25,15 @@ definitions:
       name: Set export compliance
       script: |
         plutil -replace ITSAppUsesNonExemptEncryption -bool false ios/App/App/Info.plist
+    - &configure_admob
+      name: Configure AdMob
+      script: |
+        # ios/ is regenerated each build, so inject AdMob's required Info.plist
+        # keys here. ADMOB_APP_ID (set it in the `chess` variable group) defaults
+        # to Google's public test app id, which serves only test ads.
+        plutil -replace GADApplicationIdentifier -string "${ADMOB_APP_ID:-ca-app-pub-3940256099942544~1458002511}" ios/App/App/Info.plist
+        plutil -replace GADIsAdManagerApp -bool true ios/App/App/Info.plist
+        plutil -replace NSUserTrackingUsageDescription -string "This identifier will be used to deliver personalized ads to you." ios/App/App/Info.plist
     - &resolve_spm
       name: Resolve Swift Package dependencies
       script: |
@@ -118,6 +127,7 @@ workflows:
       - *cap_add
       - *cap_sync
       - *export_compliance
+      - *configure_admob
       - *resolve_spm
       - *keychain_init
       - *fetch_signing
