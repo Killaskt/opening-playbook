@@ -21,6 +21,23 @@ integration safe to merge without changing the app.
   `NSUserTrackingUsageDescription`) because `npx cap add ios` regenerates the
   native project each build.
 
+## In-feed "sponsored card" slots
+
+`src/components/SponsoredCard.tsx` renders an ad slot styled to match the app's
+cards, placed inline in the Library scroll (after the first section) and at the
+bottom of the Moves list. Like everything else here it's gated by `ADS_ENABLED`.
+
+**These are card-styled placeholders, not live Google ads.** Google AdMob's
+Capacitor plugin supports only banner / interstitial / rewarded formats — **not
+native (custom-rendered) ads** — and banner ads are fixed native overlays that
+cannot be inlined into a scrolling list. To actually fill these slots with Google
+ads you need a native-ad-capable plugin (custom native iOS/Android work) or a
+different ad provider. The `SponsoredCard` layout is ready for that data.
+
+To preview the slots during development, set `ADS_ENABLED = true` in
+`src/lib/ads.ts` — the placeholder cards will appear in-feed (this does not serve
+real ads).
+
 ## Ads are NOT OTA-updatable
 
 AdMob is a native SDK, so adding/enabling it requires a full Codemagic build +
