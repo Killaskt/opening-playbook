@@ -26,6 +26,9 @@ workflows:
         script: npx cap add ios
       - name: Sync Capacitor
         script: npx cap sync ios
+      - name: Set export compliance
+        script: |
+          plutil -replace ITSAppUsesNonExemptEncryption -bool false ios/App/App/Info.plist
       - name: Resolve Swift Package dependencies
         script: |
           xcodebuild -resolvePackageDependencies \
