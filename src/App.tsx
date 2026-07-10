@@ -26,12 +26,15 @@ export default function App() {
     paddingBottom: showTabBar ? 'max(calc(env(safe-area-inset-bottom, 0px) + 96px), 104px)' : 0,
   };
 
+  // Empty — bottom padding is handled via appStyle above
+  const tabPageStyle: CSSProperties = {};
+
   return (
     <div style={appStyle}>
       <Routes>
-        <Route path="/" element={<MovesPage />} />
-        <Route path="/library" element={<LibraryPage />} />
-        <Route path="/learn" element={<LearnPage />} />
+        <Route path="/" element={<div style={tabPageStyle}><MovesPage /></div>} />
+        <Route path="/library" element={<div style={tabPageStyle}><LibraryPage /></div>} />
+        <Route path="/learn" element={<div style={tabPageStyle}><LearnPage /></div>} />
         <Route path="/move/:id" element={<MoveDetailPage />} />
         <Route path="/opening-detail" element={<OpeningDetailPage />} />
         <Route path="/contact" element={<ContactPage />} />

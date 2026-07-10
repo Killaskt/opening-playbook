@@ -9,7 +9,7 @@ interface SectionJumperProps {
 }
 
 export function SectionJumper({ onPrev, onNext, canGoUp, canGoDown }: SectionJumperProps) {
-  const { colors, elevation } = useTheme();
+  const { colors } = useTheme();
 
   const wrapStyle: CSSProperties = {
     position: 'fixed',
@@ -17,12 +17,14 @@ export function SectionJumper({ onPrev, onNext, canGoUp, canGoDown }: SectionJum
     right: 16,
     display: 'flex',
     flexDirection: 'column',
-    borderRadius: 16,
+    borderRadius: 20,
     border: `1px solid ${colors.glassBorder}`,
     backgroundColor: colors.cardGlassStrong,
+    backdropFilter: 'blur(24px) saturate(1.5)',
+    WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
+    boxShadow: `inset 0 1px 0 ${colors.glassSpecularLight}, 0 4px 16px rgba(0,0,0,0.14)`,
     overflow: 'hidden',
     zIndex: 100,
-    ...elevation.md,
   };
 
   const btnStyle = (enabled: boolean, borderBottom: boolean): CSSProperties => ({

@@ -24,6 +24,16 @@ export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
   const navigate = useNavigate();
   const { colors, mode, cycleMode, spacing, typography, elevation } = useTheme();
 
+  const stickyWrapStyle: CSSProperties = {
+    position: 'sticky',
+    top: 0,
+    zIndex: 50,
+    backgroundColor: colors.cardGlassStrong,
+    backdropFilter: 'blur(28px) saturate(1.6)',
+    WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
+    borderBottom: `1px solid ${colors.glassBorder}`,
+  };
+
   const containerStyle: CSSProperties = {
     paddingTop: `calc(env(safe-area-inset-top, 0px) + ${spacing.xl}px)`,
     paddingBottom: spacing.sm,
@@ -68,9 +78,11 @@ export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    borderRadius: 10,
+    borderRadius: 12,
     border: `1px solid ${colors.glassBorder}`,
     backgroundColor: colors.cardGlassStrong,
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
     paddingLeft: spacing.md,
     paddingRight: spacing.md,
     paddingTop: spacing.sm,
@@ -83,9 +95,11 @@ export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 10,
+    borderRadius: 12,
     border: `1px solid ${colors.glassBorder}`,
     backgroundColor: colors.cardGlassStrong,
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
     paddingLeft: spacing.sm,
     paddingRight: spacing.sm,
     paddingTop: spacing.sm,
@@ -95,24 +109,26 @@ export function ScreenHeader({ title, subtitle }: ScreenHeaderProps) {
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={rowStyle}>
-        <div style={{ flex: 1 }}>
-          <h1 style={titleStyle}>{title}</h1>
-          {subtitle && <p style={subtitleStyle}>{subtitle}</p>}
-        </div>
-        <div style={buttonsRowStyle}>
-          <button style={themeBtnStyle} onClick={cycleMode} aria-label={`Theme: ${MODE_LABEL[mode]}`}>
-            <span style={{ fontSize: 16, color: colors.textSecondary, userSelect: 'none' }}>
-              {MODE_ICON[mode]}
-            </span>
-            <span style={{ fontSize: 11, fontWeight: '600', color: colors.textTertiary, userSelect: 'none' }}>
-              {MODE_LABEL[mode]}
-            </span>
-          </button>
-          <button style={mailBtnStyle} onClick={() => navigate('/contact')} aria-label="Contact">
-            <MailIcon color={colors.textSecondary} size={18} />
-          </button>
+    <div style={stickyWrapStyle}>
+      <div style={containerStyle}>
+        <div style={rowStyle}>
+          <div style={{ flex: 1 }}>
+            <h1 style={titleStyle}>{title}</h1>
+            {subtitle && <p style={subtitleStyle}>{subtitle}</p>}
+          </div>
+          <div style={buttonsRowStyle}>
+            <button style={themeBtnStyle} onClick={cycleMode} aria-label={`Theme: ${MODE_LABEL[mode]}`}>
+              <span style={{ fontSize: 16, color: colors.textSecondary, userSelect: 'none' }}>
+                {MODE_ICON[mode]}
+              </span>
+              <span style={{ fontSize: 11, fontWeight: '600', color: colors.textTertiary, userSelect: 'none' }}>
+                {MODE_LABEL[mode]}
+              </span>
+            </button>
+            <button style={mailBtnStyle} onClick={() => navigate('/contact')} aria-label="Contact">
+              <MailIcon color={colors.textSecondary} size={18} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
