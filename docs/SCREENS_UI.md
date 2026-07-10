@@ -142,7 +142,7 @@
 | Component | Purpose |
 |-----------|---------|
 | `TabIcons` | Text-based tab icons (P, L, B, M) |
-| `AdBanner` | Placeholder, currently empty |
+| `AdBanner` | Inline ad card — interleaved in Moves and Library lists; `AdCard` renders house ads, `shouldShowAd()` controls frequency |
 
 ---
 

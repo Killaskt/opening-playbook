@@ -1,11 +1,13 @@
 import { useState, useMemo } from 'react';
 import type { CSSProperties } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeContext';
 import { nodesById } from '../data/openings';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { SearchBar } from '../components/SearchBar';
 import { useTabSwipe } from '../hooks/useTabSwipe';
+import { AdCard, shouldShowAd, AD_FREQUENCY_MOVES } from '../components/AdBanner';
 import type { OpeningNode } from '../types';
 
 const START_MOVE_IDS = ['e4', 'd4', 'c4', 'nf3', 'b3'];
@@ -61,9 +63,27 @@ export default function MovesPage() {
       <SearchBar value={query} onChangeText={setQuery} placeholder="Search openings…" />
 
       <div style={listStyle}>
-        {moves.map((node) => (
-          <MoveCard key={node.id} node={node} onPress={() => navigate(`/move/${node.id}`)} />
-        ))}
+        {moves.length > 2
+          ? (() => {
+              const listItems: ReactNode[] = [];
+              moves.forEach((node, i) => {
+                listItems.push(
+                  <MoveCard key={node.id} node={node} onPress={() => navigate(`/move/${node.id}`)} />,
+                );
+                if (shouldShowAd(i + 1, AD_FREQUENCY_MOVES)) {
+                  listItems.push(
+                    <AdCard
+                      key={`ad-${i}`}
+                      adIndex={Math.floor((i + 1) / AD_FREQUENCY_MOVES) - 1}
+                    />,
+                  );
+                }
+              });
+              return listItems;
+            })()
+          : moves.map((node) => (
+              <MoveCard key={node.id} node={node} onPress={() => navigate(`/move/${node.id}`)} />
+            ))}
         {moves.length === 0 && (
           <p style={{ color: colors.textMuted, textAlign: 'center', marginTop: spacing.xxl, fontSize: typography.bodyMD.fontSize }}>
             No results for "{query}"
