@@ -154,7 +154,7 @@ export default function MoveDetailPage() {
           pgn={node.boardPgn}
           arrows={node.boardArrows}
           responses={node.responses}
-          startAtEnd={startAtEnd}
+          startAtEnd
           onResponsePress={(respId) =>
             navigate(`/move/${respId}`, { state: { startAtEnd: true } })
           }
