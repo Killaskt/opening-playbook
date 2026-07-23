@@ -45,6 +45,9 @@ yarn-error.*
 # Logs
 OpeningPlaybook*.ips
 
+# Claude Code internal worktrees (agent isolation)
+.claude/worktrees/
+
 # Test output
 test-results.json
 test-output.txt

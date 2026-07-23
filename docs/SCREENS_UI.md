@@ -114,20 +114,28 @@
 
 | Component | Purpose | Notes |
 |-----------|---------|-------|
-| `LiquidTabBar` | Animated tab bar | Spring physics, drag preview. Most complex component — needs full rewrite for web. |
-| `ScreenHeader` | Top bar: title, theme toggle, contact | Platform-aware padding |
-| `SearchBar` | Text input + clear | Wraps in GlassCard |
-| `SectionJumper` | Floating ↑↓ navigation | Bottom-right positioned |
+| `LiquidTabBar` | **Floating glass island** nav bar | Apple liquid glass: pill-shaped, centered, fixed `24px` above safe-area bottom. `blur(40px) saturate(1.8)`. Spring-animated sliding pill indicator (`cubic-bezier(0.34,1.56,0.64,1)`) slides between active tabs using `useRef`/`useEffect` position measurement. Width is content-driven (not full-width). |
+| `ScreenHeader` | Sticky top bar with glass blur | `position: sticky; top: 0`. Glass background (`blur(28px) saturate(1.6)`) + separating bottom border. Theme toggle + mail buttons have `borderRadius: 12` + `blur(12px)`. |
+| `SearchBar` | Text input + clear | Wraps in GlassCard. Input is transparent against the glass base. Leading `⌕` search icon at 16px. Input left-padding shifted to 40px. |
+| `SectionJumper` | Floating ↑↓ navigation | Bottom-right positioned. Glass blur (`blur(24px) saturate(1.5)`) + specular highlight. `borderRadius: 20`. |
 
 ### UI Primitives (`UIPrimitives.tsx`)
 
 | Component | Purpose |
 |-----------|---------|
-| `GlassCard` | Frosted glass card with border + elevation |
+| `GlassCard` | Frosted glass card — `backdrop-filter: blur(28px) saturate(1.6)`, specular inner highlight (`inset 0 1px 0 glassSpecularLight`), `borderRadius: 20`. No elevation spread (provides its own shadow). |
 | `SectionCard` | Card with colored left accent border |
 | `PillChip` | Badge/label pill |
 | `EcoBadge` | Small ECO code display |
 | `SectionTitle` | Section heading |
+
+#### Glass token reference (`src/theme/colors.ts`)
+
+| Token | Purpose |
+|-------|---------|
+| `glassSpecularLight` | Inset top-edge highlight: `rgba(255,255,255,0.80)` — simulates light hitting the top of a glass surface |
+| `glassSpecularDark` | Subtle specular for contexts needing a muted highlight: `rgba(255,255,255,0.08)` |
+| `glassBlur` | Shared blur CSS value for cards/headers: `'blur(28px) saturate(1.6)'` |
 
 ### Other
 
@@ -145,3 +153,17 @@
 - **Search:** Instant filter, case-insensitive, multi-term (all terms must match)
 - **Expand/collapse:** Learn cards + Go Deeper section use animated toggle
 - **Theme toggle:** Cycles system → light → dark → system via ScreenHeader button
+
+---
+
+## Liquid Glass Design System
+
+The app implements Apple's iOS 26 / visionOS "Liquid Glass" visual language. See [LIQUID_GLASS_DESIGN.md](./LIQUID_GLASS_DESIGN.md) for full documentation including:
+
+- Design philosophy and comparison to flat/material design
+- Core property tables (blur values, opacity, specular recipes)
+- All new color tokens (`glassSpecularLight`, `glassSpecularDark`, `glassBlur`)
+- Component-level specification table
+- Dark vs light variant details
+- Accessibility guidance for `prefers-reduced-motion`
+- How to add new glass surfaces

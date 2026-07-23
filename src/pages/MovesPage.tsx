@@ -45,7 +45,6 @@ export default function MovesPage() {
 
   const pageStyle: CSSProperties = {
     backgroundColor: 'transparent',
-    paddingBottom: 100,
     minHeight: '100dvh',
   };
 
@@ -79,9 +78,12 @@ function MoveCard({ node, onPress }: { node: OpeningNode; onPress: () => void })
   const { colors, spacing, typography } = useTheme();
 
   const cardStyle: CSSProperties = {
-    borderRadius: 16,
+    borderRadius: 20,
     border: `1px solid ${colors.glassBorder}`,
-    backgroundColor: colors.card,
+    backgroundColor: colors.cardGlass,
+    backdropFilter: 'blur(20px) saturate(1.4)',
+    WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+    boxShadow: `inset 0 1px 0 ${colors.glassSpecularLight}, 0 2px 8px rgba(0,0,0,0.07)`,
     overflow: 'hidden',
     cursor: 'pointer',
     transition: 'opacity 0.15s ease',
@@ -99,6 +101,7 @@ function MoveCard({ node, onPress }: { node: OpeningNode; onPress: () => void })
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.accent,
+    borderRight: '1px solid rgba(255,255,255,0.25)',
     flexShrink: 0,
   };
 

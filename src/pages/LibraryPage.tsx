@@ -72,7 +72,6 @@ export default function LibraryPage() {
 
   const pagePad: CSSProperties = {
     backgroundColor: 'transparent',
-    paddingBottom: 100,
     minHeight: '100dvh',
   };
 
@@ -190,6 +189,8 @@ function filterBtnStyle(active: boolean, colors: { accent: string; border: strin
     borderRadius: 20,
     border: active ? `1px solid ${colors.accent}` : `1px solid ${colors.border}`,
     backgroundColor: active ? colors.accentBg : colors.chipBg,
+    backdropFilter: active ? 'blur(12px)' : undefined,
+    WebkitBackdropFilter: active ? 'blur(12px)' : undefined,
     color: active ? colors.accent : colors.textSecondary,
     fontSize: 13,
     fontWeight: active ? '600' : '400',
@@ -203,9 +204,12 @@ function EntryCard({ entry, onPress }: { entry: CatalogEntry; onPress: () => voi
   const { colors, spacing, typography } = useTheme();
 
   const cardStyle: CSSProperties = {
-    borderRadius: 14,
+    borderRadius: 18,
     border: `1px solid ${colors.glassBorder}`,
-    backgroundColor: colors.card,
+    backgroundColor: colors.cardGlass,
+    backdropFilter: 'blur(20px) saturate(1.4)',
+    WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+    boxShadow: `inset 0 1px 0 ${colors.glassSpecularLight}, 0 2px 8px rgba(0,0,0,0.06)`,
     padding: `${spacing.md}px ${spacing.lg}px`,
     cursor: 'pointer',
     display: 'flex',

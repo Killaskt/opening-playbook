@@ -18,6 +18,7 @@ export function SearchBar({ value, onChangeText, placeholder }: SearchBarProps) 
     marginRight: spacing.lg,
     marginTop: spacing.sm,
     marginBottom: 15,
+    borderRadius: 16,
   };
 
   const rowStyle: CSSProperties = {
@@ -26,17 +27,30 @@ export function SearchBar({ value, onChangeText, placeholder }: SearchBarProps) 
     alignItems: 'center',
   };
 
+  const searchIconStyle: CSSProperties = {
+    position: 'absolute',
+    left: 12,
+    top: 0,
+    bottom: 0,
+    display: 'flex',
+    alignItems: 'center',
+    pointerEvents: 'none',
+    fontSize: 16,
+    color: colors.textMuted,
+    userSelect: 'none',
+  };
+
   const inputStyle: CSSProperties = {
     width: '100%',
     boxSizing: 'border-box',
-    borderRadius: 12,
-    border: `1px solid ${colors.glassBorder}`,
-    backgroundColor: colors.inputBg,
+    borderRadius: 14,
+    border: 'none',
+    backgroundColor: 'transparent',
     color: colors.text,
     // 16px min prevents iOS WKWebView from auto-zooming when the field is focused
     fontSize: 16,
     lineHeight: `${typography.bodyLG.lineHeight}px`,
-    padding: `${spacing.md}px ${showClear ? 44 : 16}px ${spacing.md}px 16px`,
+    padding: `${spacing.md}px ${showClear ? 44 : 16}px ${spacing.md}px 40px`,
     outline: 'none',
   };
 
@@ -61,6 +75,7 @@ export function SearchBar({ value, onChangeText, placeholder }: SearchBarProps) 
   return (
     <GlassCard style={wrapperStyle}>
       <div style={rowStyle}>
+        <span style={searchIconStyle} aria-hidden="true">⌕</span>
         <input
           type="text"
           style={inputStyle}

@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -14,160 +15,161 @@ const TABS: TabItem[] = [
   { to: '/learn',   label: 'Learn',   icon: '✦' },
 ];
 
+function getActiveIndex(pathname: string): number {
+  if (pathname.startsWith('/library')) return 1;
+  if (pathname.startsWith('/learn')) return 2;
+  return 0;
+}
+
+interface PillState {
+  left: number;
+  width: number;
+  animated: boolean;
+}
+
 export function LiquidTabBar() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const location = useLocation();
-  const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const [pillStyle, setPillStyle] = useState<{ left: number; width: number } | null>(null);
-  const [prevIndex, setPrevIndex] = useState<number>(-1);
-  const containerRef = useRef<HTMLElement | null>(null);
+  const activeIndex = getActiveIndex(location.pathname);
 
-  const activeIndex = TABS.findIndex((t) =>
-    t.to === '/' ? location.pathname === '/' : location.pathname.startsWith(t.to)
-  );
+  const tabRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const prevIndexRef = useRef<number | null>(null);
 
-  // Animate the sliding pill to the active tab
+  const [pill, setPill] = useState<PillState | null>(null);
+
   useEffect(() => {
-    const el = tabRefs.current[activeIndex];
-    const container = containerRef.current;
-    if (!el || !container) return;
+    const measure = () => {
+      const container = containerRef.current;
+      const tabEl = tabRefs.current[activeIndex];
+      if (!container || !tabEl) return;
 
-    const containerRect = container.getBoundingClientRect();
-    const tabRect = el.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const tabRect = tabEl.getBoundingClientRect();
 
-    setPillStyle({
-      left: tabRect.left - containerRect.left,
-      width: tabRect.width,
-    });
-    setPrevIndex(activeIndex);
-  }, [activeIndex]);
+      const left = tabRect.left - containerRect.left;
+      const width = tabRect.width;
+      const isFirstMount = prevIndexRef.current === null;
+      prevIndexRef.current = activeIndex;
 
-  const isDark = colors.bg === '#111113';
+      setPill({ left, width, animated: !isFirstMount });
+    };
 
-  const islandBg = isDark
-    ? 'rgba(28, 28, 36, 0.72)'
-    : 'rgba(255, 255, 255, 0.62)';
+    const frame = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(frame);
+  }, [activeIndex, isDark]);
 
-  const islandBorder = isDark
-    ? 'rgba(255, 255, 255, 0.10)'
-    : 'rgba(255, 255, 255, 0.80)';
+  const pillIndicatorStyle: CSSProperties = pill
+    ? {
+        position: 'absolute',
+        top: 4,
+        bottom: 4,
+        left: pill.left,
+        width: pill.width,
+        borderRadius: 999,
+        backgroundColor: isDark
+          ? 'rgba(255,255,255,0.10)'
+          : 'rgba(255,255,255,0.85)',
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.90)'}`,
+        boxShadow: isDark
+          ? 'inset 0 1px 0 rgba(255,255,255,0.08)'
+          : '0 1px 4px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.90)',
+        transition: pill.animated
+          ? 'left 0.35s cubic-bezier(0.34,1.56,0.64,1), width 0.35s cubic-bezier(0.34,1.56,0.64,1)'
+          : 'none',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }
+    : { display: 'none' };
 
-  const pillBg = isDark
-    ? 'rgba(255, 255, 255, 0.10)'
-    : 'rgba(255, 255, 255, 0.85)';
+  const islandStyle: CSSProperties = {
+    position: 'relative',
+    display: 'inline-flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: isDark
+      ? 'rgba(28,28,36,0.72)'
+      : 'rgba(255,255,255,0.62)',
+    backdropFilter: 'blur(40px) saturate(1.8)',
+    WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
+    border: `1px solid ${isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.80)'}`,
+    borderRadius: 999,
+    boxShadow: isDark
+      ? '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)'
+      : '0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.90)',
+    padding: 4,
+  };
 
-  const pillBorder = isDark
-    ? 'rgba(255, 255, 255, 0.18)'
-    : 'rgba(200, 210, 230, 0.60)';
+  const outerStyle: CSSProperties = {
+    position: 'fixed',
+    bottom: 'max(calc(env(safe-area-inset-bottom, 0px) + 16px), 24px)',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 100,
+    pointerEvents: 'auto',
+  };
 
   return (
-    <nav
-      ref={containerRef}
-      style={{
-        position: 'fixed',
-        bottom: 'max(env(safe-area-inset-bottom, 0px) + 16px, 24px)',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 'min(480px, calc(100% - 24px))',
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '6px',
-        gap: 0,
-        borderRadius: 999,
-        background: islandBg,
-        backdropFilter: 'blur(40px) saturate(1.8)',
-        WebkitBackdropFilter: 'blur(40px) saturate(1.8)',
-        border: `1px solid ${islandBorder}`,
-        boxShadow: isDark
-          ? '0 8px 32px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.06) inset'
-          : '0 8px 32px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.9) inset',
-        zIndex: 100,
-        // Sliding pill indicator (positioned relative to this container)
-        ...(pillStyle
-          ? {
-              '--pill-left': `${pillStyle.left}px`,
-              '--pill-width': `${pillStyle.width}px`,
-            }
-          : {}),
-      } as React.CSSProperties}
-    >
-      {/* Sliding pill background */}
-      {pillStyle && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 6,
-            bottom: 6,
-            left: pillStyle.left,
-            width: pillStyle.width,
-            borderRadius: 999,
-            background: pillBg,
-            border: `1px solid ${pillBorder}`,
-            boxShadow: isDark
-              ? '0 2px 8px rgba(0,0,0,0.3)'
-              : '0 2px 12px rgba(0,0,0,0.10)',
-            transition: prevIndex === -1
-              ? 'none'
-              : 'left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            pointerEvents: 'none',
-          }}
-        />
-      )}
+    <nav style={outerStyle} aria-label="Main navigation">
+      <div ref={containerRef} style={islandStyle}>
+        <div style={pillIndicatorStyle} aria-hidden="true" />
 
-      {TABS.map((tab, i) => {
-        const isActive = i === activeIndex;
-        return (
-          <NavLink
-            key={tab.to}
-            to={tab.to}
-            end={tab.to === '/'}
-            ref={(el) => { tabRefs.current[i] = el; }}
-            style={{
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 2,
-              textDecoration: 'none',
-              padding: '8px 12px',
-              borderRadius: 999,
-              flex: 1,
-              minWidth: 0,
-              transition: 'transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              transform: isActive ? 'scale(1.04)' : 'scale(1)',
-            }}
-          >
-            <span
-              style={{
-                fontSize: 19,
-                lineHeight: '22px',
-                color: isActive ? colors.accent : colors.tabBarInactive,
-                transition: 'color 0.22s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                transform: isActive ? 'translateY(-1px)' : 'translateY(0)',
-                display: 'block',
-              }}
+        {TABS.map((tab, idx) => {
+          const isActive = idx === activeIndex;
+          return (
+            <div
+              key={tab.to}
+              ref={(el) => { tabRefs.current[idx] = el; }}
+              style={{ position: 'relative', zIndex: 1 }}
             >
-              {tab.icon}
-            </span>
-            <span
-              style={{
-                fontSize: 10,
-                fontWeight: isActive ? 700 : 500,
-                letterSpacing: isActive ? '0.02em' : '0',
-                color: isActive ? colors.accent : colors.tabBarInactive,
-                transition: 'color 0.22s ease, font-weight 0.22s ease',
-                lineHeight: '12px',
-              }}
-            >
-              {tab.label}
-            </span>
-          </NavLink>
-        );
-      })}
+              <NavLink
+                to={tab.to}
+                end={tab.to === '/'}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column' as const,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 2,
+                  textDecoration: 'none',
+                  padding: '8px 20px',
+                  minWidth: 72,
+                  borderRadius: 999,
+                  transform: isActive ? 'scale(1.04)' : 'scale(1)',
+                  transition: 'transform 0.18s cubic-bezier(0.34,1.56,0.64,1)',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 19,
+                    lineHeight: '22px',
+                    color: isActive ? colors.tabBarActive : colors.tabBarInactive,
+                    transform: isActive ? 'translateY(-1px)' : 'translateY(0)',
+                    transition: 'color 0.18s ease, transform 0.18s cubic-bezier(0.34,1.56,0.64,1)',
+                    userSelect: 'none',
+                    display: 'block',
+                  }}
+                >
+                  {tab.icon}
+                </span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: isActive ? '700' : '500',
+                    letterSpacing: isActive ? '0.02em' : '0em',
+                    color: isActive ? colors.tabBarActive : colors.tabBarInactive,
+                    transition: 'color 0.18s ease',
+                    userSelect: 'none',
+                    display: 'block',
+                  }}
+                >
+                  {tab.label}
+                </span>
+              </NavLink>
+            </div>
+          );
+        })}
+      </div>
     </nav>
   );
 }

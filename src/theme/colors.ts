@@ -12,6 +12,9 @@ export interface ThemeColors {
   border: string;
   borderLight: string;
   glassBorder: string;
+  glassSpecularLight: string;
+  glassSpecularDark: string;
+  glassBlur: string;
   overlay: string;
   accent: string;
   accentBg: string;
@@ -55,8 +58,8 @@ export interface ThemeColors {
 export const lightColors: ThemeColors = {
   bg: '#faf8f5',
   card: '#fff',
-  cardGlass: 'rgba(255, 255, 255, 0.78)',
-  cardGlassStrong: 'rgba(255, 255, 255, 0.9)',
+  cardGlass: 'rgba(255, 255, 255, 0.68)',
+  cardGlassStrong: 'rgba(255, 255, 255, 0.84)',
   cardPressed: '#f0f6fb',
   text: '#222',
   textSecondary: '#555',
@@ -65,7 +68,10 @@ export const lightColors: ThemeColors = {
   textInverse: '#ffffff',
   border: '#e8e4df',
   borderLight: '#f0edea',
-  glassBorder: 'rgba(255, 255, 255, 0.6)',
+  glassBorder: 'rgba(255, 255, 255, 0.65)',
+  glassSpecularLight: 'rgba(255, 255, 255, 0.80)',
+  glassSpecularDark: 'rgba(255, 255, 255, 0.08)',
+  glassBlur: 'blur(28px) saturate(1.6)',
   overlay: 'rgba(14, 18, 28, 0.08)',
   accent: '#2e78b7',
   accentBg: '#eef5fb',
@@ -109,8 +115,8 @@ export const lightColors: ThemeColors = {
 export const darkColors: ThemeColors = {
   bg: '#111113',
   card: '#1e1e24',
-  cardGlass: 'rgba(36, 36, 44, 0.82)',
-  cardGlassStrong: 'rgba(36, 36, 44, 0.95)',
+  cardGlass: 'rgba(30, 30, 40, 0.72)',
+  cardGlassStrong: 'rgba(28, 28, 36, 0.88)',
   cardPressed: '#28283200',
   text: '#eae8e5',
   textSecondary: '#b4b2af',
@@ -119,7 +125,10 @@ export const darkColors: ThemeColors = {
   textInverse: '#ffffff',
   border: '#33333c',
   borderLight: '#29292f',
-  glassBorder: 'rgba(255, 255, 255, 0.10)',
+  glassBorder: 'rgba(255, 255, 255, 0.12)',
+  glassSpecularLight: 'rgba(255, 255, 255, 0.80)',
+  glassSpecularDark: 'rgba(255, 255, 255, 0.08)',
+  glassBlur: 'blur(28px) saturate(1.6)',
   overlay: 'rgba(0, 0, 0, 0.36)',
   accent: '#5b9fd6',
   accentBg: '#1a2a3a',

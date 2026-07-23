@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeContext';
 import { nodesById } from '../data/openings';
 import { catalogByNodeId } from '../data/catalog';
@@ -27,7 +27,10 @@ const PRINCIPLE_ICON_MAP: Record<string, IdeaIconKind> = {
 export default function MoveDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { colors, spacing, typography, isDark } = useTheme();
+  // When navigating here from a green response square, start board at final position
+  const startAtEnd = !!(location.state as { startAtEnd?: boolean } | null)?.startAtEnd;
   const [goDeeperOpen, setGoDeeperOpen] = useState(false);
   const swipeRef = useSwipeBack<HTMLDivElement>();
 
@@ -149,8 +152,12 @@ export default function MoveDetailPage() {
         {/* Board */}
         <AnimatedChessBoard
           pgn={node.boardPgn}
+          arrows={node.boardArrows}
           responses={node.responses}
-          onResponsePress={(respId) => navigate(`/move/${respId}`)}
+          startAtEnd
+          onResponsePress={(respId) =>
+            navigate(`/move/${respId}`, { state: { startAtEnd: true } })
+          }
         />
 
         {/* Intent */}

@@ -9,14 +9,16 @@ interface GlassCardProps {
 }
 
 export function GlassCard({ children, style }: GlassCardProps) {
-  const { colors, elevation } = useTheme();
+  const { colors } = useTheme();
 
   const cardStyle: CSSProperties = {
-    borderRadius: 16,
+    borderRadius: 20,
     border: `1px solid ${colors.glassBorder}`,
     backgroundColor: colors.cardGlass,
+    backdropFilter: 'blur(28px) saturate(1.6)',
+    WebkitBackdropFilter: 'blur(28px) saturate(1.6)',
+    boxShadow: `inset 0 1px 0 ${colors.glassSpecularLight}, 0 2px 12px rgba(0,0,0,0.06)`,
     overflow: 'hidden',
-    ...elevation.md,
     ...style,
   };
 
