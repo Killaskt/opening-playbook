@@ -1,33 +1,26 @@
 import { Capacitor } from '@capacitor/core';
 import {
   AdMob,
-  BannerAdSize,
-  BannerAdPosition,
-  type BannerAdOptions,
+  type AdOptions,
 } from '@capacitor-community/admob';
 
 /**
- * Master switch for ads. Stays false until real AdMob unit IDs are set and the
- * banner placement has been verified on a device (see docs/ADS_ADMOB.md). While
- * false, every function here is a no-op, so merging changes nothing at runtime.
+ * Master switch for ads. Set to true once real AdMob unit IDs are in place.
+ * While false, every function here is a no-op.
  */
-export const ADS_ENABLED = false;
+export const ADS_ENABLED = true;
 
-/**
- * Google's official AdMob **test** unit IDs — safe to use during development
- * and never generate real revenue or invalid-traffic flags. Swap for your real
- * unit IDs (or wire them via a build-time env) before shipping ads for real.
- */
-const BANNER_AD_ID = {
-  ios: 'ca-app-pub-3940256099942544/2934735716',
-  android: 'ca-app-pub-3940256099942544/6300978111',
+/** Real interstitial ad unit IDs. Android falls back to Google's test ID. */
+const INTERSTITIAL_AD_ID = {
+  ios: 'ca-app-pub-4145314521757592/3123932958',
+  android: 'ca-app-pub-3940256099942544/1033173712',
 };
 
-/** Height (px) the layout should reserve for the banner; 0 when ads are off. */
-export const AD_BANNER_HEIGHT = ADS_ENABLED ? 50 : 0;
+/** No banner unit — kept at 0 so layout padding is unchanged. */
+export const AD_BANNER_HEIGHT = 0;
 
-function bannerAdId(): string {
-  return Capacitor.getPlatform() === 'ios' ? BANNER_AD_ID.ios : BANNER_AD_ID.android;
+function interstitialAdId(): string {
+  return Capacitor.getPlatform() === 'ios' ? INTERSTITIAL_AD_ID.ios : INTERSTITIAL_AD_ID.android;
 }
 
 /** Initialize the AdMob SDK and handle iOS App Tracking Transparency. */
@@ -44,27 +37,28 @@ export async function initializeAds(): Promise<void> {
   }
 }
 
-export async function showBanner(): Promise<void> {
+/** Pre-load the interstitial so it's ready to show immediately when needed. */
+export async function prepareInterstitial(): Promise<void> {
   if (!ADS_ENABLED || !Capacitor.isNativePlatform()) return;
-  const options: BannerAdOptions = {
-    adId: bannerAdId(),
-    adSize: BannerAdSize.ADAPTIVE_BANNER,
-    position: BannerAdPosition.TOP_CENTER,
-    // Serve test ads regardless of ID; set false once real unit IDs are in.
-    isTesting: true,
+  const options: AdOptions = {
+    adId: interstitialAdId(),
+    isTesting: false,
   };
   try {
-    await AdMob.showBanner(options);
+    await AdMob.prepareInterstitial(options);
   } catch (err) {
-    console.warn('[ads] showBanner failed', err);
+    console.warn('[ads] prepareInterstitial failed', err);
   }
 }
 
-export async function hideBanner(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
+/** Show a prepared interstitial, then pre-load the next one. */
+export async function showInterstitial(): Promise<void> {
+  if (!ADS_ENABLED || !Capacitor.isNativePlatform()) return;
   try {
-    await AdMob.removeBanner();
-  } catch {
-    /* nothing to hide */
+    await AdMob.showInterstitial();
+  } catch (err) {
+    console.warn('[ads] showInterstitial failed', err);
   }
+  // Pre-load next ad so it's ready for the following trigger.
+  void prepareInterstitial();
 }

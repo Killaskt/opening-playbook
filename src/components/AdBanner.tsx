@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { useTheme } from '../theme/ThemeContext';
-import { showBanner, hideBanner, AD_BANNER_HEIGHT } from '../lib/ads';
+import { prepareInterstitial, AD_BANNER_HEIGHT } from '../lib/ads';
 
 export { AD_BANNER_HEIGHT };
 
-// ─── Native AdMob banner driver ──────────────────────────────────────────────
-// Renders nothing in the DOM — the banner is a native overlay managed by the
-// AdMob plugin. No-op on web or when ADS_ENABLED is false in ../lib/ads.
+// ─── Native AdMob interstitial pre-loader ────────────────────────────────────
+// Renders nothing in the DOM. Pre-loads the first interstitial on mount so it's
+// ready to show immediately when triggered by navigation.
 export function AdBanner() {
   useEffect(() => {
-    void showBanner();
-    return () => { void hideBanner(); };
+    void prepareInterstitial();
   }, []);
   return null;
 }

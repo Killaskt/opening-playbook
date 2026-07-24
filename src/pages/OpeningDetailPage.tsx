@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeContext';
 import { nodesById } from '../data/openings';
+import { showInterstitial } from '../lib/ads';
 import { openingStyleColors } from '../theme/openingStyles';
 import { EcoBadge, PillChip, SectionCard, SectionTitle } from '../components/UIPrimitives';
 import { BulletRow } from '../components/BulletRow';
@@ -26,6 +28,21 @@ export default function OpeningDetailPage() {
   const swipeRef = useSwipeBack<HTMLDivElement>();
 
   const state = location.state as OpeningDetailState | null;
+
+  // Interstitial trigger based on frequency
+  useEffect(() => {
+    if (!state) return;
+    
+    // Read clicks from sessionStorage so it resets on app restart
+    const clicksStr = sessionStorage.getItem('OPENING_CLICKS') || '0';
+    const clicks = parseInt(clicksStr, 10) + 1;
+    sessionStorage.setItem('OPENING_CLICKS', clicks.toString());
+
+    // Show interstitial every 7th opening detail view
+    if (clicks > 0 && clicks % 7 === 0) {
+      void showInterstitial();
+    }
+  }, [state]);
 
   if (!state) {
     return (
