@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeContext';
 import { nodesById } from '../data/openings';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { SearchBar } from '../components/SearchBar';
-import { SponsoredCard } from '../components/SponsoredCard';
+import { AdCard, shouldShowAd, AD_FREQUENCY_MOVES } from '../components/AdBanner';
 import { useTabSwipe } from '../hooks/useTabSwipe';
 import type { OpeningNode } from '../types';
 
@@ -62,11 +62,27 @@ export default function MovesPage() {
       <SearchBar value={query} onChangeText={setQuery} placeholder="Search openings…" />
 
       <div style={listStyle}>
-        {moves.map((node) => (
-          <MoveCard key={node.id} node={node} onPress={() => navigate(`/move/${node.id}`)} />
-        ))}
-        {/* In-feed ad slot after all the moves, styled to match the cards. */}
-        {moves.length > 0 && <SponsoredCard variant="move" />}
+        {moves.length > 2
+          ? (() => {
+              const listItems: ReactNode[] = [];
+              moves.forEach((node, i) => {
+                listItems.push(
+                  <MoveCard key={node.id} node={node} onPress={() => navigate(`/move/${node.id}`)} />,
+                );
+                if (shouldShowAd(i + 1, AD_FREQUENCY_MOVES)) {
+                  listItems.push(
+                    <AdCard
+                      key={`ad-${i}`}
+                      adIndex={Math.floor((i + 1) / AD_FREQUENCY_MOVES) - 1}
+                    />,
+                  );
+                }
+              });
+              return listItems;
+            })()
+          : moves.map((node) => (
+              <MoveCard key={node.id} node={node} onPress={() => navigate(`/move/${node.id}`)} />
+            ))}
         {moves.length === 0 && (
           <p style={{ color: colors.textMuted, textAlign: 'center', marginTop: spacing.xxl, fontSize: typography.bodyMD.fontSize }}>
             No results for "{query}"
