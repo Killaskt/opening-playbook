@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 /**
  * Edge-swipe-to-go-back gesture, matching iOS interactive pop.
@@ -12,6 +12,20 @@ import { useNavigate } from 'react-router-dom';
 export function useSwipeBack<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Clear any leftover exit-animation styles on every navigation. React reuses
+  // this DOM node across same-component route changes (e.g. /move/a → /move/b,
+  // and the navigate(-1) back to /move/a), so the transform/opacity applied
+  // during a completed back-swipe would otherwise persist and leave the page we
+  // land on translated off-screen and invisible.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.transition = '';
+    el.style.transform = '';
+    el.style.opacity = '';
+  }, [location.key]);
 
   useEffect(() => {
     const el = ref.current;
