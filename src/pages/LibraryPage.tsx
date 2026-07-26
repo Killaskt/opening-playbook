@@ -1,12 +1,11 @@
 import { useState, useMemo, useRef } from 'react';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeContext';
 import { openingsCatalog } from '../data/catalog';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { SearchBar } from '../components/SearchBar';
 import { SectionJumper } from '../components/SectionJumper';
-import { AdCard, shouldShowAd, AD_FREQUENCY_LIBRARY } from '../components/AdBanner';
 import { useTabSwipe } from '../hooks/useTabSwipe';
 import { EcoBadge, PillChip } from '../components/UIPrimitives';
 import { openingStyleColors, openingTypeColors } from '../theme/openingStyles';
@@ -140,67 +139,29 @@ export default function LibraryPage() {
         <div key={category} ref={(el) => { sectionRefs.current[idx] = el; }}>
           <div style={categoryLabelStyle}>{catLabels[category as CategoryKey]}</div>
           <div style={entriesListStyle}>
-            {entries.length > 4
-              ? (() => {
-                  const sectionItems: ReactNode[] = [];
-                  entries.forEach((entry, i) => {
-                    sectionItems.push(
-                      <EntryCard
-                        key={entry.name + entry.pgn}
-                        entry={entry}
-                        onPress={() => {
-                          if (entry.nodeId) {
-                            navigate(`/move/${entry.nodeId}`);
-                          } else {
-                            navigate('/opening-detail', {
-                              state: {
-                                name: entry.name,
-                                pgn: entry.pgn,
-                                eco: entry.eco,
-                                style: entry.style,
-                                keyIdeas: entry.keyIdeas,
-                                description: entry.description,
-                                nodeId: entry.nodeId,
-                              },
-                            });
-                          }
-                        }}
-                      />,
-                    );
-                    if (shouldShowAd(i + 1, AD_FREQUENCY_LIBRARY)) {
-                      sectionItems.push(
-                        <AdCard
-                          key={`ad-${category}-${i}`}
-                          adIndex={Math.floor((i + 1) / AD_FREQUENCY_LIBRARY) - 1}
-                        />,
-                      );
-                    }
-                  });
-                  return sectionItems;
-                })()
-              : entries.map((entry) => (
-                  <EntryCard
-                    key={entry.name + entry.pgn}
-                    entry={entry}
-                    onPress={() => {
-                      if (entry.nodeId) {
-                        navigate(`/move/${entry.nodeId}`);
-                      } else {
-                        navigate('/opening-detail', {
-                          state: {
-                            name: entry.name,
-                            pgn: entry.pgn,
-                            eco: entry.eco,
-                            style: entry.style,
-                            keyIdeas: entry.keyIdeas,
-                            description: entry.description,
-                            nodeId: entry.nodeId,
-                          },
-                        });
-                      }
-                    }}
-                  />
-                ))}
+            {entries.map((entry) => (
+              <EntryCard
+                key={entry.name + entry.pgn}
+                entry={entry}
+                onPress={() => {
+                  if (entry.nodeId) {
+                    navigate(`/move/${entry.nodeId}`);
+                  } else {
+                    navigate('/opening-detail', {
+                      state: {
+                        name: entry.name,
+                        pgn: entry.pgn,
+                        eco: entry.eco,
+                        style: entry.style,
+                        keyIdeas: entry.keyIdeas,
+                        description: entry.description,
+                        nodeId: entry.nodeId,
+                      },
+                    });
+                  }
+                }}
+              />
+            ))}
           </div>
         </div>
       ))}
