@@ -21,6 +21,17 @@ definitions:
     - &cap_sync
       name: Sync Capacitor
       script: npx cap sync ios
+    - &generate_icon
+      name: Generate app icon
+      script: |
+        # ios/ is regenerated each build, so bake the app icon from
+        # assets/icon.png into the native AppIcon set here. Skips gracefully
+        # when there is no custom icon so the build never breaks on its absence.
+        if [ -f assets/icon.png ]; then
+          npx @capacitor/assets generate --ios
+        else
+          echo "assets/icon.png not found — keeping the default icon"
+        fi
     - &export_compliance
       name: Set export compliance
       script: |
@@ -98,6 +109,7 @@ workflows:
       - *build_web
       - *cap_add
       - *cap_sync
+      - *generate_icon
       - *export_compliance
       - *configure_admob
       - *resolve_spm
@@ -127,6 +139,7 @@ workflows:
       - *build_web
       - *cap_add
       - *cap_sync
+      - *generate_icon
       - *export_compliance
       - *configure_admob
       - *resolve_spm
