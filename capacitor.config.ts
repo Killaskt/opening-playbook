@@ -9,11 +9,13 @@ const config: CapacitorConfig = {
       style: 'DEFAULT',
       overlaysWebView: false,
     },
-    // Over-the-air updates via Capgo. autoUpdate stays false until a Capgo
-    // account (or self-hosted update server) is configured — see
-    // docs/OTA_UPDATES.md. When false the app simply runs its built-in bundle.
+    // Over-the-air updates via Capgo (see docs/OTA_UPDATES.md). autoUpdate is on:
+    // on each launch the app checks the `production` channel for a newer bundle
+    // and applies it. This must ship inside a native build to take effect — it
+    // can't be enabled OTA later.
     CapacitorUpdater: {
-      autoUpdate: false,
+      autoUpdate: true,
+      defaultChannel: 'production',
     },
   },
 }

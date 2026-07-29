@@ -14,6 +14,7 @@
     "ota:deploy": "npm run build && npx @capgo/cli@latest bundle upload"
   },
   "dependencies": {
+    "@capacitor-community/admob": "^7.2.0",
     "@capacitor/core": "^7.0.0",
     "@capacitor/ios": "^7.0.0",
     "@capgo/capacitor-updater": "^7.50.1",
