@@ -11,16 +11,16 @@ import {
 export const ADS_ENABLED = true;
 
 /**
- * Ad mode switch. While true we serve Google's TEST ads — they always fill, are
- * safe to tap, and earn nothing — so ads can be verified on-device. Flip to
- * false for the production / App Store build to serve the real units below.
+ * Ad mode switch. When true, serves Google's TEST ads (always fill, safe to tap,
+ * earn nothing). When false — as it is now, for the App Store build — it serves
+ * the real units below. To keep your own device safe while shipping real ads,
+ * add your phone to TEST_DEVICE_IDS rather than flipping this back to true.
  *
- * Before flipping to false:
- *   1. Put your own AdMob interstitial unit in REAL_INTERSTITIAL_AD_ID.ios.
- *   2. Set ADMOB_APP_ID in Codemagic's `chess` variable group to your real
- *      AdMob app id (see docs/ADS_ADMOB.md).
+ * Requires (for real ads to serve at all): ADMOB_APP_ID set in Codemagic's
+ * `chess` group, and a real interstitial unit in REAL_INTERSTITIAL_AD_ID.ios.
+ * See docs/ADS_ADMOB.md.
  */
-export const USE_TEST_ADS = true;
+export const USE_TEST_ADS = false;
 
 /** Google's public TEST interstitial unit IDs — guaranteed to return an ad. */
 const TEST_INTERSTITIAL_AD_ID = {
@@ -34,6 +34,17 @@ const REAL_INTERSTITIAL_AD_ID = {
   android: 'ca-app-pub-3940256099942544/1033173712', // TODO: replace with a real Android unit
 };
 
+/**
+ * Devices that always get TEST ads even in this real-ads build — add your own
+ * phone here so you can test without risking your AdMob account by tapping live
+ * ads. Any device NOT listed (i.e. real users) gets real ads. Grab the ID from
+ * the device console the first time an ad loads, where AdMob prints a line like:
+ *   "To get test ads on this device, set: ...testDeviceIdentifiers = @[ @"<ID>" ]"
+ */
+const TEST_DEVICE_IDS: string[] = [
+  // 'PASTE_YOUR_DEVICE_TEST_ID_HERE',
+];
+
 /** No banner unit — kept at 0 so layout padding is unchanged. */
 export const AD_BANNER_HEIGHT = 0;
 
@@ -46,7 +57,7 @@ function interstitialAdId(): string {
 export async function initializeAds(): Promise<void> {
   if (!ADS_ENABLED || !Capacitor.isNativePlatform()) return;
   try {
-    await AdMob.initialize();
+    await AdMob.initialize({ testingDevices: TEST_DEVICE_IDS });
     const { status } = await AdMob.trackingAuthorizationStatus();
     if (status === 'notDetermined') {
       await AdMob.requestTrackingAuthorization();
