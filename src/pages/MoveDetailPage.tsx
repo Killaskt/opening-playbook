@@ -162,18 +162,20 @@ export default function MoveDetailPage() {
           }
         />
 
-        {/* Intent */}
-        {node.intent && node.intent.length > 0 && (
-          <div>
-            {node.intent.map((line, i) => (
-              <BulletRow key={i} text={line} kind="idea" />
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Sections */}
       <div style={sectionGap}>
+
+        {/* Overview */}
+        {node.intent && node.intent.length > 0 && (
+          <SectionCard accentColor={colors.accent}>
+            <SectionTitle>Overview</SectionTitle>
+            {node.intent.map((line, i) => (
+              <BulletRow key={i} text={line} kind="idea" />
+            ))}
+          </SectionCard>
+        )}
 
         {/* Principle Applications */}
         {node.principleApplications && node.principleApplications.length > 0 && (
