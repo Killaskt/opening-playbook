@@ -1,14 +1,10 @@
-import { useEffect } from 'react';
-import { prepareInterstitial, AD_BANNER_HEIGHT } from '../lib/ads';
+import { AD_BANNER_HEIGHT } from '../lib/ads';
 
 export { AD_BANNER_HEIGHT };
 
-// ─── Native AdMob interstitial pre-loader ────────────────────────────────────
-// Renders nothing in the DOM. Pre-loads the first interstitial on mount so it's
-// ready to show immediately when triggered by navigation.
+// Renders nothing. The first interstitial is pre-loaded inside initializeAds()
+// once the SDK is ready (see src/lib/ads.ts) to avoid an init/prepare race, so
+// this component no longer needs to trigger the preload itself.
 export function AdBanner() {
-  useEffect(() => {
-    void prepareInterstitial();
-  }, []);
   return null;
 }

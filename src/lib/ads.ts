@@ -51,6 +51,11 @@ export async function initializeAds(): Promise<void> {
     if (status === 'notDetermined') {
       await AdMob.requestTrackingAuthorization();
     }
+    // Preload the first interstitial now that the SDK is initialized. Doing it
+    // here (rather than on a component mount) avoids a race where an early
+    // prepare runs before initialize() resolves and silently fails, which would
+    // leave no ad ready for the whole session.
+    await prepareInterstitial();
   } catch (err) {
     console.warn('[ads] initialize failed', err);
   }
