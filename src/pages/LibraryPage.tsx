@@ -145,7 +145,7 @@ export default function LibraryPage() {
                 entry={entry}
                 onPress={() => {
                   if (entry.nodeId) {
-                    navigate(`/move/${entry.nodeId}`);
+                    navigate(`/move/${entry.nodeId}`, { state: { startAtEnd: false } });
                   } else {
                     navigate('/opening-detail', {
                       state: {

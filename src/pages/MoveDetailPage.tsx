@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeContext';
 import { nodesById } from '../data/openings';
 import { catalogByNodeId } from '../data/catalog';
@@ -27,6 +27,11 @@ const PRINCIPLE_ICON_MAP: Record<string, IdeaIconKind> = {
 export default function MoveDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Default to the final position (fine for the short Moves-tab lines). Callers
+  // can opt out via navigation state — Library openings pass startAtEnd:false so
+  // their longer lines begin at the first move instead of jumping to the end.
+  const startAtEnd = (location.state as { startAtEnd?: boolean } | null)?.startAtEnd ?? true;
   const { colors, spacing, typography, isDark } = useTheme();
   const [goDeeperOpen, setGoDeeperOpen] = useState(false);
   const swipeRef = useSwipeBack<HTMLDivElement>();
@@ -151,7 +156,7 @@ export default function MoveDetailPage() {
           pgn={node.boardPgn}
           arrows={node.boardArrows}
           responses={node.responses}
-          startAtEnd
+          startAtEnd={startAtEnd}
           onResponsePress={(respId) =>
             navigate(`/move/${respId}`, { state: { startAtEnd: true } })
           }
