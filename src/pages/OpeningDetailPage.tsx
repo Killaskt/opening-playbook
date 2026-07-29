@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
 import type { CSSProperties } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../theme/ThemeContext';
 import { nodesById } from '../data/openings';
-import { showInterstitial, USE_TEST_ADS } from '../lib/ads';
 import { openingStyleColors } from '../theme/openingStyles';
 import { EcoBadge, PillChip, SectionCard, SectionTitle } from '../components/UIPrimitives';
 import { BulletRow } from '../components/BulletRow';
@@ -28,23 +26,6 @@ export default function OpeningDetailPage() {
   const swipeRef = useSwipeBack<HTMLDivElement>();
 
   const state = location.state as OpeningDetailState | null;
-
-  // Interstitial trigger based on frequency
-  useEffect(() => {
-    if (!state) return;
-    
-    // Read clicks from sessionStorage so it resets on app restart
-    const clicksStr = sessionStorage.getItem('OPENING_CLICKS') || '0';
-    const clicks = parseInt(clicksStr, 10) + 1;
-    sessionStorage.setItem('OPENING_CLICKS', clicks.toString());
-
-    // Show interstitial every Nth opening-detail view. In test mode fire more
-    // often so the (test) ad is easy to verify on-device; production stays 7.
-    const frequency = USE_TEST_ADS ? 2 : 7;
-    if (clicks > 0 && clicks % frequency === 0) {
-      void showInterstitial();
-    }
-  }, [state]);
 
   if (!state) {
     return (

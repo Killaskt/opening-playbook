@@ -207,7 +207,7 @@ export default function MoveDetailPage() {
         )}
 
         {/* At a Glance */}
-        {(node.prosAndCons || node.threats?.length || node.traps?.length) && (
+        {!!(node.prosAndCons || node.threats?.length || node.traps?.length) && (
           <GlanceSection
             pros={node.prosAndCons?.pros}
             cons={node.prosAndCons?.cons}
@@ -217,7 +217,7 @@ export default function MoveDetailPage() {
         )}
 
         {/* Go Deeper */}
-        {(node.lines?.length || node.famousGames?.length || node.tree?.length) && (
+        {!!(node.lines?.length || node.famousGames?.length || node.tree?.length) && (
           <div>
             <div style={goDeeperHeaderStyle} onClick={() => setGoDeeperOpen(!goDeeperOpen)}>
               <span style={{ fontSize: typography.titleSM.fontSize, fontWeight: '600', color: colors.text }}>
@@ -240,7 +240,7 @@ export default function MoveDetailPage() {
                 ))}
 
                 {/* Famous Players & Games */}
-                {(node.famousPlayers?.length || node.famousGames?.length) && (
+                {!!(node.famousPlayers?.length || node.famousGames?.length) && (
                   <SectionCard accentColor={colors.orange}>
                     <SectionTitle>Hall of Fame</SectionTitle>
                     {node.famousPlayers && (
