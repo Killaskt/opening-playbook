@@ -195,8 +195,10 @@ export function AnimatedChessBoard({
   // ── Build arrow list: static arrows prop + response move arrows ───────────
   const allArrows = useMemo<ArrowSpec[]>(() => {
     const list: ArrowSpec[] = [];
-    // Prop-supplied arrows (for example lines)
-    if (arrows) {
+    // Prop-supplied annotation arrows — only once the board is at the position
+    // they annotate (the end of the line), so they don't show over the opening
+    // position when a line starts at move one.
+    if (arrows && isAtEnd) {
       for (const a of arrows) {
         list.push({ from: a.from, to: a.to, color: a.color ?? colors.arrowAnnotation });
       }
