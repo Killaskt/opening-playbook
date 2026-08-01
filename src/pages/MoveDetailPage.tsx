@@ -123,9 +123,32 @@ export default function MoveDetailPage() {
     marginRight: spacing.lg,
   };
 
+  const stickyBoardStyle: CSSProperties = {
+    position: 'sticky',
+    // Pin just below the sticky DetailHeader (safe-area inset + header height).
+    top: 'calc(env(safe-area-inset-top, 0px) + 52px)',
+    zIndex: 10,
+    backgroundColor: colors.bg,
+    padding: `${spacing.md}px ${spacing.lg}px`,
+    borderBottom: `1px solid ${colors.borderLight}`,
+  };
+
   return (
     <div ref={swipeRef} style={pageStyle}>
       <DetailHeader title={node.name} />
+
+      {/* Sticky reference board — stays visible while the notes scroll below */}
+      <div style={stickyBoardStyle}>
+        <AnimatedChessBoard
+          pgn={node.boardPgn}
+          arrows={node.boardArrows}
+          responses={node.responses}
+          startAtEnd={startAtEnd}
+          onResponsePress={(respId) =>
+            navigate(`/move/${respId}`, { state: { startAtEnd: true } })
+          }
+        />
+      </div>
 
       {/* Hero */}
       <div style={heroStyle}>
@@ -150,17 +173,6 @@ export default function MoveDetailPage() {
             })}
           </div>
         )}
-
-        {/* Board */}
-        <AnimatedChessBoard
-          pgn={node.boardPgn}
-          arrows={node.boardArrows}
-          responses={node.responses}
-          startAtEnd={startAtEnd}
-          onResponsePress={(respId) =>
-            navigate(`/move/${respId}`, { state: { startAtEnd: true } })
-          }
-        />
 
         {/* Intent */}
         {node.intent && node.intent.length > 0 && (
